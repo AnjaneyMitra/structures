@@ -6,9 +6,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from ..db import models, base
 from sqlalchemy.orm import Session
+import os
 
-# Secret key for JWT (in production, use env var)
-SECRET_KEY = "supersecretkey"
+# Get secret key from environment variable
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")  # fallback for development
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 
