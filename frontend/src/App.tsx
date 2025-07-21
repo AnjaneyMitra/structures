@@ -1,15 +1,11 @@
 import React from 'react';
-import { Box, Container, Paper, Typography, Stack, Button, Chip, Grid } from '@mui/material';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Box, Container, Paper, Typography, Stack, Button, Grid } from '@mui/material';
+import { Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import { Sidebar } from './components/Sidebar';
-import LoginIcon from '@mui/icons-material/Login';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import CodeIcon from '@mui/icons-material/Code';
-import GroupWorkIcon from '@mui/icons-material/GroupWork';
-import SpeedIcon from '@mui/icons-material/Speed';
+
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import RoomsPage from './pages/RoomsPage';
@@ -21,14 +17,33 @@ function Landing() {
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#FFFFFF',
+        bgcolor: 'background.default',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         p: 3,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: (theme) => theme.palette.mode === 'dark'
+            ? `
+              radial-gradient(circle at 30% 70%, rgba(129, 140, 248, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(244, 114, 182, 0.1) 0%, transparent 50%)
+            `
+            : `
+              radial-gradient(circle at 30% 70%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.05) 0%, transparent 50%)
+            `,
+          pointerEvents: 'none',
+        },
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={8} alignItems="center">
           {/* Left Content */}
           <Grid item xs={12} md={6}>
@@ -38,7 +53,7 @@ function Landing() {
                 mb: 3, 
                 fontSize: { xs: '2.5rem', md: '3.5rem' }, 
                 fontWeight: 700,
-                color: '#37352F',
+                color: 'text.primary',
                 lineHeight: 1.2,
               }}
             >
@@ -49,7 +64,7 @@ function Landing() {
               variant="h6" 
               sx={{ 
                 mb: 4, 
-                color: '#787774', 
+                color: 'text.secondary', 
                 fontWeight: 400,
                 lineHeight: 1.6,
               }}
@@ -68,13 +83,7 @@ function Landing() {
                 to="/login"
                 variant="contained"
                 size="large"
-                sx={{ 
-                  minWidth: 180,
-                  backgroundColor: '#00D084',
-                  '&:hover': {
-                    backgroundColor: '#00A86B',
-                  }
-                }}
+                sx={{ minWidth: 180 }}
               >
                 Start Coding Together
               </Button>
@@ -83,21 +92,13 @@ function Landing() {
                 to="/register"
                 variant="outlined"
                 size="large"
-                sx={{ 
-                  minWidth: 160,
-                  borderColor: '#EBEAE6',
-                  color: '#37352F',
-                  '&:hover': {
-                    borderColor: '#D3D1CB',
-                    backgroundColor: '#F7F6F3',
-                  }
-                }}
+                sx={{ minWidth: 160 }}
               >
                 Browse Problems →
               </Button>
             </Stack>
 
-            <Typography variant="body2" color="#787774" sx={{ fontSize: '0.875rem' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
               What's new: Just shipped v0.1.0 ✨
             </Typography>
           </Grid>
@@ -109,15 +110,17 @@ function Landing() {
                 position: 'relative',
                 borderRadius: 4,
                 overflow: 'hidden',
-                background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
+                background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
                 p: 0.5,
-                boxShadow: '0 20px 40px rgba(0, 208, 132, 0.2)',
+                boxShadow: (theme) => theme.palette.mode === 'dark'
+                  ? '0 20px 40px rgba(79, 70, 229, 0.3)'
+                  : '0 20px 40px rgba(79, 70, 229, 0.2)',
               }}
             >
               <Paper
                 sx={{
                   p: 4,
-                  backgroundColor: '#1a1a1a',
+                  backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#0F172A' : '#1a1a1a',
                   borderRadius: 3,
                   border: 'none',
                   position: 'relative',
@@ -218,7 +221,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           flexGrow: 1, 
           ml: '280px', 
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #FAFBFC 0%, #F8FAFC 100%)',
+          bgcolor: 'background.default',
           position: 'relative',
           '&::before': {
             content: '""',
@@ -227,11 +230,17 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             left: 0,
             right: 0,
             bottom: 0,
-            background: `
-              radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%)
-            `,
+            background: (theme) => theme.palette.mode === 'dark'
+              ? `
+                radial-gradient(circle at 25% 25%, rgba(129, 140, 248, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.05) 0%, transparent 50%)
+              `
+              : `
+                radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%)
+              `,
             pointerEvents: 'none',
           },
           '&::after': {
@@ -241,10 +250,15 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             left: 0,
             right: 0,
             bottom: 0,
-            background: `
-              linear-gradient(45deg, transparent 49%, rgba(79, 70, 229, 0.01) 50%, transparent 51%),
-              linear-gradient(-45deg, transparent 49%, rgba(236, 72, 153, 0.01) 50%, transparent 51%)
-            `,
+            background: (theme) => theme.palette.mode === 'dark'
+              ? `
+                linear-gradient(45deg, transparent 49%, rgba(129, 140, 248, 0.02) 50%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, rgba(244, 114, 182, 0.02) 50%, transparent 51%)
+              `
+              : `
+                linear-gradient(45deg, transparent 49%, rgba(79, 70, 229, 0.01) 50%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, rgba(236, 72, 153, 0.01) 50%, transparent 51%)
+              `,
             backgroundSize: '60px 60px',
             pointerEvents: 'none',
             opacity: 0.3,
@@ -260,7 +274,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-  const location = useLocation();
+
   // You can use location here for nav highlighting, etc.
   return (
     <Routes>

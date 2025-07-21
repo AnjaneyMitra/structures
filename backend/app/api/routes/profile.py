@@ -25,7 +25,13 @@ def get_user_submissions(user=Depends(deps.get_current_user), db: Session = Depe
             "runtime": sub.runtime,
             "submission_time": sub.submission_time,
             "language": sub.language,
-            "code": sub.code
+            "code": sub.code,
+            # New fields for detailed results
+            "overall_status": sub.overall_status,
+            "test_case_results": sub.test_case_results,
+            "error_message": sub.error_message,
+            "execution_time": sub.execution_time,
+            "memory_usage": sub.memory_usage
         })
     return result
 

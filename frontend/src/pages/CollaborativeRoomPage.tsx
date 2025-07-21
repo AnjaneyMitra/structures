@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Box, Typography, Paper, Stack, Chip, CircularProgress, Alert, MenuItem, Button } from '@mui/material';
 import MonacoEditor from '@monaco-editor/react';
 import io from 'socket.io-client';
-import { Socket } from 'socket.io-client';
+
 import SendIcon from '@mui/icons-material/Send';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -50,7 +50,7 @@ const CollaborativeRoomPage: React.FC = () => {
   const [language, setLanguage] = useState(languageOptions[0].value);
   const [connected, setConnected] = useState(false);
   const [users, setUsers] = useState<string[]>([]);
-  const [error, setError] = useState('');
+  const [error] = useState('');
   const socketRef = useRef<ReturnType<typeof io> | null>(null);
   const codeRef = useRef(code);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -127,7 +127,7 @@ const CollaborativeRoomPage: React.FC = () => {
       socket.emit('leave_room', { room: roomCode });
       socket.disconnect();
     };
-  }, [roomCode]);
+  }, [roomCode, language, username]);
 
   useEffect(() => {
     if (chatBoxRef.current) {

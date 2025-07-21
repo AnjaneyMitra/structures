@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid, Alert, Button, Chip, Stack, TextField, InputAdornment, Container, Paper } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, Alert, Button, Chip, Stack, TextField, InputAdornment, Container } from '@mui/material';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import ListAltIcon from '@mui/icons-material/ListAlt';
+
 import BoltIcon from '@mui/icons-material/Bolt';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SearchIcon from '@mui/icons-material/Search';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import FilterListIcon from '@mui/icons-material/FilterList';
+
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { AnimatedBackground } from '../components/BackgroundEffects';
+
 
 interface Problem {
   id: number;

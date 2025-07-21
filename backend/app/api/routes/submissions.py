@@ -37,9 +37,28 @@ def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Session = 
             'output': tc.output
         })
     
-    # Execute code against test cases
-    execution_results = executor.run_all_test_cases(submission.code, test_case_data)
+    # Determine function name (default to 'solution', or get from problem definition if available)
+    function_name = getattr(problem, 'function_name', None) or getattr(submission, 'function_name', None) or 'solution'
     
+    # Execute code against test cases using dynamic function execution
+    execution_results = executor.run_all_test_cases(submission.code, test_case_data, function_name=function_name)
+
+    # Determine if all test cases failed due to error (collect errors)
+    all_failed = all(not tc['passed'] for tc in execution_results['test_case_results'])
+    error_messages = [tc['error'] for tc in execution_results['test_case_results'] if tc['error']]
+    top_error_message = None
+    if all_failed and error_messages:
+        # If all failed and there are error messages, show the first one
+        top_error_message = error_messages[0]
+
+    # Collect memory usage if available (use max across test cases)
+    memory_usages = [tc.get('memory_usage', 0) for tc in execution_results['test_case_results'] if tc.get('memory_usage') is not None]
+    max_memory_usage = max(memory_usages) if memory_usages else 0
+
+    # Add summary of passed/failed test cases
+    passed_cases = [i for i, tc in enumerate(execution_results['test_case_results']) if tc['passed']]
+    failed_cases = [i for i, tc in enumerate(execution_results['test_case_results']) if not tc['passed']]
+
     # Create submission result
     if getattr(submission, 'sample_only', False):
         # Return only the sample run result, no DB write
@@ -54,9 +73,13 @@ def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Session = 
             submission_time=datetime.datetime.utcnow(),
             test_case_results=execution_results['test_case_results'],
             execution_time=execution_results['total_execution_time'],
-            memory_usage=0,  # Will be calculated if needed
+            memory_usage=max_memory_usage,
             overall_status=execution_results['overall_status'],
-            error_message=None
+            error_message=top_error_message,
+            # Add summary fields for frontend clarity
+            # (If you want to add these to the schema, update schemas.py accordingly)
+            # passed_cases=passed_cases,
+            # failed_cases=failed_cases
         )
     else:
         # Create new submission in database
@@ -69,15 +92,13 @@ def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Session = 
             runtime=str(execution_results['total_execution_time']),  # Legacy field
             test_case_results=execution_results['test_case_results'],
             execution_time=execution_results['total_execution_time'],
-            memory_usage=0,  # Will be calculated if needed
+            memory_usage=max_memory_usage,
             overall_status=execution_results['overall_status'],
-            error_message=None
+            error_message=top_error_message
         )
-        
         db.add(new_submission)
         db.commit()
         db.refresh(new_submission)
-        
         return schemas.SubmissionOut(
             id=new_submission.id,
             user_id=new_submission.user_id,

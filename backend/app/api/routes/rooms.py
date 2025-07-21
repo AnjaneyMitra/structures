@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session, joinedload
 from ...db import models, schemas
 from ...api import deps
@@ -22,7 +22,10 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(deps.get_db), us
     return new_room
 
 @router.post("/join/", response_model=schemas.RoomOut)
-def join_room(code: str, db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+def join_room(data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+    code = data.get("code")
+    if not code:
+        raise HTTPException(status_code=422, detail="Room code is required")
     room = db.query(models.Room).options(joinedload(models.Room.participants)).filter(models.Room.code == code).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")

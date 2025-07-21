@@ -5,14 +5,11 @@ import { useParams } from 'react-router-dom';
 import BoltIcon from '@mui/icons-material/Bolt';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import CodeIcon from '@mui/icons-material/Code';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { Monaco } from '@monaco-editor/react';
 import MonacoEditor from '@monaco-editor/react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import TimerIcon from '@mui/icons-material/Timer';
-import MemoryIcon from '@mui/icons-material/Memory';
 
 interface TestCase {
   id: number;

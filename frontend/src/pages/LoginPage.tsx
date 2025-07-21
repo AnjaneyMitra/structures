@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button, Container, Paper, TextField, Typography, Stack, Alert, InputAdornment, Divider } from '@mui/material';
 import axios from 'axios';
-import LoginIcon from '@mui/icons-material/Login';
+
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
 import GoogleIcon from '@mui/icons-material/Google';
-import { AnimatedBackground } from '../components/BackgroundEffects';
+
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -59,7 +59,7 @@ const LoginPage: React.FC = () => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(251, 251, 250, 1) 100%)',
+        bgcolor: 'background.default',
         position: 'relative',
         '&::before': {
           content: '""',
@@ -68,7 +68,9 @@ const LoginPage: React.FC = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'radial-gradient(circle at 30% 70%, rgba(0, 208, 132, 0.05) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(107, 115, 255, 0.05) 0%, transparent 50%)',
+          background: (theme) => theme.palette.mode === 'dark'
+            ? 'radial-gradient(circle at 30% 70%, rgba(129, 140, 248, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(244, 114, 182, 0.08) 0%, transparent 50%)'
+            : 'radial-gradient(circle at 30% 70%, rgba(79, 70, 229, 0.05) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.05) 0%, transparent 50%)',
           pointerEvents: 'none',
         },
       }}
@@ -80,10 +82,6 @@ const LoginPage: React.FC = () => {
             p: { xs: 4, md: 6 }, 
             borderRadius: 4, 
             textAlign: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            border: '1px solid rgba(235, 234, 230, 0.6)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 20px 40px rgba(55, 53, 47, 0.1)',
           }}
         >
           <Typography 
@@ -91,12 +89,12 @@ const LoginPage: React.FC = () => {
             sx={{ 
               mb: 1, 
               fontWeight: 600, 
-              color: '#37352F',
+              color: 'text.primary',
             }}
           >
             Welcome Back
           </Typography>
-          <Typography variant="body1" color="#787774" sx={{ mb: 4 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
             Sign in to continue coding together
           </Typography>
           
@@ -152,10 +150,6 @@ const LoginPage: React.FC = () => {
                 sx={{ 
                   fontWeight: 500, 
                   py: 1.5,
-                  backgroundColor: '#00D084',
-                  '&:hover': {
-                    backgroundColor: '#00A86B',
-                  }
                 }}
                 fullWidth
               >
@@ -163,7 +157,7 @@ const LoginPage: React.FC = () => {
               </Button>
               
               <Divider sx={{ my: 3 }}>
-                <Typography variant="body2" color="#787774">
+                <Typography variant="body2" color="text.secondary">
                   or
                 </Typography>
               </Divider>
@@ -175,12 +169,6 @@ const LoginPage: React.FC = () => {
                 sx={{ 
                   fontWeight: 500, 
                   py: 1.5,
-                  borderColor: '#EBEAE6',
-                  color: '#37352F',
-                  '&:hover': {
-                    borderColor: '#D3D1CB',
-                    backgroundColor: '#F7F6F3',
-                  }
                 }}
                 fullWidth
               >

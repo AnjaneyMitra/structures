@@ -20,7 +20,7 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
         contrastText: '#FFFFFF',
       },
       background: {
-        default: isLight ? '#FAFBFC' : '#0F0F23',
+        default: isLight ? '#FAFBFC' : '#0A0A0F',
         paper: isLight ? '#FFFFFF' : '#1A1A2E',
       },
       text: {
@@ -232,31 +232,33 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
         styleOverrides: {
           root: {
             borderRadius: 20,
-            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(26, 26, 46, 0.8)',
-            border: isLight ? '1px solid rgba(226, 232, 240, 0.5)' : '1px solid rgba(51, 65, 85, 0.5)',
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(26, 26, 46, 0.9)',
+            border: isLight 
+              ? '1px solid rgba(226, 232, 240, 0.5)' 
+              : '1px solid rgba(71, 85, 105, 0.3)',
             boxShadow: 'none',
             backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)', // Safari support
+            WebkitBackdropFilter: 'blur(20px)',
           },
           elevation1: {
             boxShadow: isLight
               ? '0 1px 3px rgba(30, 41, 59, 0.1), 0 1px 2px rgba(30, 41, 59, 0.06)'
-              : '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
+              : '0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3)',
           },
           elevation2: {
             boxShadow: isLight
               ? '0 4px 6px rgba(30, 41, 59, 0.1), 0 2px 4px rgba(30, 41, 59, 0.06)'
-              : '0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)',
+              : '0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)',
           },
           elevation3: {
             boxShadow: isLight
               ? '0 10px 15px rgba(30, 41, 59, 0.1), 0 4px 6px rgba(30, 41, 59, 0.05)'
-              : '0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3)',
+              : '0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4)',
           },
           elevation4: {
             boxShadow: isLight
               ? '0 20px 25px rgba(30, 41, 59, 0.15), 0 10px 10px rgba(30, 41, 59, 0.04)'
-              : '0 20px 25px rgba(0, 0, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.3)',
+              : '0 20px 25px rgba(0, 0, 0, 0.6), 0 10px 10px rgba(0, 0, 0, 0.4)',
           },
         },
       },
@@ -264,8 +266,10 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
         styleOverrides: {
           root: {
             borderRadius: 20,
-            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(26, 26, 46, 0.7)',
-            border: isLight ? '1px solid rgba(226, 232, 240, 0.4)' : '1px solid rgba(51, 65, 85, 0.4)',
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(30, 41, 59, 0.8)',
+            border: isLight 
+              ? '1px solid rgba(226, 232, 240, 0.4)' 
+              : '1px solid rgba(71, 85, 105, 0.4)',
             boxShadow: 'none',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -281,16 +285,16 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
               height: '1px',
               background: isLight 
                 ? 'linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.3), transparent)'
-                : 'linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), transparent)',
+                : 'linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.5), transparent)',
               opacity: 0,
               transition: 'opacity 0.3s ease',
             },
             '&:hover': {
-              backgroundColor: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(26, 26, 46, 0.9)',
-              borderColor: isLight ? 'rgba(79, 70, 229, 0.2)' : 'rgba(99, 102, 241, 0.3)',
+              backgroundColor: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(30, 41, 59, 0.95)',
+              borderColor: isLight ? 'rgba(79, 70, 229, 0.2)' : 'rgba(129, 140, 248, 0.4)',
               boxShadow: isLight
                 ? '0 20px 40px rgba(79, 70, 229, 0.1), 0 8px 16px rgba(30, 41, 59, 0.08)'
-                : '0 20px 40px rgba(79, 70, 229, 0.2), 0 8px 16px rgba(0, 0, 0, 0.3)',
+                : '0 20px 40px rgba(79, 70, 229, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4)',
               transform: 'translateY(-8px) scale(1.02)',
               '&::before': {
                 opacity: 1,
@@ -304,25 +308,37 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
           root: {
             '& .MuiOutlinedInput-root': {
               borderRadius: 16,
-              backgroundColor: isLight ? 'rgba(248, 250, 252, 0.6)' : 'rgba(30, 41, 59, 0.6)',
-              border: isLight ? '1px solid rgba(226, 232, 240, 0.5)' : '1px solid rgba(71, 85, 105, 0.5)',
+              backgroundColor: isLight ? 'rgba(248, 250, 252, 0.6)' : 'rgba(51, 65, 85, 0.6)',
+              border: isLight 
+                ? '1px solid rgba(226, 232, 240, 0.5)' 
+                : '1px solid rgba(71, 85, 105, 0.5)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
-              minHeight: 44, // Touch-friendly
+              minHeight: 44,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              color: isLight ? '#1E293B' : '#F1F5F9',
               '&:hover': {
-                backgroundColor: isLight ? 'rgba(241, 245, 249, 0.8)' : 'rgba(51, 65, 85, 0.8)',
-                borderColor: isLight ? 'rgba(79, 70, 229, 0.3)' : 'rgba(99, 102, 241, 0.4)',
+                backgroundColor: isLight ? 'rgba(241, 245, 249, 0.8)' : 'rgba(71, 85, 105, 0.8)',
+                borderColor: isLight ? 'rgba(79, 70, 229, 0.3)' : 'rgba(129, 140, 248, 0.4)',
                 transform: 'translateY(-1px)',
               },
               '&.Mui-focused': {
-                backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(26, 26, 46, 0.95)',
-                borderColor: '#4F46E5',
-                boxShadow: '0 0 0 3px rgba(79, 70, 229, 0.15)',
+                backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)',
+                borderColor: isLight ? '#4F46E5' : '#818CF8',
+                boxShadow: isLight 
+                  ? '0 0 0 3px rgba(79, 70, 229, 0.15)'
+                  : '0 0 0 3px rgba(129, 140, 248, 0.2)',
                 transform: 'translateY(-2px)',
               },
               '& fieldset': {
                 border: 'none',
+              },
+              '& input': {
+                color: isLight ? '#1E293B' : '#F1F5F9',
+              },
+              '& input::placeholder': {
+                color: isLight ? '#64748B' : '#94A3B8',
+                opacity: 1,
               },
             },
           },

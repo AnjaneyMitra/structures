@@ -35,7 +35,7 @@ const ProfilePage: React.FC = () => {
   const [newUsername, setNewUsername] = useState('');
   const [updateError, setUpdateError] = useState('');
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchData = async () => {

@@ -9,10 +9,10 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const useTheme = () => {
+export const useThemeMode = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeContextProvider');
+    throw new Error('useThemeMode must be used within a ThemeContextProvider');
   }
   return context;
 };
@@ -29,6 +29,8 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+    // Update data-theme attribute for CSS variables
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
   const toggleTheme = () => {

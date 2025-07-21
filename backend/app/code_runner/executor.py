@@ -103,6 +103,123 @@ class CodeExecutor:
             except:
                 pass
     
+    def execute_python_function(self, user_code: str, function_name: str, input_args: str) -> Dict[str, Any]:
+        """
+        Execute a user-defined function with given input arguments.
+        Args:
+            user_code: The user's function code as a string.
+            function_name: The name of the function to call.
+            input_args: The arguments for the function as a string (comma/newline separated).
+        Returns:
+            Dict containing execution results (output, error, etc.)
+        """
+        start_time = time.time()
+        tmp_file_path = None
+        try:
+            # Prepare the wrapper code
+            wrapper_code = f"""
+import sys
+import json
+{user_code}
+
+def parse_input(input_str):
+    # Try to parse as JSON, else split by lines/commas
+    try:
+        return json.loads(input_str)
+    except:
+        parts = [x.strip() for x in input_str.strip().replace('\r', '').replace('\n', ',').split(',') if x.strip()]
+        # Try to convert to int/float if possible
+        def try_num(x):
+            try:
+                return int(x)
+            except:
+                try:
+                    return float(x)
+                except:
+                    return x
+        return [try_num(x) for x in parts]
+
+if __name__ == "__main__":
+    input_str = sys.stdin.read()
+    args = parse_input(input_str)
+    if not isinstance(args, list):
+        args = [args]
+    try:
+        result = {function_name}(*args)
+        print(json.dumps(result))
+    except Exception as e:
+        print(f"__EXCEPTION__{{str(e)}}", file=sys.stderr)
+        sys.exit(1)
+"""
+            # Write the wrapper code to a temp file
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp_file:
+                tmp_file.write(wrapper_code)
+                tmp_file_path = tmp_file.name
+
+            def limit_memory():
+                resource.setrlimit(resource.RLIMIT_AS, (self.memory_limit_mb * 1024 * 1024, -1))
+
+            use_preexec = platform.system() == 'Linux'
+            process = subprocess.Popen(
+                ['python3', tmp_file_path],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                preexec_fn=limit_memory if use_preexec else None
+            )
+            try:
+                stdout, stderr = process.communicate(
+                    input=input_args,
+                    timeout=self.timeout
+                )
+                execution_time = time.time() - start_time
+                if process.returncode == 0:
+                    return {
+                        'success': True,
+                        'output': stdout.strip(),
+                        'error': None,
+                        'execution_time': execution_time,
+                        'memory_usage': self._estimate_memory_usage(process.pid)
+                    }
+                else:
+                    # Check for our custom exception marker
+                    if stderr and '__EXCEPTION__' in stderr:
+                        error_msg = stderr.strip().split('__EXCEPTION__')[-1]
+                    else:
+                        error_msg = stderr.strip() or 'Runtime error occurred'
+                    return {
+                        'success': False,
+                        'output': None,
+                        'error': error_msg,
+                        'execution_time': execution_time,
+                        'memory_usage': self._estimate_memory_usage(process.pid)
+                    }
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+                return {
+                    'success': False,
+                    'output': None,
+                    'error': f'Execution timed out after {self.timeout} seconds',
+                    'execution_time': self.timeout,
+                    'memory_usage': 0
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'output': None,
+                'error': f'Execution error: {str(e)}',
+                'execution_time': time.time() - start_time,
+                'memory_usage': 0
+            }
+        finally:
+            try:
+                if tmp_file_path:
+                    os.unlink(tmp_file_path)
+            except:
+                pass
+    
     def _estimate_memory_usage(self, pid: int) -> float:
         """Estimate memory usage of the process in MB"""
         try:
@@ -155,20 +272,18 @@ class CodeExecutor:
         
         return False
     
-    def run_test_case(self, code: str, test_input: str, expected_output: str) -> Dict[str, Any]:
+    def run_test_case(self, code: str, test_input: str, expected_output: str, function_name: str = "solution") -> Dict[str, Any]:
         """
         Run a single test case and return the result.
-        
         Args:
             code: Python code to execute
             test_input: Input for the test case
             expected_output: Expected output
-            
+            function_name: Name of the function to call in user code
         Returns:
             Dict containing test case result
         """
-        execution_result = self.execute_python_code(code, test_input)
-        
+        execution_result = self.execute_python_function(code, function_name, test_input)
         if execution_result['success']:
             passed = self.validate_output(execution_result['output'], expected_output)
             return {
@@ -188,33 +303,31 @@ class CodeExecutor:
                 'execution_time': execution_result['execution_time'],
                 'error': execution_result['error']
             }
-    
-    def run_all_test_cases(self, code: str, test_cases: list) -> Dict[str, Any]:
+
+    def run_all_test_cases(self, code: str, test_cases: list, function_name: str = "solution") -> Dict[str, Any]:
         """
         Run code against all test cases and return comprehensive results.
-        
         Args:
             code: Python code to execute
             test_cases: List of test cases with input and output
-            
+            function_name: Name of the function to call in user code
         Returns:
             Dict containing all test case results
         """
         results = []
         total_time = 0
         passed_count = 0
-        
         for test_case in test_cases:
             result = self.run_test_case(
-                code, 
-                test_case['input'], 
-                test_case['output']
+                code,
+                test_case['input'],
+                test_case['output'],
+                function_name
             )
             results.append(result)
             total_time += result['execution_time']
             if result['passed']:
                 passed_count += 1
-        
         # Determine overall status
         if passed_count == len(test_cases):
             overall_status = 'pass'
@@ -222,7 +335,6 @@ class CodeExecutor:
             overall_status = 'fail'
         else:
             overall_status = 'partial'
-        
         return {
             'test_case_results': results,
             'total_test_cases': len(test_cases),
