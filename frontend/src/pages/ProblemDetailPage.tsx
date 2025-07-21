@@ -11,6 +11,8 @@ import { Monaco } from '@monaco-editor/react';
 import MonacoEditor from '@monaco-editor/react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import TimerIcon from '@mui/icons-material/Timer';
+import MemoryIcon from '@mui/icons-material/Memory';
 
 interface TestCase {
   id: number;
@@ -28,6 +30,24 @@ interface Problem {
   test_cases: TestCase[];
 }
 
+interface TestCaseResult {
+  input: string;
+  expected: string;
+  output: string;
+  passed: boolean;
+  execution_time: number;
+  error?: string;
+}
+
+interface SubmissionResult {
+  test_case_results: TestCaseResult[];
+  total_test_cases: number;
+  passed_test_cases: number;
+  overall_status: string;
+  total_execution_time: number;
+  average_execution_time: number;
+}
+
 const difficultyColors: Record<string, any> = {
   Easy: { color: 'success', icon: <BoltIcon fontSize="small" /> },
   Medium: { color: 'warning', icon: <AssignmentTurnedInIcon fontSize="small" /> },
@@ -35,8 +55,8 @@ const difficultyColors: Record<string, any> = {
 };
 
 const languageOptions = [
-  { label: 'Python', value: 'python', monaco: 'python', defaultCode: '# Write your solution here\n' },
-  { label: 'JavaScript', value: 'javascript', monaco: 'javascript', defaultCode: '// Write your solution here\n' },
+  { label: 'Python', value: 'python', monaco: 'python', defaultCode: '# Write your solution here\n\ndef solution():\n    # Your code here\n    pass\n\n# Read input and call solution\nif __name__ == "__main__":\n    result = solution()\n    print(result)\n' },
+  { label: 'JavaScript', value: 'javascript', monaco: 'javascript', defaultCode: '// Write your solution here\n\nfunction solution() {\n    // Your code here\n}\n\n// Read input and call solution\nconst result = solution();\nconsole.log(result);\n' },
 ];
 
 const ProblemDetailPage: React.FC = () => {
@@ -47,9 +67,9 @@ const ProblemDetailPage: React.FC = () => {
   const [language, setLanguage] = useState(languageOptions[0].value);
   const [code, setCode] = useState(languageOptions[0].defaultCode);
   const [submitting, setSubmitting] = useState(false);
-  const [results, setResults] = useState<any[] | null>(null);
+  const [results, setResults] = useState<SubmissionResult | null>(null);
   const [submitError, setSubmitError] = useState('');
-  const [runResult, setRunResult] = useState<any | null>(null);
+  const [runResult, setRunResult] = useState<TestCaseResult | null>(null);
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
@@ -91,8 +111,7 @@ const ProblemDetailPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Show per-test-case results if available
-      setResults(res.data.test_case_results || []);
+      setResults(res.data);
     } catch (err: any) {
       setSubmitError(err.response?.data?.detail || 'Submission failed');
     } finally {
@@ -107,19 +126,20 @@ const ProblemDetailPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'https://structures-production.up.railway.app/api/submissions/',
+        'https://structures-production.up.railway.app/api/submissions/run',
         {
           problem_id: problem?.id,
           code,
           language,
-          sample_only: true,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Only show the first test case result (sample)
-      setRunResult(res.data.test_case_results ? res.data.test_case_results[0] : null);
+      // Get the first test case result
+      if (res.data.test_case_results && res.data.test_case_results.length > 0) {
+        setRunResult(res.data.test_case_results[0]);
+      }
     } catch (err: any) {
       setSubmitError(err.response?.data?.detail || 'Run failed');
     } finally {
@@ -134,7 +154,7 @@ const ProblemDetailPage: React.FC = () => {
   const diff = difficultyColors[problem.difficulty] || { color: 'default', icon: null };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 900, mx: 'auto' }}>
+    <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
       <Paper elevation={3} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, background: '#fff', boxShadow: '0 2px 12px 0 rgba(108,99,255,0.07)' }}>
         <Stack direction="row" spacing={2} alignItems="center" mb={2}>
           <Typography variant="h4" fontWeight={700} color="primary">{problem.title}</Typography>
@@ -150,11 +170,11 @@ const ProblemDetailPage: React.FC = () => {
             <Paper variant="outlined" sx={{ p: 2, mb: 2, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', background: '#f7f7fa', fontSize: '1.05rem' }}>{problem.sample_output}</Paper>
           </Box>
           <Box flex={1}>
-            <Typography variant="subtitle1" fontWeight={600} mb={1}>Test Cases</Typography>
+            <Typography variant="subtitle1" fontWeight={600} mb={1}>Test Cases ({problem.test_cases.length})</Typography>
             <Stack spacing={1}>
-              {problem.test_cases.map(tc => (
+              {problem.test_cases.map((tc, index) => (
                 <Paper key={tc.id} variant="outlined" sx={{ p: 2, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', background: '#f7f7fa', display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <CodeIcon color="primary" sx={{ mr: 1 }} />
+                  <Chip label={`#${index + 1}`} size="small" color="primary" />
                   <Box>
                     <b>Input:</b> {tc.input}<br />
                     <b>Output:</b> {tc.output}
@@ -217,64 +237,81 @@ const ProblemDetailPage: React.FC = () => {
             {submitting ? 'Submitting...' : 'Submit Solution'}
           </Button>
         </Box>
+        
+        {/* Sample Run Result */}
         {runResult && (
           <Box mt={3}>
             <Typography variant="subtitle1" fontWeight={700} mb={1}>Sample Run Result</Typography>
             <Paper variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: runResult.passed ? '#e7fbe7' : '#fff0f0', borderLeft: runResult.passed ? '6px solid #4caf50' : '6px solid #f44336' }}>
               {runResult.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
-              <Box>
+              <Box flex={1}>
                 <Typography variant="subtitle2" color={runResult.passed ? 'success.main' : 'error.main'} fontWeight={700}>
                   {runResult.passed ? 'Passed' : 'Failed'}
                 </Typography>
-                <Typography variant="body2">Input: <code>{runResult.input}</code></Typography>
-                <Typography variant="body2">Expected: <code>{runResult.expected}</code></Typography>
-                <Typography variant="body2">Output: <code>{runResult.output}</code></Typography>
-                <Typography variant="body2">Runtime: {runResult.runtime}</Typography>
-                {runResult.error_type && (
-                  <Stack direction="row" spacing={1} alignItems="center" mt={1}>
-                    <Chip label={runResult.error_type} color="error" size="small" />
-                    <details style={{ marginLeft: 8 }}>
-                      <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#f44336' }}>Show Error Details</summary>
-                      <Typography variant="body2" color="error" sx={{ mt: 1 }}>{runResult.runtime}</Typography>
-                    </details>
-                  </Stack>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Input: {runResult.input}</Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Expected: {runResult.expected}</Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Output: {runResult.output}</Typography>
+                <Stack direction="row" spacing={2} alignItems="center" mt={1}>
+                  <Chip icon={<TimerIcon />} label={`${runResult.execution_time.toFixed(3)}s`} size="small" />
+                </Stack>
+                {runResult.error && (
+                  <Alert severity="error" sx={{ mt: 1 }}>{runResult.error}</Alert>
                 )}
               </Box>
             </Paper>
           </Box>
         )}
-        {submitError && (
-          <Alert severity="error" sx={{ mt: 3 }}>{submitError}</Alert>
-        )}
+        
+        {/* Submission Results */}
         {results && (
           <Box mt={4}>
             <Typography variant="h6" fontWeight={700} mb={2}>Submission Results</Typography>
+            
+            {/* Overall Results Summary */}
+            <Paper variant="outlined" sx={{ p: 3, mb: 3, background: results.overall_status === 'pass' ? '#e7fbe7' : results.overall_status === 'partial' ? '#fff3e0' : '#fff0f0' }}>
+              <Stack direction="row" spacing={3} alignItems="center" mb={2}>
+                <Chip 
+                  label={results.overall_status.toUpperCase()} 
+                  color={results.overall_status === 'pass' ? 'success' : results.overall_status === 'partial' ? 'warning' : 'error'} 
+                  size="medium"
+                />
+                <Typography variant="h6">
+                  {results.passed_test_cases} / {results.total_test_cases} test cases passed
+                </Typography>
+              </Stack>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Chip icon={<TimerIcon />} label={`Total: ${results.total_execution_time.toFixed(3)}s`} />
+                <Chip icon={<TimerIcon />} label={`Avg: ${results.average_execution_time.toFixed(3)}s`} />
+              </Stack>
+            </Paper>
+            
+            {/* Individual Test Case Results */}
             <Stack spacing={2}>
-              {results.map((r, i) => (
-                <Paper key={i} variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: r.passed ? '#e7fbe7' : '#fff0f0', borderLeft: r.passed ? '6px solid #4caf50' : '6px solid #f44336' }}>
-                  {r.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
-                  <Box>
-                    <Typography variant="subtitle2" color={r.passed ? 'success.main' : 'error.main'} fontWeight={700}>
-                      {r.passed ? 'Passed' : 'Failed'}
-                    </Typography>
-                    <Typography variant="body2">Input: <code>{r.input}</code></Typography>
-                    <Typography variant="body2">Expected: <code>{r.expected}</code></Typography>
-                    <Typography variant="body2">Output: <code>{r.output}</code></Typography>
-                    <Typography variant="body2">Runtime: {r.runtime}</Typography>
-                    {r.error_type && (
-                      <Stack direction="row" spacing={1} alignItems="center" mt={1}>
-                        <Chip label={r.error_type} color="error" size="small" />
-                        <details style={{ marginLeft: 8 }}>
-                          <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#f44336' }}>Show Error Details</summary>
-                          <Typography variant="body2" color="error" sx={{ mt: 1 }}>{r.runtime}</Typography>
-                        </details>
-                      </Stack>
+              {results.test_case_results.map((result, index) => (
+                <Paper key={index} variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: result.passed ? '#e7fbe7' : '#fff0f0', borderLeft: result.passed ? '6px solid #4caf50' : '6px solid #f44336' }}>
+                  {result.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
+                  <Box flex={1}>
+                    <Stack direction="row" spacing={2} alignItems="center" mb={1}>
+                      <Typography variant="subtitle2" color={result.passed ? 'success.main' : 'error.main'} fontWeight={700}>
+                        Test Case #{index + 1} - {result.passed ? 'Passed' : 'Failed'}
+                      </Typography>
+                      <Chip icon={<TimerIcon />} label={`${result.execution_time.toFixed(3)}s`} size="small" />
+                    </Stack>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Input: {result.input}</Typography>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Expected: {result.expected}</Typography>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Output: {result.output}</Typography>
+                    {result.error && (
+                      <Alert severity="error" sx={{ mt: 1 }}>{result.error}</Alert>
                     )}
                   </Box>
                 </Paper>
               ))}
             </Stack>
           </Box>
+        )}
+        
+        {submitError && (
+          <Alert severity="error" sx={{ mt: 3 }}>{submitError}</Alert>
         )}
       </Paper>
     </Box>
