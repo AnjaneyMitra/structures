@@ -1,64 +1,69 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 
-// Clean, Notion-inspired theme matching the reference
-const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
+// Advanced Design System Theme following the comprehensive design guide
+const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
   const isLight = mode === 'light';
 
   const baseTheme: ThemeOptions = {
     palette: {
       mode,
       primary: {
-        main: '#00D084', // Notion-style green from reference
-        light: '#26D0CE',
-        dark: '#00A86B',
-        contrastText: '#fff',
+        main: '#4F46E5', // Modern indigo for trust and professionalism
+        light: '#818CF8',
+        dark: '#3730A3',
+        contrastText: '#FFFFFF',
       },
       secondary: {
-        main: '#6B73FF', // Soft blue accent
-        light: '#9CA3FF',
-        dark: '#4C52CC',
+        main: '#EC4899', // Vibrant pink for energy and creativity
+        light: '#F472B6',
+        dark: '#DB2777',
+        contrastText: '#FFFFFF',
       },
       background: {
-        default: isLight ? '#FFFFFF' : '#191919',
-        paper: isLight ? '#FFFFFF' : '#2F2F2F',
+        default: isLight ? '#FAFBFC' : '#0F0F23',
+        paper: isLight ? '#FFFFFF' : '#1A1A2E',
       },
       text: {
-        primary: isLight ? '#37352F' : '#FFFFFF',
-        secondary: isLight ? '#787774' : '#9B9A97',
+        primary: isLight ? '#1E293B' : '#F1F5F9',
+        secondary: isLight ? '#64748B' : '#94A3B8',
       },
       success: {
-        main: '#00D084',
-        light: '#26D0CE',
-        dark: '#00A86B',
+        main: '#10B981',
+        light: '#34D399',
+        dark: '#059669',
+        contrastText: '#FFFFFF',
       },
       error: {
-        main: '#E03E3E',
-        light: '#FF6B6B',
-        dark: '#C92A2A',
+        main: '#EF4444',
+        light: '#F87171',
+        dark: '#DC2626',
+        contrastText: '#FFFFFF',
       },
       warning: {
-        main: '#FFAB00',
-        light: '#FFD93D',
-        dark: '#FF8F00',
+        main: '#F59E0B',
+        light: '#FBBF24',
+        dark: '#D97706',
+        contrastText: '#FFFFFF',
       },
       info: {
-        main: '#6B73FF',
-        light: '#9CA3FF',
-        dark: '#4C52CC',
+        main: '#3B82F6',
+        light: '#60A5FA',
+        dark: '#2563EB',
+        contrastText: '#FFFFFF',
       },
       grey: {
-        50: '#FBFBFA',
-        100: '#F7F6F3',
-        200: '#EBEAE6',
-        300: '#D3D1CB',
-        400: '#B8B5B2',
-        500: '#9B9A97',
-        600: '#787774',
-        700: '#5E5C58',
-        800: '#37352F',
-        900: '#2F2E2A',
+        50: '#F8FAFC',
+        100: '#F1F5F9',
+        200: '#E2E8F0',
+        300: '#CBD5E1',
+        400: '#94A3B8',
+        500: '#64748B',
+        600: '#475569',
+        700: '#334155',
+        800: '#1E293B',
+        900: '#0F172A',
       },
-      divider: isLight ? '#EBEAE6' : '#37352F',
+      divider: isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(51, 65, 85, 0.8)',
     },
     typography: {
       fontFamily: [
@@ -67,154 +72,229 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
         'BlinkMacSystemFont',
         'Segoe UI',
         'Roboto',
+        'Oxygen',
+        'Ubuntu',
+        'Cantarell',
         'sans-serif',
       ].join(','),
+      // Major Third Scale (1.25x) for harmonious typography
       h1: {
         fontFamily: 'Inter, sans-serif',
-        fontWeight: 700,
-        letterSpacing: '-0.02em',
-        lineHeight: 1.2,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        fontWeight: 800,
+        fontSize: '3.05rem', // 49px
+        letterSpacing: '-0.025em',
+        lineHeight: 1.1,
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       h2: {
         fontFamily: 'Inter, sans-serif',
-        fontWeight: 600,
-        letterSpacing: '-0.015em',
-        lineHeight: 1.3,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        fontWeight: 700,
+        fontSize: '2.44rem', // 39px
+        letterSpacing: '-0.02em',
+        lineHeight: 1.2,
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       h3: {
         fontFamily: 'Inter, sans-serif',
         fontWeight: 600,
-        letterSpacing: '-0.01em',
-        lineHeight: 1.4,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        fontSize: '1.95rem', // 31px
+        letterSpacing: '-0.015em',
+        lineHeight: 1.3,
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       h4: {
         fontFamily: 'Inter, sans-serif',
-        fontWeight: 500,
-        letterSpacing: '-0.005em',
-        lineHeight: 1.5,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        fontWeight: 600,
+        fontSize: '1.56rem', // 25px
+        letterSpacing: '-0.01em',
+        lineHeight: 1.4,
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       h5: {
         fontFamily: 'Inter, sans-serif',
         fontWeight: 500,
-        lineHeight: 1.6,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        fontSize: '1.25rem', // 20px
+        letterSpacing: '-0.005em',
+        lineHeight: 1.5,
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       h6: {
         fontFamily: 'Inter, sans-serif',
         fontWeight: 500,
+        fontSize: '1rem', // 16px
         lineHeight: 1.6,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       body1: {
         fontFamily: 'Inter, sans-serif',
         fontWeight: 400,
+        fontSize: '1rem', // 16px
         lineHeight: 1.6,
-        color: isLight ? '#2C3E50' : '#FFFFFF',
+        color: isLight ? '#1E293B' : '#F1F5F9',
       },
       body2: {
         fontFamily: 'Inter, sans-serif',
         fontWeight: 400,
+        fontSize: '0.875rem', // 14px
         lineHeight: 1.5,
-        color: isLight ? '#7F8C8D' : '#BDC3C7',
+        color: isLight ? '#64748B' : '#94A3B8',
+      },
+      caption: {
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: 400,
+        fontSize: '0.75rem', // 12px
+        lineHeight: 1.4,
+        color: isLight ? '#64748B' : '#94A3B8',
       },
     },
     shape: {
-      borderRadius: 12,
+      borderRadius: 16,
     },
+    spacing: 8, // 8-point grid system
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 12,
+            borderRadius: 16,
             textTransform: 'none',
-            fontWeight: 500,
-            padding: '10px 20px',
+            fontWeight: 600,
             fontSize: '0.875rem',
+            padding: '12px 24px',
+            minHeight: 44, // Touch-friendly minimum
             boxShadow: 'none',
+            position: 'relative',
+            overflow: 'hidden',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+              transition: 'left 0.5s',
+            },
+            '&:hover::before': {
+              left: '100%',
+            },
             '&:hover': {
-              transform: 'translateY(-1px)',
-              boxShadow: isLight
-                ? '0 4px 12px rgba(0, 208, 132, 0.15)'
-                : '0 4px 12px rgba(0, 0, 0, 0.3)',
+              transform: 'translateY(-2px)',
             },
           },
           contained: {
-            background: isLight
-              ? 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)'
-              : 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
+            background: isLight 
+              ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)'
+              : 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
             color: '#FFFFFF',
-            boxShadow: '0 2px 8px rgba(0, 208, 132, 0.2)',
+            boxShadow: '0 4px 14px rgba(79, 70, 229, 0.25)',
             '&:hover': {
-              background: isLight
-                ? 'linear-gradient(135deg, #00A86B 0%, #1FBAB8 100%)'
-                : 'linear-gradient(135deg, #00A86B 0%, #1FBAB8 100%)',
-              boxShadow: '0 6px 20px rgba(0, 208, 132, 0.3)',
+              background: isLight 
+                ? 'linear-gradient(135deg, #3730A3 0%, #6D28D9 100%)'
+                : 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+              boxShadow: '0 8px 25px rgba(79, 70, 229, 0.35)',
+            },
+            '&:active': {
+              transform: 'translateY(0px)',
+              boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
             },
           },
           outlined: {
-            borderColor: isLight ? '#EBEAE6' : '#37352F',
-            color: isLight ? '#37352F' : '#FFFFFF',
-            borderWidth: '1.5px',
+            borderColor: isLight ? 'rgba(79, 70, 229, 0.3)' : 'rgba(99, 102, 241, 0.4)',
+            color: isLight ? '#4F46E5' : '#818CF8',
+            borderWidth: '2px',
+            background: isLight ? 'rgba(79, 70, 229, 0.02)' : 'rgba(99, 102, 241, 0.05)',
             '&:hover': {
-              borderColor: '#00D084',
-              backgroundColor: isLight ? 'rgba(0, 208, 132, 0.05)' : 'rgba(0, 208, 132, 0.1)',
-              borderWidth: '1.5px',
+              borderColor: isLight ? '#4F46E5' : '#818CF8',
+              backgroundColor: isLight ? 'rgba(79, 70, 229, 0.08)' : 'rgba(99, 102, 241, 0.12)',
+              borderWidth: '2px',
             },
           },
           text: {
-            color: isLight ? '#787774' : '#9B9A97',
+            color: isLight ? '#64748B' : '#94A3B8',
             '&:hover': {
-              backgroundColor: isLight ? 'rgba(0, 208, 132, 0.05)' : 'rgba(0, 208, 132, 0.1)',
+              backgroundColor: isLight ? 'rgba(79, 70, 229, 0.05)' : 'rgba(99, 102, 241, 0.08)',
             },
+          },
+          sizeSmall: {
+            padding: '8px 16px',
+            fontSize: '0.75rem',
+            minHeight: 36,
+          },
+          sizeLarge: {
+            padding: '16px 32px',
+            fontSize: '1rem',
+            minHeight: 52,
           },
         },
       },
       MuiPaper: {
         styleOverrides: {
           root: {
-            borderRadius: 16,
-            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(47, 47, 47, 0.95)',
-            border: isLight ? '1px solid rgba(235, 234, 230, 0.6)' : '1px solid rgba(55, 53, 47, 0.6)',
+            borderRadius: 20,
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(26, 26, 46, 0.8)',
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.5)' : '1px solid rgba(51, 65, 85, 0.5)',
             boxShadow: 'none',
-            backdropFilter: 'blur(12px)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)', // Safari support
           },
           elevation1: {
             boxShadow: isLight
-              ? '0 2px 8px rgba(55, 53, 47, 0.08), 0 1px 2px rgba(55, 53, 47, 0.06)'
-              : '0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
+              ? '0 1px 3px rgba(30, 41, 59, 0.1), 0 1px 2px rgba(30, 41, 59, 0.06)'
+              : '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
           },
           elevation2: {
             boxShadow: isLight
-              ? '0 4px 16px rgba(55, 53, 47, 0.1), 0 2px 4px rgba(55, 53, 47, 0.06)'
-              : '0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)',
+              ? '0 4px 6px rgba(30, 41, 59, 0.1), 0 2px 4px rgba(30, 41, 59, 0.06)'
+              : '0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)',
           },
           elevation3: {
             boxShadow: isLight
-              ? '0 8px 24px rgba(55, 53, 47, 0.12), 0 4px 8px rgba(55, 53, 47, 0.08)'
-              : '0 8px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3)',
+              ? '0 10px 15px rgba(30, 41, 59, 0.1), 0 4px 6px rgba(30, 41, 59, 0.05)'
+              : '0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3)',
+          },
+          elevation4: {
+            boxShadow: isLight
+              ? '0 20px 25px rgba(30, 41, 59, 0.15), 0 10px 10px rgba(30, 41, 59, 0.04)'
+              : '0 20px 25px rgba(0, 0, 0, 0.5), 0 10px 10px rgba(0, 0, 0, 0.3)',
           },
         },
       },
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: 16,
-            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(47, 47, 47, 0.9)',
-            border: isLight ? '1px solid rgba(235, 234, 230, 0.5)' : '1px solid rgba(55, 53, 47, 0.5)',
+            borderRadius: 20,
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(26, 26, 46, 0.7)',
+            border: isLight ? '1px solid rgba(226, 232, 240, 0.4)' : '1px solid rgba(51, 65, 85, 0.4)',
             boxShadow: 'none',
-            backdropFilter: 'blur(12px)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: isLight 
+                ? 'linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.3), transparent)'
+                : 'linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), transparent)',
+              opacity: 0,
+              transition: 'opacity 0.3s ease',
+            },
             '&:hover': {
+              backgroundColor: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(26, 26, 46, 0.9)',
+              borderColor: isLight ? 'rgba(79, 70, 229, 0.2)' : 'rgba(99, 102, 241, 0.3)',
               boxShadow: isLight
-                ? '0 8px 32px rgba(0, 208, 132, 0.1), 0 2px 8px rgba(55, 53, 47, 0.08)'
-                : '0 8px 32px rgba(0, 208, 132, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)',
-              transform: 'translateY(-4px)',
-              borderColor: isLight ? 'rgba(0, 208, 132, 0.2)' : 'rgba(0, 208, 132, 0.3)',
+                ? '0 20px 40px rgba(79, 70, 229, 0.1), 0 8px 16px rgba(30, 41, 59, 0.08)'
+                : '0 20px 40px rgba(79, 70, 229, 0.2), 0 8px 16px rgba(0, 0, 0, 0.3)',
+              transform: 'translateY(-8px) scale(1.02)',
+              '&::before': {
+                opacity: 1,
+              },
             },
           },
         },
@@ -223,19 +303,23 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              borderRadius: 12,
-              backgroundColor: isLight ? 'rgba(247, 246, 243, 0.8)' : 'rgba(55, 53, 47, 0.8)',
-              border: isLight ? '1px solid rgba(235, 234, 230, 0.6)' : '1px solid rgba(94, 92, 88, 0.6)',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 0.3s ease',
+              borderRadius: 16,
+              backgroundColor: isLight ? 'rgba(248, 250, 252, 0.6)' : 'rgba(30, 41, 59, 0.6)',
+              border: isLight ? '1px solid rgba(226, 232, 240, 0.5)' : '1px solid rgba(71, 85, 105, 0.5)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              minHeight: 44, // Touch-friendly
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                backgroundColor: isLight ? 'rgba(235, 234, 230, 0.8)' : 'rgba(94, 92, 88, 0.8)',
-                borderColor: isLight ? 'rgba(0, 208, 132, 0.3)' : 'rgba(0, 208, 132, 0.4)',
+                backgroundColor: isLight ? 'rgba(241, 245, 249, 0.8)' : 'rgba(51, 65, 85, 0.8)',
+                borderColor: isLight ? 'rgba(79, 70, 229, 0.3)' : 'rgba(99, 102, 241, 0.4)',
+                transform: 'translateY(-1px)',
               },
               '&.Mui-focused': {
-                backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(47, 47, 47, 0.95)',
-                borderColor: '#00D084',
-                boxShadow: '0 0 0 3px rgba(0, 208, 132, 0.15)',
+                backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(26, 26, 46, 0.95)',
+                borderColor: '#4F46E5',
+                boxShadow: '0 0 0 3px rgba(79, 70, 229, 0.15)',
+                transform: 'translateY(-2px)',
               },
               '& fieldset': {
                 border: 'none',
@@ -247,29 +331,41 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
-            fontWeight: 500,
+            borderRadius: 12,
+            fontWeight: 600,
             fontSize: '0.75rem',
-            backdropFilter: 'blur(8px)',
-            transition: 'all 0.2s ease',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
             '&:hover': {
-              transform: 'scale(1.05)',
+              transform: 'scale(1.05) translateY(-1px)',
             },
           },
           colorSuccess: {
-            background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
+            background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
             color: 'white',
-            boxShadow: '0 2px 8px rgba(0, 208, 132, 0.3)',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
           },
           colorWarning: {
-            background: 'linear-gradient(135deg, #FFAB00 0%, #FFD93D 100%)',
+            background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
             color: 'white',
-            boxShadow: '0 2px 8px rgba(255, 171, 0, 0.3)',
+            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
           },
           colorError: {
-            background: 'linear-gradient(135deg, #E03E3E 0%, #FF6B6B 100%)',
+            background: 'linear-gradient(135deg, #EF4444 0%, #F87171 100%)',
             color: 'white',
-            boxShadow: '0 2px 8px rgba(224, 62, 62, 0.3)',
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+          },
+          colorPrimary: {
+            background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+            color: 'white',
+            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+          },
+          colorSecondary: {
+            background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+            color: 'white',
+            boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)',
           },
         },
       },
@@ -314,6 +410,6 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
   return createTheme(baseTheme);
 };
 
-const theme = createNotionTheme('light');
-export const darkTheme = createNotionTheme('dark');
+const theme = createAdvancedTheme('light');
+export const darkTheme = createAdvancedTheme('dark');
 export default theme;

@@ -216,9 +216,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         component="main" 
         sx={{ 
           flexGrow: 1, 
-          ml: '240px', 
+          ml: '280px', 
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(251, 251, 250, 1) 100%)',
+          background: 'linear-gradient(135deg, #FAFBFC 0%, #F8FAFC 100%)',
           position: 'relative',
           '&::before': {
             content: '""',
@@ -227,8 +227,27 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'radial-gradient(circle at 20% 80%, rgba(0, 208, 132, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(107, 115, 255, 0.03) 0%, transparent 50%)',
+            background: `
+              radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%)
+            `,
             pointerEvents: 'none',
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `
+              linear-gradient(45deg, transparent 49%, rgba(79, 70, 229, 0.01) 50%, transparent 51%),
+              linear-gradient(-45deg, transparent 49%, rgba(236, 72, 153, 0.01) 50%, transparent 51%)
+            `,
+            backgroundSize: '60px 60px',
+            pointerEvents: 'none',
+            opacity: 0.3,
           },
         }}
       >
