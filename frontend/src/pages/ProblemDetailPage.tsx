@@ -57,7 +57,7 @@ const ProblemDetailPage: React.FC = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get(`http://localhost:8000/api/problems/${id}`);
+        const res = await axios.get(`https://structures-production.up.railway.app/api/problems/${id}`);
         setProblem(res.data);
       } catch (err) {
         setError('Failed to load problem.');
@@ -81,7 +81,7 @@ const ProblemDetailPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'http://localhost:8000/api/submissions/',
+        'https://structures-production.up.railway.app/api/submissions/',
         {
           problem_id: problem?.id,
           code,
@@ -107,7 +107,7 @@ const ProblemDetailPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'http://localhost:8000/api/submissions/',
+        'https://structures-production.up.railway.app/api/submissions/',
         {
           problem_id: problem?.id,
           code,

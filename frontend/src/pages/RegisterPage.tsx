@@ -18,7 +18,7 @@ const RegisterPage: React.FC = () => {
     setError('');
     setSuccess(false);
     try {
-      await axios.post('http://localhost:8000/api/auth/register', {
+      await axios.post('https://structures-production.up.railway.app/api/auth/register', {
         username,
         password,
       });

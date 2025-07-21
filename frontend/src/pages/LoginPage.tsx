@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('http://localhost:8000/api/auth/login', new URLSearchParams({
+      const res = await axios.post('https://structures-production.up.railway.app/api/auth/login', new URLSearchParams({
         username,
         password,
       }), {
@@ -32,7 +32,7 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const GOOGLE_LOGIN_URL = 'http://localhost:8000/api/auth/google-login';
+  const GOOGLE_LOGIN_URL = 'https://structures-production.up.railway.app/api/auth/google-login';
 
   const handleGoogleLogin = () => {
     // Redirect to backend Google OAuth endpoint

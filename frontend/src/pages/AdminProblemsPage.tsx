@@ -35,7 +35,7 @@ const AdminProblemsPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('http://localhost:8000/api/problems/');
+      const res = await axios.get('https://structures-production.up.railway.app/api/problems/');
       setProblems(res.data);
     } catch (err) {
       setError('Failed to load problems.');
@@ -58,12 +58,12 @@ const AdminProblemsPage: React.FC = () => {
     const token = localStorage.getItem('token');
     try {
       if (editingId) {
-        await axios.put(`http://localhost:8000/api/problems/${editingId}`, form, {
+        await axios.put(`https://structures-production.up.railway.app/api/problems/${editingId}`, form, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSuccess('Problem updated!');
       } else {
-        await axios.post('http://localhost:8000/api/problems/', form, {
+        await axios.post('https://structures-production.up.railway.app/api/problems/', form, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSuccess('Problem created!');

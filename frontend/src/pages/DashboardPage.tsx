@@ -38,13 +38,13 @@ const DashboardPage: React.FC = () => {
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const userRes = await axios.get('http://localhost:8000/api/profile/', {
+        const userRes = await axios.get('https://structures-production.up.railway.app/api/profile/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
-        const probRes = await axios.get('http://localhost:8000/api/problems/');
+        const probRes = await axios.get('https://structures-production.up.railway.app/api/problems/');
         setProblems(probRes.data.slice(0, 6)); // Preview top 6 problems
-        const statsRes = await axios.get('http://localhost:8000/api/profile/stats/', {
+        const statsRes = await axios.get('https://structures-production.up.railway.app/api/profile/stats/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(statsRes.data);

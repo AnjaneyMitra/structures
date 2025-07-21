@@ -32,7 +32,7 @@ const ProblemsPage: React.FC = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get('http://localhost:8000/api/problems/');
+        const res = await axios.get('https://structures-production.up.railway.app/api/problems/');
         setProblems(res.data);
       } catch (err) {
         setError('Failed to load problems.');

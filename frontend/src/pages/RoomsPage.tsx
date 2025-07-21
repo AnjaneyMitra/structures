@@ -39,7 +39,7 @@ const RoomsPage: React.FC = () => {
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:8000/api/rooms/', {
+        const res = await axios.get('https://structures-production.up.railway.app/api/rooms/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRooms(res.data);
@@ -53,7 +53,7 @@ const RoomsPage: React.FC = () => {
     // Fetch problems for create room dialog
     const fetchProblems = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/problems/');
+        const res = await axios.get('https://structures-production.up.railway.app/api/problems/');
         setProblems(res.data.map((p: any) => ({ id: p.id, title: p.title })));
       } catch {}
     };
@@ -65,7 +65,7 @@ const RoomsPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:8000/api/rooms/join/', { code: joinCode }, {
+      await axios.post('https://structures-production.up.railway.app/api/rooms/join/', { code: joinCode }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       window.location.reload();
@@ -81,7 +81,7 @@ const RoomsPage: React.FC = () => {
     setCreateError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:8000/api/rooms/', { problem_id: selectedProblem }, {
+      const res = await axios.post('https://structures-production.up.railway.app/api/rooms/', { problem_id: selectedProblem }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCreating(false);

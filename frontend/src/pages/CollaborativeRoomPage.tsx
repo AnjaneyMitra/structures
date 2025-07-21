@@ -17,7 +17,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import HistoryIcon from '@mui/icons-material/History';
 
-const SOCKET_URL = 'http://localhost:8000';
+const SOCKET_URL = 'https://structures-production.up.railway.app';
 
 const languageOptions = [
   { label: 'Python', value: 'python', monaco: 'python', defaultCode: '# Write your solution here\n' },
@@ -197,7 +197,7 @@ const CollaborativeRoomPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'http://localhost:8000/api/submissions/',
+        'https://structures-production.up.railway.app/api/submissions/',
         {
           code,
           language,
@@ -223,7 +223,7 @@ const CollaborativeRoomPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'http://localhost:8000/api/submissions/',
+        'https://structures-production.up.railway.app/api/submissions/',
         {
           code,
           language,
@@ -250,7 +250,7 @@ const CollaborativeRoomPage: React.FC = () => {
       // Try to get problemId from URL or props, fallback to undefined
       const pid = problemId || undefined;
       if (!pid) return;
-      const res = await axios.get(`http://localhost:8000/api/submissions/problem/${pid}`, {
+      const res = await axios.get(`https://structures-production.up.railway.app/api/submissions/problem/${pid}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Filter by username if available

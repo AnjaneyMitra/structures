@@ -43,15 +43,15 @@ const ProfilePage: React.FC = () => {
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const userRes = await axios.get('http://localhost:8000/api/profile/', {
+        const userRes = await axios.get('https://structures-production.up.railway.app/api/profile/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
-        const subRes = await axios.get('http://localhost:8000/api/profile/submissions/', {
+        const subRes = await axios.get('https://structures-production.up.railway.app/api/profile/submissions/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSubmissions(subRes.data);
-        const statsRes = await axios.get('http://localhost:8000/api/profile/stats/', {
+        const statsRes = await axios.get('https://structures-production.up.railway.app/api/profile/stats/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(statsRes.data);
@@ -97,7 +97,7 @@ const ProfilePage: React.FC = () => {
                     try {
                       const token = localStorage.getItem('token');
                       const res = await axios.put(
-                        'http://localhost:8000/api/profile/username',
+                        'https://structures-production.up.railway.app/api/profile/username',
                         { new_username: newUsername },
                         { headers: { Authorization: `Bearer ${token}` } }
                       );
