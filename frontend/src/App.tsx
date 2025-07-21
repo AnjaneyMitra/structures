@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, Container, Paper, Typography, Stack, Button, Chip } from '@mui/material';
+import { Box, Container, Paper, Typography, Stack, Button, Chip, Grid } from '@mui/material';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
-import AppBar from './components/AppBar';
+import { Sidebar } from './components/Sidebar';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import CodeIcon from '@mui/icons-material/Code';
@@ -15,163 +15,144 @@ import ProblemDetailPage from './pages/ProblemDetailPage';
 import RoomsPage from './pages/RoomsPage';
 import ProfilePage from './pages/ProfilePage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
-import { AnimatedBackground } from './components/BackgroundEffects';
 
 function Landing() {
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #3B82F6 100%)',
+        backgroundColor: '#FFFFFF',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'relative',
-        overflow: 'hidden',
+        p: 3,
       }}
     >
-      <AnimatedBackground variant="gradient" opacity={0.15} />
-      
-      <Container maxWidth="lg" sx={{ zIndex: 2, position: 'relative' }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: { xs: 4, md: 8 }, 
-            borderRadius: 6, 
-            textAlign: 'center',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)',
-          }}
-        >
-          <Typography 
-            variant="h1" 
-            sx={{ 
-              mb: 3, 
-              fontSize: { xs: '2.8rem', md: '4.5rem' }, 
-              fontWeight: 800, 
-              letterSpacing: '-0.03em',
-              fontFamily: 'Space Grotesk, Inter, sans-serif',
-              background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            DSA Collaborative
-          </Typography>
-          
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              mb: 4, 
-              color: 'text.secondary', 
-              fontWeight: 400,
-              lineHeight: 1.6,
-              maxWidth: '600px',
-              mx: 'auto',
-            }}
-          >
-            Solve Data Structures & Algorithms problems together in real time.
-            <br />
-            Beautiful, modern, and collaborative—like LeetCode, but social.
-          </Typography>
+      <Container maxWidth="lg">
+        <Grid container spacing={8} alignItems="center">
+          {/* Left Content */}
+          <Grid item xs={12} md={6}>
+            <Typography 
+              variant="h2" 
+              sx={{ 
+                mb: 3, 
+                fontSize: { xs: '2.5rem', md: '3.5rem' }, 
+                fontWeight: 700,
+                color: '#37352F',
+                lineHeight: 1.2,
+              }}
+            >
+              Code Together, Solve Faster
+            </Typography>
+            
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 4, 
+                color: '#787774', 
+                fontWeight: 400,
+                lineHeight: 1.6,
+              }}
+            >
+              Join your friends in solving Data Structures & Algorithms problems. 
+              Practice individually or collaborate in real-time with built-in pair programming features.
+            </Typography>
 
-          <Stack 
-            direction="row" 
-            spacing={2} 
-            justifyContent="center" 
-            sx={{ mb: 6, flexWrap: 'wrap', gap: 2 }}
-          >
-            <Chip 
-              icon={<CodeIcon />} 
-              label="Real-time Coding" 
+            <Stack 
+              direction={{ xs: 'column', sm: 'row' }} 
+              spacing={2} 
+              sx={{ mb: 4 }}
+            >
+              <Button
+                component={Link}
+                to="/login"
+                variant="contained"
+                size="large"
+                sx={{ 
+                  minWidth: 180,
+                  backgroundColor: '#00D084',
+                  '&:hover': {
+                    backgroundColor: '#00A86B',
+                  }
+                }}
+              >
+                Start Coding Together
+              </Button>
+              <Button
+                component={Link}
+                to="/register"
+                variant="outlined"
+                size="large"
+                sx={{ 
+                  minWidth: 160,
+                  borderColor: '#EBEAE6',
+                  color: '#37352F',
+                  '&:hover': {
+                    borderColor: '#D3D1CB',
+                    backgroundColor: '#F7F6F3',
+                  }
+                }}
+              >
+                Browse Problems →
+              </Button>
+            </Stack>
+
+            <Typography variant="body2" color="#787774" sx={{ fontSize: '0.875rem' }}>
+              What's new: Just shipped v0.1.0 ✨
+            </Typography>
+          </Grid>
+
+          {/* Right Content - Code Preview */}
+          <Grid item xs={12} md={6}>
+            <Paper 
               sx={{ 
-                background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
-                color: 'white',
-                fontWeight: 600,
-                px: 2,
-                py: 1,
-              }} 
-            />
-            <Chip 
-              icon={<GroupWorkIcon />} 
-              label="Collaborative Rooms" 
-              sx={{ 
-                background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
-                color: 'white',
-                fontWeight: 600,
-                px: 2,
-                py: 1,
-              }} 
-            />
-            <Chip 
-              icon={<SpeedIcon />} 
-              label="Instant Execution" 
-              sx={{ 
-                background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-                color: 'white',
-                fontWeight: 600,
-                px: 2,
-                py: 1,
-              }} 
-            />
-          </Stack>
-          
-          <Stack 
-            direction={{ xs: 'column', sm: 'row' }} 
-            spacing={3} 
-            justifyContent="center" 
-            sx={{ mb: 4 }}
-          >
-            <Button
-              component={Link}
-              to="/login"
-              variant="contained"
-              size="large"
-              startIcon={<LoginIcon />}
-              sx={{ 
-                fontWeight: 700, 
-                fontSize: '1.2rem', 
-                px: 5, 
-                py: 1.5,
-                borderRadius: 4,
-                minWidth: 160,
+                p: 4,
+                backgroundColor: '#00D084',
+                borderRadius: 3,
+                position: 'relative',
+                overflow: 'hidden',
               }}
             >
-              Get Started
-            </Button>
-            <Button
-              component={Link}
-              to="/register"
-              variant="outlined"
-              size="large"
-              startIcon={<PersonAddIcon />}
-              sx={{ 
-                fontWeight: 700, 
-                fontSize: '1.2rem', 
-                px: 5, 
-                py: 1.5,
-                borderRadius: 4,
-                minWidth: 160,
-                borderWidth: 2,
-                '&:hover': { borderWidth: 2 }
-              }}
-            >
-              Sign Up Free
-            </Button>
-          </Stack>
-          
-          <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.8 }}>
-            Built with{' '}
-            <Box component="span" sx={{ color: '#6366F1', fontWeight: 600 }}>React</Box>
-            {', '}
-            <Box component="span" sx={{ color: '#EC4899', fontWeight: 600 }}>Material UI</Box>
-            {', and '}
-            <Box component="span" sx={{ color: '#10B981', fontWeight: 600 }}>Socket.io</Box>
-          </Typography>
-        </Paper>
+              <Paper
+                sx={{
+                  p: 3,
+                  backgroundColor: '#1a1a1a',
+                  borderRadius: 2,
+                  border: 'none',
+                }}
+              >
+                <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#FF5F57' }} />
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#FFBD2E' }} />
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#28CA42' }} />
+                </Stack>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    fontFamily: 'JetBrains Mono, monospace',
+                    color: '#00D084',
+                    lineHeight: 1.6,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {`// Given an array of integers and target, return indices
+// of the two numbers that add up to target.
+
+function twoSum(nums, target) {
+  const map = new Map();
+  for (let i = 0; i < nums.length; i++) {
+    const complement = target - nums[i];
+    if (map.has(complement)) {
+      return [map.get(complement), i];
+    }
+    map.set(nums[i], i);
+  }
+}`}
+                </Typography>
+              </Paper>
+            </Paper>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );
@@ -179,10 +160,20 @@ function Landing() {
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <AppBar />
-      {children}
-    </>
+    <Box sx={{ display: 'flex' }}>
+      <Sidebar />
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          ml: '240px', 
+          minHeight: '100vh',
+          backgroundColor: 'background.default',
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
   );
 }
 

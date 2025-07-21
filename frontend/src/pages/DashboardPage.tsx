@@ -81,183 +81,74 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh' }}>
-      <AnimatedBackground variant="particles" opacity={0.05} />
-      
-      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 6 }, position: 'relative', zIndex: 1 }}>
-        {/* Welcome Header */}
-        <Paper 
-          elevation={0}
-          sx={{ 
-            p: { xs: 3, md: 5 }, 
-            mb: 4, 
-            borderRadius: 5,
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)',
-            border: '1px solid rgba(99, 102, 241, 0.1)',
-          }}
-        >
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} alignItems="center">
-            <Avatar 
-              sx={{ 
-                width: 100, 
-                height: 100, 
-                background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
-                fontWeight: 700, 
-                fontSize: 42,
-                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
-                border: '4px solid rgba(255, 255, 255, 0.2)',
-              }}
-            >
-              {user?.username[0].toUpperCase()}
-            </Avatar>
-            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              <Typography 
-                variant="h3" 
-                fontWeight={800} 
-                sx={{
-                  mb: 1,
-                  background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Welcome back, {user?.username}!
+    <Box sx={{ p: 4 }}>
+      {/* Welcome Header */}
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h3" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
+          Good morning, {user?.username}
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Ready to solve some problems today?
+        </Typography>
+      </Box>
+
+      {/* Stats Cards */}
+      {stats && (
+        <Grid container spacing={3} sx={{ mb: 6 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={1} sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h4" fontWeight={600} color="primary.main" sx={{ mb: 1 }}>
+                {stats.problems_solved}
               </Typography>
-              <Typography variant="h6" color="text.secondary" fontWeight={400}>
-                Ready to solve some challenging problems today?
+              <Typography variant="body2" color="text.secondary">
+                Problems Solved
               </Typography>
-            </Box>
-            {stats && (
-              <Stack 
-                direction={{ xs: 'row', md: 'row' }} 
-                spacing={3} 
-                sx={{ ml: { md: 'auto' } }}
-              >
-                <Paper 
-                  elevation={0} 
-                  sx={{ 
-                    p: 3, 
-                    borderRadius: 4, 
-                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%)',
-                    border: '1px solid rgba(16, 185, 129, 0.2)',
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    minWidth: 140,
-                    transition: 'transform 0.2s ease',
-                    '&:hover': { transform: 'translateY(-2px)' }
-                  }}
-                >
-                  <TrendingUpIcon sx={{ color: '#10B981', mr: 2, fontSize: 32 }} />
-                  <Box>
-                    <Typography variant="h4" fontWeight={800} color="#10B981">
-                      {stats.problems_solved}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                      Problems Solved
-                    </Typography>
-                  </Box>
-                </Paper>
-                <Paper 
-                  elevation={0} 
-                  sx={{ 
-                    p: 3, 
-                    borderRadius: 4, 
-                    background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(244, 114, 182, 0.1) 100%)',
-                    border: '1px solid rgba(236, 72, 153, 0.2)',
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    minWidth: 140,
-                    transition: 'transform 0.2s ease',
-                    '&:hover': { transform: 'translateY(-2px)' }
-                  }}
-                >
-                  <CodeIcon sx={{ color: '#EC4899', mr: 2, fontSize: 32 }} />
-                  <Box>
-                    <Typography variant="h4" fontWeight={800} color="#EC4899">
-                      {stats.total_submissions}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                      Total Submissions
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Stack>
-            )}
-          </Stack>
-        </Paper>
-        {/* Featured Problems Section */}
-        <Typography 
-          variant="h4" 
-          fontWeight={700} 
-          mb={4} 
-          sx={{
-            background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}
-        >
-          🔥 Featured Problems
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={1} sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h4" fontWeight={600} color="secondary.main" sx={{ mb: 1 }}>
+                {stats.total_submissions}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Total Submissions
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
+
+      {/* Featured Problems */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" fontWeight={600} color="text.primary" sx={{ mb: 3 }}>
+          Featured Problems
         </Typography>
         
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
           {problems.map((problem) => {
             const diff = difficultyColors[problem.difficulty] || { color: 'default', icon: null };
             return (
-              <Grid item xs={12} sm={6} lg={4} key={problem.id}>
-                <Card 
-                  elevation={0}
-                  sx={{ 
-                    borderRadius: 5, 
-                    height: '100%',
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)',
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                    <Stack direction="row" alignItems="center" spacing={2} mb={3}>
-                      <Typography 
-                        variant="h6" 
-                        fontWeight={700} 
-                        sx={{ flexGrow: 1, color: 'text.primary' }}
-                      >
+              <Grid item xs={12} sm={6} md={4} key={problem.id}>
+                <Card elevation={1}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                      <Typography variant="h6" fontWeight={500} sx={{ flexGrow: 1 }}>
                         {problem.title}
                       </Typography>
                       <Chip
                         label={problem.difficulty}
                         color={diff.color}
-                        icon={diff.icon}
-                        sx={{ 
-                          fontWeight: 700, 
-                          fontSize: '0.9rem', 
-                          px: 2,
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                        }}
+                        size="small"
                       />
                     </Stack>
                     <Button
                       component={Link}
                       to={`/problems/${problem.id}`}
                       variant="contained"
-                      size="large"
-                      startIcon={<PlayArrowIcon />}
-                      sx={{ 
-                        mt: 2, 
-                        borderRadius: 3, 
-                        fontWeight: 700,
-                        fontSize: '1.1rem',
-                        py: 1.5,
-                      }}
+                      size="small"
                       fullWidth
                     >
-                      Start Solving
+                      Solve
                     </Button>
                   </CardContent>
                 </Card>
@@ -266,26 +157,16 @@ const DashboardPage: React.FC = () => {
           })}
         </Grid>
         
-        <Box textAlign="center" mt={6}>
+        <Box sx={{ mt: 4, textAlign: 'center' }}>
           <Button 
             component={Link} 
             to="/problems" 
-            variant="outlined" 
-            size="large" 
-            sx={{ 
-              borderRadius: 4, 
-              fontWeight: 700, 
-              px: 6,
-              py: 1.5,
-              fontSize: '1.1rem',
-              borderWidth: 2,
-              '&:hover': { borderWidth: 2 }
-            }}
+            variant="outlined"
           >
-            Explore All Problems →
+            View All Problems
           </Button>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };

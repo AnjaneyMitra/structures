@@ -59,42 +59,32 @@ const LoginPage: React.FC = () => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #3B82F6 100%)',
-        position: 'relative',
-        overflow: 'hidden',
+        backgroundColor: '#FFFFFF',
       }}
     >
-      <AnimatedBackground variant="geometric" opacity={0.1} />
-      
-      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 2 }}>
+      <Container maxWidth="sm">
         <Paper 
-          elevation={0}
+          elevation={1}
           sx={{ 
             p: { xs: 4, md: 6 }, 
-            borderRadius: 6, 
+            borderRadius: 2, 
             textAlign: 'center',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #EBEAE6',
           }}
         >
           <Typography 
-            variant="h3" 
+            variant="h4" 
             sx={{ 
               mb: 1, 
-              fontWeight: 800, 
-              letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              fontWeight: 600, 
+              color: '#37352F',
             }}
           >
             Welcome Back
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontWeight: 500 }}>
-            Sign in to continue your coding journey
+          <Typography variant="body1" color="#787774" sx={{ mb: 4 }}>
+            Sign in to continue coding together
           </Typography>
           
           <form onSubmit={handleSubmit}>
@@ -145,21 +135,22 @@ const LoginPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="contained"
-                startIcon={<LoginIcon />}
                 disabled={loading}
                 sx={{ 
-                  fontWeight: 700, 
-                  fontSize: '1.2rem', 
-                  py: 1.8,
-                  borderRadius: 4,
+                  fontWeight: 500, 
+                  py: 1.5,
+                  backgroundColor: '#00D084',
+                  '&:hover': {
+                    backgroundColor: '#00A86B',
+                  }
                 }}
                 fullWidth
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
               
-              <Divider sx={{ my: 2 }}>
-                <Typography variant="body2" color="text.secondary">
+              <Divider sx={{ my: 3 }}>
+                <Typography variant="body2" color="#787774">
                   or
                 </Typography>
               </Divider>
@@ -169,12 +160,14 @@ const LoginPage: React.FC = () => {
                 startIcon={<GoogleIcon />}
                 onClick={handleGoogleLogin}
                 sx={{ 
-                  fontWeight: 700, 
-                  fontSize: '1.1rem', 
-                  py: 1.8,
-                  borderRadius: 4,
-                  borderWidth: 2,
-                  '&:hover': { borderWidth: 2 }
+                  fontWeight: 500, 
+                  py: 1.5,
+                  borderColor: '#EBEAE6',
+                  color: '#37352F',
+                  '&:hover': {
+                    borderColor: '#D3D1CB',
+                    backgroundColor: '#F7F6F3',
+                  }
                 }}
                 fullWidth
               >

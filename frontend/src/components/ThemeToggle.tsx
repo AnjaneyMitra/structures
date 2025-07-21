@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton, Tooltip, Box } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -10,26 +10,17 @@ export const ThemeToggle: React.FC = () => {
     <Tooltip title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}>
       <IconButton
         onClick={toggleTheme}
+        size="small"
         sx={{
-          background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
-          color: 'white',
-          width: 48,
-          height: 48,
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          color: 'text.secondary',
+          transition: 'all 0.2s ease',
           '&:hover': {
-            transform: 'scale(1.1) rotate(180deg)',
-            boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)',
+            backgroundColor: 'action.hover',
+            color: 'text.primary',
           },
         }}
       >
-        <Box
-          sx={{
-            transition: 'transform 0.3s ease',
-            transform: isDarkMode ? 'rotate(0deg)' : 'rotate(180deg)',
-          }}
-        >
-          {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-        </Box>
+        {isDarkMode ? <Brightness7 fontSize="small" /> : <Brightness4 fontSize="small" />}
       </IconButton>
     </Tooltip>
   );
