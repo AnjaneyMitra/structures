@@ -106,7 +106,7 @@ const LoginPage: React.FC = () => {
                 required
                 autoFocus
                 fullWidth
-                size="large"
+                size="medium"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -122,7 +122,7 @@ const LoginPage: React.FC = () => {
                 onChange={e => setPassword(e.target.value)}
                 required
                 fullWidth
-                size="large"
+                size="medium"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -145,7 +145,6 @@ const LoginPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="contained"
-                size="large"
                 startIcon={<LoginIcon />}
                 disabled={loading}
                 sx={{ 
@@ -167,7 +166,6 @@ const LoginPage: React.FC = () => {
               
               <Button
                 variant="outlined"
-                size="large"
                 startIcon={<GoogleIcon />}
                 onClick={handleGoogleLogin}
                 sx={{ 

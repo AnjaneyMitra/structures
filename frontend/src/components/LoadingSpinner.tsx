@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { SxProps, Theme } from '@mui/material/styles';
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -12,7 +13,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 60,
   fullScreen = false 
 }) => {
-  const containerSx = fullScreen 
+  const containerSx: SxProps<Theme> = fullScreen 
     ? { 
         position: 'fixed',
         top: 0,

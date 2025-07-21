@@ -47,6 +47,7 @@ const RegisterPage: React.FC = () => {
                 required
                 autoFocus
                 fullWidth
+                size="medium"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -62,6 +63,7 @@ const RegisterPage: React.FC = () => {
                 onChange={e => setPassword(e.target.value)}
                 required
                 fullWidth
+                size="medium"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -75,7 +77,6 @@ const RegisterPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="contained"
-                size="large"
                 startIcon={<PersonAddIcon />}
                 disabled={loading}
                 sx={{ fontWeight: 700, fontSize: '1.1rem', borderRadius: 3, boxShadow: 2, py: 1.2 }}
