@@ -8,7 +8,7 @@ echo "Listing contents:"
 ls -la
 
 echo "Running database migrations..."
-alembic upgrade head --config /app/alembic.ini
+alembic -c /app/alembic.ini upgrade head
 
 echo "Running database seeding..."
 python -c "from app.db.seed_problems import seed_problems; seed_problems()"
