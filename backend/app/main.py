@@ -11,31 +11,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
 from app.db.models import Room, User
-
-# Socket.io server
-sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
-
-app = FastAPI()
-
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-import os
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
-
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=SESSION_SECRET_KEY
-)
+from app.sockets import sio
 
 sio_app = socketio.ASGIApp(sio, app)
 

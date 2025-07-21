@@ -4,7 +4,7 @@ from ...db import models, schemas
 from ...api import deps
 import random, string
 import time
-from app.main import sio
+from app.sockets import sio
 
 router = APIRouter()
 
