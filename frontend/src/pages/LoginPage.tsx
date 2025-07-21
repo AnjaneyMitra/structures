@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, Paper, TextField, Typography, Stack, Alert, InputAdornment } from '@mui/material';
+import { Box, Button, Container, Paper, TextField, Typography, Stack, Alert, InputAdornment, Divider } from '@mui/material';
 import axios from 'axios';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
 import GoogleIcon from '@mui/icons-material/Google';
+import { AnimatedBackground } from '../components/BackgroundEffects';
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -52,10 +53,50 @@ const LoginPage: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #6C63FF 0%, #3A86FF 100%)' }}>
-      <Container maxWidth="xs">
-        <Paper elevation={8} sx={{ p: 5, borderRadius: 5, textAlign: 'center', background: 'rgba(255,255,255,0.97)', boxShadow: '0 4px 32px 0 rgba(108,99,255,0.10)' }}>
-          <Typography variant="h4" sx={{ mb: 2, fontWeight: 700, color: 'primary.main', letterSpacing: '-0.02em' }}>Login</Typography>
+    <Box 
+      sx={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #3B82F6 100%)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <AnimatedBackground variant="geometric" opacity={0.1} />
+      
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 2 }}>
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: { xs: 4, md: 6 }, 
+            borderRadius: 6, 
+            textAlign: 'center',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)',
+          }}
+        >
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              mb: 1, 
+              fontWeight: 800, 
+              letterSpacing: '-0.02em',
+              background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            Welcome Back
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontWeight: 500 }}>
+            Sign in to continue your coding journey
+          </Typography>
+          
           <form onSubmit={handleSubmit}>
             <Stack spacing={3}>
               <TextField
@@ -65,6 +106,7 @@ const LoginPage: React.FC = () => {
                 required
                 autoFocus
                 fullWidth
+                size="large"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -80,6 +122,7 @@ const LoginPage: React.FC = () => {
                 onChange={e => setPassword(e.target.value)}
                 required
                 fullWidth
+                size="large"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -88,27 +131,56 @@ const LoginPage: React.FC = () => {
                   ),
                 }}
               />
-              {error && <Alert severity="error">{error}</Alert>}
+              {error && (
+                <Alert 
+                  severity="error" 
+                  sx={{ 
+                    borderRadius: 3,
+                    boxShadow: '0 4px 20px rgba(239, 68, 68, 0.1)',
+                  }}
+                >
+                  {error}
+                </Alert>
+              )}
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
                 startIcon={<LoginIcon />}
                 disabled={loading}
-                sx={{ fontWeight: 700, fontSize: '1.1rem', borderRadius: 3, boxShadow: 2, py: 1.2 }}
+                sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '1.2rem', 
+                  py: 1.8,
+                  borderRadius: 4,
+                }}
                 fullWidth
               >
-                {loading ? 'Logging in...' : 'Login'}
+                {loading ? 'Signing in...' : 'Sign In'}
               </Button>
+              
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  or
+                </Typography>
+              </Divider>
+              
               <Button
                 variant="outlined"
                 size="large"
                 startIcon={<GoogleIcon />}
                 onClick={handleGoogleLogin}
-                sx={{ fontWeight: 700, fontSize: '1.1rem', borderRadius: 3, boxShadow: 2, py: 1.2, mt: 2 }}
+                sx={{ 
+                  fontWeight: 700, 
+                  fontSize: '1.1rem', 
+                  py: 1.8,
+                  borderRadius: 4,
+                  borderWidth: 2,
+                  '&:hover': { borderWidth: 2 }
+                }}
                 fullWidth
               >
-                Sign in with Google
+                Continue with Google
               </Button>
             </Stack>
           </form>

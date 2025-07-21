@@ -5,8 +5,10 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Drawer from '@mui/material/Drawer';
 import { Link, useLocation } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
 
 const navLinks = [
   { label: 'Dashboard', to: '/dashboard', icon: <DashboardIcon sx={{ mr: 1 }} /> },
@@ -110,17 +112,34 @@ const AppBar: React.FC = () => {
             </IconButton>
           </Box>
         </Stack>
-        <Box>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <ThemeToggle />
           <Tooltip title="Account">
             <IconButton
               size="large"
               edge="end"
               color="inherit"
               onClick={handleMenu}
-              sx={{ ml: 2, p: 0 }}
+              sx={{ p: 0 }}
               aria-label="Open account menu"
             >
-              <Avatar alt={user.name} src={user.avatar} sx={{ bgcolor: '#6C63FF', width: 40, height: 40, fontWeight: 700, border: '2px solid #fff', boxShadow: 2 }}>
+              <Avatar 
+                alt={user.name} 
+                src={user.avatar} 
+                sx={{ 
+                  background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
+                  width: 44, 
+                  height: 44, 
+                  fontWeight: 700, 
+                  border: '2px solid rgba(255, 255, 255, 0.2)', 
+                  boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    boxShadow: '0 6px 30px rgba(99, 102, 241, 0.4)',
+                  }
+                }}
+              >
                 {user.name[0]}
               </Avatar>
             </IconButton>
@@ -131,16 +150,45 @@ const AppBar: React.FC = () => {
             onClose={handleClose}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            PaperProps={{ sx: { borderRadius: 3, minWidth: 160 } }}
+            PaperProps={{ 
+              sx: { 
+                borderRadius: 4, 
+                minWidth: 180,
+                mt: 1,
+                boxShadow: '0 8px 40px rgba(99, 102, 241, 0.15)',
+              } 
+            }}
           >
-            <MenuItem onClick={handleClose} component={Link} to="/profile">
-              <AccountCircleIcon sx={{ mr: 1 }} /> Profile
+            <MenuItem 
+              onClick={handleClose} 
+              component={Link} 
+              to="/profile"
+              sx={{ 
+                borderRadius: 2, 
+                mx: 1, 
+                my: 0.5,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%)',
+                }
+              }}
+            >
+              <AccountCircleIcon sx={{ mr: 2, color: '#6366F1' }} /> Profile
             </MenuItem>
-            <MenuItem onClick={() => { handleClose(); handleLogout(); }}>
-              <MenuIcon sx={{ mr: 1 }} /> Logout
+            <MenuItem 
+              onClick={() => { handleClose(); handleLogout(); }}
+              sx={{ 
+                borderRadius: 2, 
+                mx: 1, 
+                my: 0.5,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)',
+                }
+              }}
+            >
+              <LogoutIcon sx={{ mr: 2, color: '#EF4444' }} /> Logout
             </MenuItem>
           </Menu>
-        </Box>
+        </Stack>
       </Toolbar>
       <Drawer
         anchor="left"

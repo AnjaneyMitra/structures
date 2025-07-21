@@ -6,6 +6,7 @@ import time
 import signal
 from typing import Dict, Any, Optional, Tuple
 import resource
+import platform
 
 class CodeExecutor:
     def __init__(self, timeout: int = 5, memory_limit_mb: int = 128):
@@ -37,13 +38,14 @@ class CodeExecutor:
                 resource.setrlimit(resource.RLIMIT_AS, (self.memory_limit_mb * 1024 * 1024, -1))
             
             # Execute the code
+            use_preexec = platform.system() == 'Linux'
             process = subprocess.Popen(
                 ['python3', tmp_file_path],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                preexec_fn=limit_memory
+                preexec_fn=limit_memory if use_preexec else None
             )
             
             try:
@@ -96,7 +98,8 @@ class CodeExecutor:
         finally:
             # Clean up temporary file
             try:
-                os.unlink(tmp_file_path)
+                if tmp_file_path:
+                    os.unlink(tmp_file_path)
             except:
                 pass
     

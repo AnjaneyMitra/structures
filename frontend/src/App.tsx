@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Paper, Typography, Stack, Button } from '@mui/material';
+import { Box, Container, Paper, Typography, Stack, Button, Chip } from '@mui/material';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -7,45 +7,140 @@ import DashboardPage from './pages/DashboardPage';
 import AppBar from './components/AppBar';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import CodeIcon from '@mui/icons-material/Code';
+import GroupWorkIcon from '@mui/icons-material/GroupWork';
+import SpeedIcon from '@mui/icons-material/Speed';
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import RoomsPage from './pages/RoomsPage';
 import ProfilePage from './pages/ProfilePage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
-
-const bgGradient = 'linear-gradient(135deg, #6C63FF 0%, #3A86FF 100%)';
+import { AnimatedBackground } from './components/BackgroundEffects';
 
 function Landing() {
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        background: bgGradient,
+        background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #3B82F6 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        p: 0,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <Container maxWidth="md" sx={{ zIndex: 2 }}>
-        <Paper elevation={6} sx={{ p: { xs: 3, md: 6 }, borderRadius: 6, textAlign: 'center', background: 'rgba(255,255,255,0.95)' }}>
-          <Typography variant="h1" sx={{ mb: 2, fontSize: { xs: '2.5rem', md: '3.5rem' }, fontWeight: 800, letterSpacing: '-0.03em', color: 'primary.main', fontFamily: 'Space Grotesk, Inter, sans-serif' }}>
+      <AnimatedBackground variant="gradient" opacity={0.15} />
+      
+      <Container maxWidth="lg" sx={{ zIndex: 2, position: 'relative' }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: { xs: 4, md: 8 }, 
+            borderRadius: 6, 
+            textAlign: 'center',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)',
+          }}
+        >
+          <Typography 
+            variant="h1" 
+            sx={{ 
+              mb: 3, 
+              fontSize: { xs: '2.8rem', md: '4.5rem' }, 
+              fontWeight: 800, 
+              letterSpacing: '-0.03em',
+              fontFamily: 'Space Grotesk, Inter, sans-serif',
+              background: 'linear-gradient(135deg, #6366F1 0%, #EC4899 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
             DSA Collaborative
           </Typography>
-          <Typography variant="h5" sx={{ mb: 4, color: 'text.secondary', fontWeight: 400 }}>
-            Solve Data Structures & Algorithms problems together in real time.<br />
+          
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              mb: 4, 
+              color: 'text.secondary', 
+              fontWeight: 400,
+              lineHeight: 1.6,
+              maxWidth: '600px',
+              mx: 'auto',
+            }}
+          >
+            Solve Data Structures & Algorithms problems together in real time.
+            <br />
             Beautiful, modern, and collaborative—like LeetCode, but social.
           </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center" sx={{ mb: 2 }}>
+
+          <Stack 
+            direction="row" 
+            spacing={2} 
+            justifyContent="center" 
+            sx={{ mb: 6, flexWrap: 'wrap', gap: 2 }}
+          >
+            <Chip 
+              icon={<CodeIcon />} 
+              label="Real-time Coding" 
+              sx={{ 
+                background: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
+                color: 'white',
+                fontWeight: 600,
+                px: 2,
+                py: 1,
+              }} 
+            />
+            <Chip 
+              icon={<GroupWorkIcon />} 
+              label="Collaborative Rooms" 
+              sx={{ 
+                background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                color: 'white',
+                fontWeight: 600,
+                px: 2,
+                py: 1,
+              }} 
+            />
+            <Chip 
+              icon={<SpeedIcon />} 
+              label="Instant Execution" 
+              sx={{ 
+                background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+                color: 'white',
+                fontWeight: 600,
+                px: 2,
+                py: 1,
+              }} 
+            />
+          </Stack>
+          
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            spacing={3} 
+            justifyContent="center" 
+            sx={{ mb: 4 }}
+          >
             <Button
               component={Link}
               to="/login"
               variant="contained"
               size="large"
               startIcon={<LoginIcon />}
-              sx={{ fontWeight: 700, fontSize: '1.1rem', px: 4, borderRadius: 3, boxShadow: 2 }}
+              sx={{ 
+                fontWeight: 700, 
+                fontSize: '1.2rem', 
+                px: 5, 
+                py: 1.5,
+                borderRadius: 4,
+                minWidth: 160,
+              }}
             >
-              Login
+              Get Started
             </Button>
             <Button
               component={Link}
@@ -53,28 +148,31 @@ function Landing() {
               variant="outlined"
               size="large"
               startIcon={<PersonAddIcon />}
-              sx={{ fontWeight: 700, fontSize: '1.1rem', px: 4, borderRadius: 3, boxShadow: 2 }}
+              sx={{ 
+                fontWeight: 700, 
+                fontSize: '1.2rem', 
+                px: 5, 
+                py: 1.5,
+                borderRadius: 4,
+                minWidth: 160,
+                borderWidth: 2,
+                '&:hover': { borderWidth: 2 }
+              }}
             >
-              Register
+              Sign Up Free
             </Button>
           </Stack>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>
-            Built with <span style={{ color: '#6C63FF', fontWeight: 600 }}>React</span>, <span style={{ color: '#3A86FF', fontWeight: 600 }}>Material UI</span>, and <span style={{ color: '#FF6584', fontWeight: 600 }}>Socket.io</span>.
+          
+          <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.8 }}>
+            Built with{' '}
+            <Box component="span" sx={{ color: '#6366F1', fontWeight: 600 }}>React</Box>
+            {', '}
+            <Box component="span" sx={{ color: '#EC4899', fontWeight: 600 }}>Material UI</Box>
+            {', and '}
+            <Box component="span" sx={{ color: '#10B981', fontWeight: 600 }}>Socket.io</Box>
           </Typography>
         </Paper>
       </Container>
-      <Box
-        sx={{
-          position: 'fixed',
-          width: '100vw',
-          height: '100vh',
-          zIndex: 0,
-          top: 0,
-          left: 0,
-          background: 'radial-gradient(circle at 70% 30%, #FF6584 0%, transparent 60%), radial-gradient(circle at 20% 80%, #43AA8B 0%, transparent 70%)',
-          opacity: 0.18,
-        }}
-      />
     </Box>
   );
 }
