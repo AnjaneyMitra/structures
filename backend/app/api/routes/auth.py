@@ -11,8 +11,8 @@ from fastapi.responses import RedirectResponse
 
 router = APIRouter()
 
-GOOGLE_CLIENT_ID = "1065039429672-5gnr803l9jnr9rvnkj0ltalosup5uumu.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"  # In production, use env var
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
 # Setup Authlib OAuth
 oauth = OAuth()
@@ -92,5 +92,5 @@ async def google_auth_callback(request: Request, db: Session = Depends(deps.get_
         db.refresh(user)
     access_token = auth.create_access_token({"sub": user.username})
     # Redirect to frontend with token and username
-    frontend_url = f"http://localhost:3000/login?access_token={access_token}&username={user.username}"
+    frontend_url = f"https://structures-nine.vercel.app/login?access_token={access_token}&username={user.username}"
     return RedirectResponse(frontend_url) 
