@@ -74,6 +74,12 @@ const CollaborativeRoomPage: React.FC = () => {
   const [userSubmissions, setUserSubmissions] = useState<any[]>([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [showSubmissions, setShowSubmissions] = useState(false);
+  const [roomData, setRoomData] = useState<any>(null);
+  const [roomUsers, setRoomUsers] = useState<any[]>([]);
+  const [roomLoading, setRoomLoading] = useState(true);
+  const [roomError, setRoomError] = useState('');
+  const [problemData, setProblemData] = useState<any>(null);
+  const [showProblem, setShowProblem] = useState(false);
 
   useEffect(() => {
     codeRef.current = code;
@@ -93,7 +99,7 @@ const CollaborativeRoomPage: React.FC = () => {
     socketRef.current = socket;
     socket.on('connect', () => {
       setConnected(true);
-      socket.emit('join_room', { room: roomCode, username });
+      socket.emit('join_room', { room: roomCode, username: username || 'Anonymous' });
     });
     socket.on('disconnect', () => setConnected(false));
     socket.on('code_update', (data: any) => {
@@ -104,14 +110,16 @@ const CollaborativeRoomPage: React.FC = () => {
       }
     });
     socket.on('user_joined', (data: any) => {
-      setUsers(prev => prev.includes(data.username || data.sid) ? prev : [...prev, data.username || data.sid]);
+      const userToAdd = data.username || data.sid;
+      setUsers(prev => prev.includes(userToAdd) ? prev : [...prev, userToAdd]);
       if (data.username && data.username !== username) {
         setNotifications(n => [...n, `${data.username} joined the room`]);
         setOpenNotif(true);
       }
     });
     socket.on('user_left', (data: any) => {
-      setUsers(prev => prev.filter(u => u !== (data.username || data.sid)));
+      const userToRemove = data.username || data.sid;
+      setUsers(prev => prev.filter(u => u !== userToRemove));
       if (data.username && data.username !== username) {
         setNotifications(n => [...n, `${data.username} left the room`]);
         setOpenNotif(true);
@@ -122,6 +130,19 @@ const CollaborativeRoomPage: React.FC = () => {
     });
     socket.on('language_update', (data: any) => {
       if (data.language && data.language !== language) setLanguage(data.language);
+    });
+    socket.on('code_executed', (data: any) => {
+      if (data.username !== username) {
+        setNotifications(n => [...n, `${data.username} ran their code`]);
+        setOpenNotif(true);
+      }
+    });
+    socket.on('code_submitted', (data: any) => {
+      if (data.username !== username) {
+        const status = data.passed ? 'passed' : 'failed';
+        setNotifications(n => [...n, `${data.username} submitted code - ${status}`]);
+        setOpenNotif(true);
+      }
     });
     return () => {
       socket.emit('leave_room', { room: roomCode });
@@ -139,8 +160,49 @@ const CollaborativeRoomPage: React.FC = () => {
     // Get username from localStorage or profile API
     const stored = localStorage.getItem('username');
     if (stored) setUsername(stored);
-    // Optionally fetch from API if not found
-  }, []);
+    
+    // Fetch room data and users
+    const fetchRoomData = async () => {
+      setRoomLoading(true);
+      setRoomError('');
+      try {
+        const token = localStorage.getItem('token');
+        const [roomRes, usersRes] = await Promise.all([
+          axios.get(`https://structures-production.up.railway.app/api/rooms/code/${roomCode}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`https://structures-production.up.railway.app/api/rooms/${roomCode}/users`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        ]);
+        setRoomData(roomRes.data);
+        setRoomUsers(usersRes.data);
+        // Initialize users list with room participants
+        setUsers(usersRes.data.map((u: any) => u.username));
+        
+        // Fetch problem details
+        if (roomRes.data.problem_id) {
+          try {
+            const problemRes = await axios.get(`https://structures-production.up.railway.app/api/problems/${roomRes.data.problem_id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setProblemData(problemRes.data);
+          } catch (err) {
+            console.error('Failed to fetch problem data:', err);
+          }
+        }
+      } catch (err: any) {
+        console.error('Failed to fetch room data:', err);
+        setRoomError(err.response?.data?.detail || 'Failed to load room data');
+      } finally {
+        setRoomLoading(false);
+      }
+    };
+    
+    if (roomCode) {
+      fetchRoomData();
+    }
+  }, [roomCode]);
 
   const handleCodeChange = (val: string | undefined) => {
     if (val !== code) {
@@ -197,18 +259,27 @@ const CollaborativeRoomPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'https://structures-production.up.railway.app/api/submissions/',
+        `https://structures-production.up.railway.app/api/rooms/${roomCode}/execute`,
         {
           code,
           language,
-          problem_id: undefined, // You may want to pass a real problem_id if available
           sample_only: true,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setRunResult(res.data.test_case_results ? res.data.test_case_results[0] : null);
+      const result = res.data.test_case_results ? res.data.test_case_results[0] : null;
+      setRunResult(result);
+      
+      // Emit socket event for real-time updates
+      if (socketRef.current) {
+        socketRef.current.emit('code_executed', {
+          room: roomCode,
+          result: res.data,
+          sample_only: true
+        });
+      }
     } catch (err: any) {
       setSubmitError(err.response?.data?.detail || 'Run failed');
     } finally {
@@ -223,17 +294,25 @@ const CollaborativeRoomPage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        'https://structures-production.up.railway.app/api/submissions/',
+        `https://structures-production.up.railway.app/api/rooms/${roomCode}/submit`,
         {
           code,
           language,
-          problem_id: undefined, // You may want to pass a real problem_id if available
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       setResults(res.data.test_case_results || []);
+      
+      // Emit socket event for real-time updates
+      if (socketRef.current) {
+        socketRef.current.emit('code_submitted', {
+          room: roomCode,
+          result: res.data,
+          passed: res.data.overall_status === 'pass'
+        });
+      }
     } catch (err: any) {
       setSubmitError(err.response?.data?.detail || 'Submission failed');
     } finally {
@@ -247,20 +326,41 @@ const CollaborativeRoomPage: React.FC = () => {
     setShowSubmissions(true);
     try {
       const token = localStorage.getItem('token');
-      // Try to get problemId from URL or props, fallback to undefined
-      const pid = problemId || undefined;
-      if (!pid) return;
-      const res = await axios.get(`https://structures-production.up.railway.app/api/submissions/problem/${pid}`, {
+      const res = await axios.get(`https://structures-production.up.railway.app/api/rooms/${roomCode}/submissions`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Filter by username if available
-      setUserSubmissions(res.data.filter((s: any) => s.username === user));
+      const userSubs = res.data.filter((s: any) => s.username === user);
+      setUserSubmissions(userSubs);
     } catch (err) {
+      console.error('Failed to fetch user submissions:', err);
       setUserSubmissions([]);
     } finally {
       setLoadingSubmissions(false);
     }
   };
+
+  if (roomLoading) {
+    return (
+      <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto', textAlign: 'center' }}>
+        <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2 }}>Loading room...</Typography>
+      </Box>
+    );
+  }
+
+  if (roomError) {
+    return (
+      <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {roomError}
+        </Alert>
+        <Button variant="contained" onClick={() => window.location.href = '/rooms'}>
+          Back to Rooms
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
@@ -269,7 +369,26 @@ const CollaborativeRoomPage: React.FC = () => {
           <Stack direction="row" spacing={2} alignItems="center" mb={2}>
             <Typography variant="h5" fontWeight={700} color="primary">Room: {roomCode}</Typography>
             <Chip label={connected ? 'Connected' : 'Disconnected'} color={connected ? 'success' : 'error'} />
-            <Chip label={`Users: ${users.length}`} color="info" />
+            <Chip label={`Users: ${Math.max(users.length, roomUsers.length)}`} color="info" />
+            {roomData && (
+              <Chip 
+                label={`Problem #${roomData.problem_id}`} 
+                color="secondary" 
+                variant="outlined"
+                onClick={() => setShowProblem(!showProblem)}
+                sx={{ cursor: 'pointer' }}
+              />
+            )}
+            {problemData && (
+              <Button 
+                variant="text" 
+                size="small" 
+                onClick={() => setShowProblem(!showProblem)}
+                sx={{ textTransform: 'none' }}
+              >
+                {showProblem ? 'Hide Problem' : 'Show Problem'}
+              </Button>
+            )}
             <Stack direction="row" spacing={-1} ml={2}>
               {users.map((u, i) => (
                 <Tooltip key={u} title={u}><Avatar sx={{ width: 28, height: 28, bgcolor: stringToColor(u), fontSize: 14, border: '2px solid #fff', zIndex: users.length - i }}>{u.slice(0, 2)}</Avatar></Tooltip>
@@ -291,6 +410,40 @@ const CollaborativeRoomPage: React.FC = () => {
             <Button onClick={handleRedo} disabled={redoStack.length === 0}>Redo</Button>
           </Stack>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          
+          {showProblem && problemData && (
+            <Paper variant="outlined" sx={{ p: 3, mb: 3, background: '#f8f9ff', border: '1px solid #e0e7ff' }}>
+              <Typography variant="h6" fontWeight={700} color="primary" mb={2}>
+                {problemData.title}
+              </Typography>
+              <Chip label={problemData.difficulty} color={
+                problemData.difficulty === 'Easy' ? 'success' : 
+                problemData.difficulty === 'Medium' ? 'warning' : 'error'
+              } size="small" sx={{ mb: 2 }} />
+              <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
+                {problemData.description}
+              </Typography>
+              {problemData.sample_input && problemData.sample_output && (
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={700} mb={1}>Sample:</Typography>
+                  <Stack direction="row" spacing={2}>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Input:</Typography>
+                      <Paper variant="outlined" sx={{ p: 1, fontFamily: 'monospace', fontSize: 14, background: '#fff' }}>
+                        {problemData.sample_input}
+                      </Paper>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Output:</Typography>
+                      <Paper variant="outlined" sx={{ p: 1, fontFamily: 'monospace', fontSize: 14, background: '#fff' }}>
+                        {problemData.sample_output}
+                      </Paper>
+                    </Box>
+                  </Stack>
+                </Box>
+              )}
+            </Paper>
+          )}
           <MonacoEditor
             height="400px"
             language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
@@ -368,23 +521,42 @@ const CollaborativeRoomPage: React.FC = () => {
           )}
         </Paper>
         <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 4, minWidth: 320, maxHeight: 500, display: 'flex', flexDirection: 'column', background: '#f7f7fa', boxShadow: '0 2px 12px 0 rgba(108,99,255,0.07)' }}>
-          <Typography variant="h6" fontWeight={700} mb={2} color="primary">Users in Room</Typography>
+          <Typography variant="h6" fontWeight={700} mb={2} color="primary">Users in Room ({Math.max(users.length, roomUsers.length)})</Typography>
           <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-            {users.map(u => (
+            {/* Show room participants from backend */}
+            {roomUsers.map(u => (
+              <Chip
+                key={u.id}
+                avatar={<Avatar sx={{ bgcolor: stringToColor(u.username), width: 24, height: 24, fontSize: 14 }}>{u.username.slice(0, 2)}</Avatar>}
+                label={u.username === username ? `${u.username} (You)` : u.username}
+                color={selectedUser === u.username ? 'primary' : 'default'}
+                onClick={() => {
+                  setSelectedUser(u.username === selectedUser ? null : u.username);
+                  setSelectedHistoryIndex({});
+                  if (u.username !== selectedUser) fetchUserSubmissions(u.username);
+                  else setShowSubmissions(false);
+                }}
+                sx={{ 
+                  fontWeight: 600, 
+                  cursor: 'pointer', 
+                  mb: 1, 
+                  border: activeUser === u.username ? '2px solid #4caf50' : undefined, 
+                  background: activeUser === u.username ? '#e7fbe7' : undefined,
+                  opacity: users.includes(u.username) ? 1 : 0.6 // Show offline users with reduced opacity
+                }}
+                variant={activeUser === u.username ? 'filled' : 'outlined'}
+                icon={<HistoryIcon fontSize="small" />}
+              />
+            ))}
+            {/* Show any additional connected users not in room participants */}
+            {users.filter(u => !roomUsers.some(ru => ru.username === u)).map(u => (
               <Chip
                 key={u}
                 avatar={<Avatar sx={{ bgcolor: stringToColor(u), width: 24, height: 24, fontSize: 14 }}>{u.slice(0, 2)}</Avatar>}
-                label={u === username ? `${u} (You)` : u}
-                color={selectedUser === u ? 'primary' : 'default'}
-                onClick={() => {
-                  setSelectedUser(u === selectedUser ? null : u);
-                  setSelectedHistoryIndex({});
-                  if (u !== selectedUser) fetchUserSubmissions(u);
-                  else setShowSubmissions(false);
-                }}
-                sx={{ fontWeight: 600, cursor: 'pointer', mb: 1, border: activeUser === u ? '2px solid #4caf50' : undefined, background: activeUser === u ? '#e7fbe7' : undefined }}
-                variant={activeUser === u ? 'filled' : 'outlined'}
-                icon={<HistoryIcon fontSize="small" />}
+                label={`${u} (Guest)`}
+                color="warning"
+                sx={{ fontWeight: 600, mb: 1, opacity: 0.8 }}
+                variant="outlined"
               />
             ))}
           </Stack>

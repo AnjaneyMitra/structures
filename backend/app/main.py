@@ -105,4 +105,30 @@ async def chat_message(sid, data):
 def language_update(sid, data):
     room = data.get("room")
     language = data.get("language")
-    sio.emit("language_update", {"language": language}, room=room, skip_sid=sid) 
+    sio.emit("language_update", {"language": language}, room=room, skip_sid=sid)
+
+@sio.event
+async def code_executed(sid, data):
+    room = data.get("room")
+    username = usernames.get(sid)
+    result = data.get("result")
+    sample_only = data.get("sample_only", True)
+    await sio.emit("code_executed", {
+        "sid": sid, 
+        "username": username, 
+        "result": result,
+        "sample_only": sample_only
+    }, room=room)
+
+@sio.event
+async def code_submitted(sid, data):
+    room = data.get("room")
+    username = usernames.get(sid)
+    result = data.get("result")
+    passed = data.get("passed", False)
+    await sio.emit("code_submitted", {
+        "sid": sid,
+        "username": username,
+        "result": result,
+        "passed": passed
+    }, room=room) 

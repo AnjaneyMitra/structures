@@ -47,13 +47,15 @@ class SubmissionOut(SubmissionBase):
 
 class RoomBase(BaseModel):
     code: str
+    problem_id: int
 
-class RoomCreate(RoomBase):
-    pass
+class RoomCreate(BaseModel):
+    problem_id: int
 
 class RoomOut(RoomBase):
     id: int
     created_at: datetime.datetime
+    participants: List[UserOut] = []
     class Config:
         orm_mode = True 
 
