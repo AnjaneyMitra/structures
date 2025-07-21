@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-socketio
+python-multipart
+python-jose
+passlib[bcrypt]
+sqlalchemy
+starlette
+requests 
+authlib 
+httpx 
+itsdangerous 
+psycopg2-binary 
+alembic 

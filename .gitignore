@@ -1,0 +1,13 @@
+admin_details.md 
+.env
+*.db
+*.sqlite3
+__pycache__/
+*.pyc
+backend_venv/
+node_modules/
+.DS_Store
+.env.local
+.env.*.local
+.vscode/
+.idea/ 
