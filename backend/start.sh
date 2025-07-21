@@ -5,6 +5,10 @@ echo "Current directory: $(pwd)"
 echo "Listing contents:"
 ls -la
 
+# Run database migrations
+echo "Running database migrations..."
+alembic upgrade head
+
 # Run database seeding
 echo "Running database seeding..."
 python -c "
