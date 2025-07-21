@@ -123,43 +123,53 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
       },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 12,
     },
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 6,
+            borderRadius: 12,
             textTransform: 'none',
             fontWeight: 500,
-            padding: '8px 16px',
+            padding: '10px 20px',
             fontSize: '0.875rem',
             boxShadow: 'none',
-            transition: 'all 0.15s ease',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              boxShadow: 'none',
-              transform: 'none',
+              transform: 'translateY(-1px)',
+              boxShadow: isLight
+                ? '0 4px 12px rgba(0, 208, 132, 0.15)'
+                : '0 4px 12px rgba(0, 0, 0, 0.3)',
             },
           },
           contained: {
-            backgroundColor: '#00D084',
+            background: isLight
+              ? 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)'
+              : 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
             color: '#FFFFFF',
+            boxShadow: '0 2px 8px rgba(0, 208, 132, 0.2)',
             '&:hover': {
-              backgroundColor: '#00A86B',
+              background: isLight
+                ? 'linear-gradient(135deg, #00A86B 0%, #1FBAB8 100%)'
+                : 'linear-gradient(135deg, #00A86B 0%, #1FBAB8 100%)',
+              boxShadow: '0 6px 20px rgba(0, 208, 132, 0.3)',
             },
           },
           outlined: {
             borderColor: isLight ? '#EBEAE6' : '#37352F',
             color: isLight ? '#37352F' : '#FFFFFF',
+            borderWidth: '1.5px',
             '&:hover': {
-              borderColor: isLight ? '#D3D1CB' : '#5E5C58',
-              backgroundColor: isLight ? '#F7F6F3' : '#37352F',
+              borderColor: '#00D084',
+              backgroundColor: isLight ? 'rgba(0, 208, 132, 0.05)' : 'rgba(0, 208, 132, 0.1)',
+              borderWidth: '1.5px',
             },
           },
           text: {
             color: isLight ? '#787774' : '#9B9A97',
             '&:hover': {
-              backgroundColor: isLight ? '#F7F6F3' : '#37352F',
+              backgroundColor: isLight ? 'rgba(0, 208, 132, 0.05)' : 'rgba(0, 208, 132, 0.1)',
             },
           },
         },
@@ -167,41 +177,44 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
       MuiPaper: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
-            backgroundColor: isLight ? '#FFFFFF' : '#2F2F2F',
-            border: isLight ? '1px solid #EBEAE6' : '1px solid #37352F',
+            borderRadius: 16,
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(47, 47, 47, 0.95)',
+            border: isLight ? '1px solid rgba(235, 234, 230, 0.6)' : '1px solid rgba(55, 53, 47, 0.6)',
             boxShadow: 'none',
+            backdropFilter: 'blur(12px)',
           },
           elevation1: {
             boxShadow: isLight
-              ? '0 1px 3px rgba(55, 53, 47, 0.1)'
-              : '0 1px 3px rgba(0, 0, 0, 0.3)',
+              ? '0 2px 8px rgba(55, 53, 47, 0.08), 0 1px 2px rgba(55, 53, 47, 0.06)'
+              : '0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
           },
           elevation2: {
             boxShadow: isLight
-              ? '0 2px 8px rgba(55, 53, 47, 0.1)'
-              : '0 2px 8px rgba(0, 0, 0, 0.3)',
+              ? '0 4px 16px rgba(55, 53, 47, 0.1), 0 2px 4px rgba(55, 53, 47, 0.06)'
+              : '0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)',
           },
           elevation3: {
             boxShadow: isLight
-              ? '0 4px 12px rgba(55, 53, 47, 0.1)'
-              : '0 4px 12px rgba(0, 0, 0, 0.3)',
+              ? '0 8px 24px rgba(55, 53, 47, 0.12), 0 4px 8px rgba(55, 53, 47, 0.08)'
+              : '0 8px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3)',
           },
         },
       },
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
-            backgroundColor: isLight ? '#FFFFFF' : '#2F2F2F',
-            border: isLight ? '1px solid #EBEAE6' : '1px solid #37352F',
+            borderRadius: 16,
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(47, 47, 47, 0.9)',
+            border: isLight ? '1px solid rgba(235, 234, 230, 0.5)' : '1px solid rgba(55, 53, 47, 0.5)',
             boxShadow: 'none',
-            transition: 'all 0.15s ease',
+            backdropFilter: 'blur(12px)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               boxShadow: isLight
-                ? '0 2px 8px rgba(55, 53, 47, 0.1)'
-                : '0 2px 8px rgba(0, 0, 0, 0.3)',
-              transform: 'translateY(-1px)',
+                ? '0 8px 32px rgba(0, 208, 132, 0.1), 0 2px 8px rgba(55, 53, 47, 0.08)'
+                : '0 8px 32px rgba(0, 208, 132, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3)',
+              transform: 'translateY(-4px)',
+              borderColor: isLight ? 'rgba(0, 208, 132, 0.2)' : 'rgba(0, 208, 132, 0.3)',
             },
           },
         },
@@ -210,16 +223,19 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              borderRadius: 6,
-              backgroundColor: isLight ? '#F7F6F3' : '#37352F',
-              border: isLight ? '1px solid #EBEAE6' : '1px solid #5E5C58',
+              borderRadius: 12,
+              backgroundColor: isLight ? 'rgba(247, 246, 243, 0.8)' : 'rgba(55, 53, 47, 0.8)',
+              border: isLight ? '1px solid rgba(235, 234, 230, 0.6)' : '1px solid rgba(94, 92, 88, 0.6)',
+              backdropFilter: 'blur(8px)',
+              transition: 'all 0.3s ease',
               '&:hover': {
-                backgroundColor: isLight ? '#EBEAE6' : '#5E5C58',
+                backgroundColor: isLight ? 'rgba(235, 234, 230, 0.8)' : 'rgba(94, 92, 88, 0.8)',
+                borderColor: isLight ? 'rgba(0, 208, 132, 0.3)' : 'rgba(0, 208, 132, 0.4)',
               },
               '&.Mui-focused': {
-                backgroundColor: isLight ? '#FFFFFF' : '#2F2F2F',
+                backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(47, 47, 47, 0.95)',
                 borderColor: '#00D084',
-                boxShadow: '0 0 0 2px rgba(0, 208, 132, 0.2)',
+                boxShadow: '0 0 0 3px rgba(0, 208, 132, 0.15)',
               },
               '& fieldset': {
                 border: 'none',
@@ -231,21 +247,29 @@ const createNotionTheme = (mode: 'light' | 'dark' = 'light') => {
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: 4,
+            borderRadius: 8,
             fontWeight: 500,
             fontSize: '0.75rem',
+            backdropFilter: 'blur(8px)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              transform: 'scale(1.05)',
+            },
           },
           colorSuccess: {
-            backgroundColor: '#00D084',
+            background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
             color: 'white',
+            boxShadow: '0 2px 8px rgba(0, 208, 132, 0.3)',
           },
           colorWarning: {
-            backgroundColor: '#FFAB00',
+            background: 'linear-gradient(135deg, #FFAB00 0%, #FFD93D 100%)',
             color: 'white',
+            boxShadow: '0 2px 8px rgba(255, 171, 0, 0.3)',
           },
           colorError: {
-            backgroundColor: '#E03E3E',
+            background: 'linear-gradient(135deg, #E03E3E 0%, #FF6B6B 100%)',
             color: 'white',
+            boxShadow: '0 2px 8px rgba(224, 62, 62, 0.3)',
           },
         },
       },

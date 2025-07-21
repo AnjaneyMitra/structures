@@ -104,53 +104,103 @@ function Landing() {
 
           {/* Right Content - Code Preview */}
           <Grid item xs={12} md={6}>
-            <Paper 
-              sx={{ 
-                p: 4,
-                backgroundColor: '#00D084',
-                borderRadius: 3,
+            <Box
+              sx={{
                 position: 'relative',
+                borderRadius: 4,
                 overflow: 'hidden',
+                background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
+                p: 0.5,
+                boxShadow: '0 20px 40px rgba(0, 208, 132, 0.2)',
               }}
             >
               <Paper
                 sx={{
-                  p: 3,
+                  p: 4,
                   backgroundColor: '#1a1a1a',
-                  borderRadius: 2,
+                  borderRadius: 3,
                   border: 'none',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
               >
-                <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                {/* Terminal Header */}
+                <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#FF5F57' }} />
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#FFBD2E' }} />
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#28CA42' }} />
+                  <Box sx={{ flex: 1 }} />
+                  <Typography variant="caption" sx={{ color: '#666', fontSize: '0.75rem' }}>
+                    two-sum.js
+                  </Typography>
                 </Stack>
+
+                {/* Code Content */}
                 <Typography 
                   variant="body2" 
                   sx={{ 
                     fontFamily: 'JetBrains Mono, monospace',
-                    color: '#00D084',
-                    lineHeight: 1.6,
+                    lineHeight: 1.8,
                     fontSize: '0.875rem',
                   }}
                 >
-                  {`// Given an array of integers and target, return indices
-// of the two numbers that add up to target.
-
-function twoSum(nums, target) {
-  const map = new Map();
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    if (map.has(complement)) {
-      return [map.get(complement), i];
-    }
-    map.set(nums[i], i);
-  }
-}`}
+                  <Box component="span" sx={{ color: '#7C7C7C' }}>
+                    {`// Given an array of integers and target, return indices`}<br />
+                    {`// of the two numbers that add up to target.`}<br /><br />
+                  </Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>function</Box>{' '}
+                  <Box component="span" sx={{ color: '#50FA7B' }}>twoSum</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>(</Box>
+                  <Box component="span" sx={{ color: '#FFB86C' }}>nums</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>, </Box>
+                  <Box component="span" sx={{ color: '#FFB86C' }}>target</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>) {`{`}<br /></Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>  const</Box>{' '}
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>map = </Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>new</Box>{' '}
+                  <Box component="span" sx={{ color: '#50FA7B' }}>Map</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>();<br /></Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>  for</Box>{' '}
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>(</Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>let</Box>{' '}
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>i = </Box>
+                  <Box component="span" sx={{ color: '#BD93F9' }}>0</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>; i {'<'} nums.length; i++) {`{`}<br /></Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>    const</Box>{' '}
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>complement = target - nums[i];<br /></Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>    if</Box>{' '}
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>(map.</Box>
+                  <Box component="span" sx={{ color: '#50FA7B' }}>has</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>(complement)) {`{`}<br /></Box>
+                  <Box component="span" sx={{ color: '#FF79C6' }}>      return</Box>{' '}
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>[map.</Box>
+                  <Box component="span" sx={{ color: '#50FA7B' }}>get</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>(complement), i];<br /></Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>    {`}`}<br /></Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>    map.</Box>
+                  <Box component="span" sx={{ color: '#50FA7B' }}>set</Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>(nums[i], i);<br /></Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>  {`}`}<br /></Box>
+                  <Box component="span" sx={{ color: '#F8F8F2' }}>{`}`}</Box>
                 </Typography>
+
+                {/* Animated cursor */}
+                <Box
+                  sx={{
+                    display: 'inline-block',
+                    width: 2,
+                    height: 20,
+                    backgroundColor: '#00D084',
+                    ml: 0.5,
+                    animation: 'blink 1s infinite',
+                    '@keyframes blink': {
+                      '0%, 50%': { opacity: 1 },
+                      '51%, 100%': { opacity: 0 },
+                    },
+                  }}
+                />
               </Paper>
-            </Paper>
+            </Box>
           </Grid>
         </Grid>
       </Container>
@@ -168,10 +218,23 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           flexGrow: 1, 
           ml: '240px', 
           minHeight: '100vh',
-          backgroundColor: 'background.default',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(251, 251, 250, 1) 100%)',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 20% 80%, rgba(0, 208, 132, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(107, 115, 255, 0.03) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          },
         }}
       >
-        {children}
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          {children}
+        </Box>
       </Box>
     </Box>
   );

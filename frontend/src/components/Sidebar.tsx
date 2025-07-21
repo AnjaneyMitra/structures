@@ -46,8 +46,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       sx={{
         width: 240,
         height: '100vh',
-        backgroundColor: '#F7F6F3',
-        borderRight: '1px solid #EBEAE6',
+        background: 'linear-gradient(180deg, rgba(247, 246, 243, 0.95) 0%, rgba(251, 251, 250, 0.95) 100%)',
+        borderRight: '1px solid rgba(235, 234, 230, 0.6)',
+        backdropFilter: 'blur(20px)',
         display: 'flex',
         flexDirection: 'column',
         position: 'fixed',
@@ -57,22 +58,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       }}
     >
       {/* Header */}
-      <Box sx={{ p: 3, borderBottom: '1px solid #EBEAE6' }}>
+      <Box sx={{ p: 3, borderBottom: '1px solid rgba(235, 234, 230, 0.6)' }}>
         <Stack direction="row" alignItems="center" spacing={2}>
           <Box
             sx={{
-              width: 28,
-              height: 28,
-              backgroundColor: '#00D084',
-              borderRadius: 1,
+              width: 32,
+              height: 32,
+              background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
+              borderRadius: 2,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0, 208, 132, 0.3)',
             }}
           >
-            <CodeIcon sx={{ color: 'white', fontSize: 16 }} />
+            <CodeIcon sx={{ color: 'white', fontSize: 18 }} />
           </Box>
-          <Typography variant="h6" fontWeight={600} color="#37352F" sx={{ fontSize: '1rem' }}>
+          <Typography variant="h6" fontWeight={700} color="#37352F" sx={{ fontSize: '1.1rem' }}>
             CodeTogether
           </Typography>
         </Stack>
@@ -90,18 +92,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
                 to={item.path}
                 selected={isActive}
                 sx={{
-                  mb: 0.5,
-                  borderRadius: 1,
+                  mb: 1,
+                  borderRadius: 2,
                   color: '#787774',
+                  mx: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&.Mui-selected': {
-                    backgroundColor: '#00D084',
+                    background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
                     color: 'white',
+                    boxShadow: '0 4px 12px rgba(0, 208, 132, 0.3)',
+                    transform: 'translateX(4px)',
                     '& .MuiListItemIcon-root': {
                       color: 'white',
                     },
                   },
                   '&:hover': {
-                    backgroundColor: '#EBEAE6',
+                    backgroundColor: 'rgba(0, 208, 132, 0.08)',
+                    transform: 'translateX(2px)',
                   },
                 }}
               >
@@ -122,20 +129,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
       </Box>
 
       {/* Footer */}
-      <Box sx={{ p: 2, borderTop: '1px solid #EBEAE6' }}>
+      <Box sx={{ p: 3, borderTop: '1px solid rgba(235, 234, 230, 0.6)' }}>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
           <Avatar
             sx={{
-              width: 28,
-              height: 28,
-              backgroundColor: '#00D084',
-              fontSize: '0.75rem',
+              width: 32,
+              height: 32,
+              background: 'linear-gradient(135deg, #00D084 0%, #26D0CE 100%)',
+              fontSize: '0.875rem',
+              boxShadow: '0 2px 8px rgba(0, 208, 132, 0.3)',
             }}
           >
             {user.name[0].toUpperCase()}
           </Avatar>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="body2" fontWeight={500} color="#37352F" sx={{ fontSize: '0.875rem' }}>
+            <Typography variant="body2" fontWeight={600} color="#37352F" sx={{ fontSize: '0.875rem' }}>
               {user.name}
             </Typography>
           </Box>
@@ -143,12 +151,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
         </Stack>
         
         <Stack direction="row" spacing={1}>
-          <IconButton size="small" sx={{ color: '#787774' }}>
+          <IconButton 
+            size="small" 
+            sx={{ 
+              color: '#787774',
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 208, 132, 0.08)',
+                color: '#00D084',
+              }
+            }}
+          >
             <SettingsIcon fontSize="small" />
           </IconButton>
           <IconButton 
             size="small" 
-            sx={{ color: '#787774' }}
+            sx={{ 
+              color: '#787774',
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(224, 62, 62, 0.08)',
+                color: '#E03E3E',
+              }
+            }}
             onClick={handleLogout}
           >
             <PersonIcon fontSize="small" />

@@ -59,18 +59,31 @@ const LoginPage: React.FC = () => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(251, 251, 250, 1) 100%)',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 30% 70%, rgba(0, 208, 132, 0.05) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(107, 115, 255, 0.05) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        },
       }}
     >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
         <Paper 
-          elevation={1}
+          elevation={2}
           sx={{ 
             p: { xs: 4, md: 6 }, 
-            borderRadius: 2, 
+            borderRadius: 4, 
             textAlign: 'center',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #EBEAE6',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid rgba(235, 234, 230, 0.6)',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 20px 40px rgba(55, 53, 47, 0.1)',
           }}
         >
           <Typography 
