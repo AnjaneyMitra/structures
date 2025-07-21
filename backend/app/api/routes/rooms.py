@@ -67,7 +67,7 @@ def get_room_users(room_code: str, db: Session = Depends(deps.get_db), user=Depe
     return [{"id": p.id, "username": p.username} for p in room.participants]
 
 @router.post("/{room_code}/execute")
-def execute_code_in_room(room_code: str, data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+async def execute_code_in_room(room_code: str, data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
     room = db.query(models.Room).options(joinedload(models.Room.participants)).filter(models.Room.code == room_code).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -104,13 +104,12 @@ def execute_code_in_room(room_code: str, data: dict = Body(...), db: Session = D
             execution_result = execution_results
         # Emit run output to all users if share_run_output is true
         if share_run_output:
-            import asyncio
-            asyncio.create_task(sio.emit("run_output_shared", {
+            await sio.emit("run_output_shared", {
                 "room": room_code,
                 "user_id": user.id,
                 "username": user.username,
                 "result": execution_result
-            }, room=room_code))
+            }, room=room_code)
         return execution_result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
