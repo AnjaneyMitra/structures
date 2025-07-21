@@ -80,6 +80,10 @@ const CollaborativeRoomPage: React.FC = () => {
   const [roomError, setRoomError] = useState('');
   const [problemData, setProblemData] = useState<any>(null);
   const [showProblem, setShowProblem] = useState(false);
+  const [sharingRun, setSharingRun] = useState(false);
+  const [roomSubmissions, setRoomSubmissions] = useState<any[]>([]);
+  const [loadingRoomSubmissions, setLoadingRoomSubmissions] = useState(true);
+  const [expandedSubmission, setExpandedSubmission] = useState<number | null>(null);
 
   useEffect(() => {
     codeRef.current = code;
@@ -204,6 +208,39 @@ const CollaborativeRoomPage: React.FC = () => {
     }
   }, [roomCode]);
 
+  // Fetch room submissions on mount
+  useEffect(() => {
+    const fetchRoomSubmissions = async () => {
+      setLoadingRoomSubmissions(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`https://structures-production.up.railway.app/api/rooms/${roomCode}/submissions`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setRoomSubmissions(res.data.reverse()); // latest first
+      } catch (err) {
+        setRoomSubmissions([]);
+      } finally {
+        setLoadingRoomSubmissions(false);
+      }
+    };
+    if (roomCode) fetchRoomSubmissions();
+  }, [roomCode]);
+  // Listen for real-time submission events
+  useEffect(() => {
+    if (!socketRef.current) return;
+    const socket = socketRef.current;
+    const handleRoomSubmission = (data: any) => {
+      if (data && data.submission) {
+        setRoomSubmissions(prev => [data.submission, ...prev]);
+      }
+    };
+    socket.on('room_submission', handleRoomSubmission);
+    return () => {
+      socket.off('room_submission', handleRoomSubmission);
+    };
+  }, [socketRef]);
+
   const handleCodeChange = (val: string | undefined) => {
     if (val !== code) {
       setUndoStack(prev => [...prev, code]);
@@ -252,8 +289,9 @@ const CollaborativeRoomPage: React.FC = () => {
     }
   };
 
-  const handleRun = async () => {
-    setRunning(true);
+  const handleRun = async (share: boolean = false) => {
+    if (share) setSharingRun(true);
+    else setRunning(true);
     setRunResult(null);
     setSubmitError('');
     try {
@@ -264,6 +302,7 @@ const CollaborativeRoomPage: React.FC = () => {
           code,
           language,
           sample_only: true,
+          share_run_output: share,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -277,13 +316,15 @@ const CollaborativeRoomPage: React.FC = () => {
         socketRef.current.emit('code_executed', {
           room: roomCode,
           result: res.data,
-          sample_only: true
+          sample_only: true,
+          shared: share
         });
       }
     } catch (err: any) {
       setSubmitError(err.response?.data?.detail || 'Run failed');
     } finally {
-      setRunning(false);
+      if (share) setSharingRun(false);
+      else setRunning(false);
     }
   };
 
@@ -462,10 +503,20 @@ const CollaborativeRoomPage: React.FC = () => {
               color="secondary"
               startIcon={<PlayArrowIcon />}
               sx={{ fontWeight: 700, borderRadius: 2, px: 4, mr: 2 }}
-              onClick={handleRun}
-              disabled={running}
+              onClick={() => handleRun(false)}
+              disabled={running || sharingRun}
             >
               {running ? 'Running...' : 'Run Code'}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<PlayArrowIcon />}
+              sx={{ fontWeight: 700, borderRadius: 2, px: 4, mr: 2 }}
+              onClick={() => handleRun(true)}
+              disabled={sharingRun || running}
+            >
+              {sharingRun ? 'Sharing...' : 'Share Run Output'}
             </Button>
             <Button
               variant="contained"
@@ -634,6 +685,54 @@ const CollaborativeRoomPage: React.FC = () => {
           {notifications[notifications.length - 1]}
         </MuiAlert>
       </Snackbar>
+      {/* Room Submission History */}
+      <Box mt={4}>
+        <Typography variant="h6" fontWeight={700} mb={2}>Room Submission History</Typography>
+        {loadingRoomSubmissions ? (
+          <CircularProgress size={24} />
+        ) : roomSubmissions.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">No submissions yet.</Typography>
+        ) : (
+          <Stack spacing={2}>
+            {roomSubmissions.map((sub, idx) => (
+              <Paper key={idx} variant="outlined" sx={{ p: 2, background: sub.overall_status === 'pass' ? '#e7fbe7' : '#fff0f0', borderLeft: sub.overall_status === 'pass' ? '4px solid #4caf50' : '4px solid #f44336' }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Chip label={sub.overall_status} color={sub.overall_status === 'pass' ? 'success' : 'error'} size="small" />
+                  <Typography variant="subtitle2" fontWeight={700}>{sub.username}</Typography>
+                  <Typography variant="body2" color="text.secondary">{sub.execution_time ? `${sub.execution_time.toFixed(3)}s` : ''}</Typography>
+                  <Typography variant="body2" color="text.secondary">{sub.submission_time ? new Date(sub.submission_time).toLocaleString() : ''}</Typography>
+                  <Button size="small" onClick={() => setExpandedSubmission(expandedSubmission === idx ? null : idx)}>
+                    {expandedSubmission === idx ? 'Hide' : 'Show'} Details
+                  </Button>
+                </Stack>
+                {expandedSubmission === idx && (
+                  <Box mt={2}>
+                    <Typography variant="subtitle2" fontWeight={700}>Code:</Typography>
+                    <Paper variant="outlined" sx={{ p: 1, fontFamily: 'JetBrains Mono, monospace', fontSize: 13, background: '#f4f4fa', whiteSpace: 'pre-wrap', wordBreak: 'break-all', mb: 2 }}>
+                      {sub.code}
+                    </Paper>
+                    <Typography variant="subtitle2" fontWeight={700}>Test Case Results:</Typography>
+                    <Stack spacing={1}>
+                      {sub.test_case_results && Array.isArray(sub.test_case_results) && sub.test_case_results.map((r: any, i: number) => (
+                        <Paper key={i} variant="outlined" sx={{ p: 1, background: r.passed ? '#e7fbe7' : '#fff0f0', borderLeft: r.passed ? '4px solid #4caf50' : '4px solid #f44336' }}>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Chip label={r.passed ? 'Passed' : 'Failed'} color={r.passed ? 'success' : 'error'} size="small" />
+                            <Typography variant="body2">Input: <code>{r.input}</code></Typography>
+                            <Typography variant="body2">Expected: <code>{r.expected}</code></Typography>
+                            <Typography variant="body2">Output: <code>{r.output}</code></Typography>
+                            <Typography variant="body2">Runtime: {r.runtime}</Typography>
+                            {r.error && <Alert severity="error" sx={{ ml: 2 }}>{r.error}</Alert>}
+                          </Stack>
+                        </Paper>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+              </Paper>
+            ))}
+          </Stack>
+        )}
+      </Box>
     </Box>
   );
 };
