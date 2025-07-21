@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Table, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Table, Boolean, JSON, Float
 from sqlalchemy.orm import relationship
 from .base import Base
 import datetime
@@ -33,9 +33,17 @@ class Submission(Base):
     problem_id = Column(Integer, ForeignKey("problems.id"))
     code = Column(Text, nullable=False)
     language = Column(String, nullable=False)
-    result = Column(String, nullable=False)
-    runtime = Column(String)
+    result = Column(String, nullable=False)  # Legacy field - keep for backward compatibility
+    runtime = Column(String)  # Legacy field - keep for backward compatibility
     submission_time = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    # New fields for enhanced test case validation
+    test_case_results = Column(JSON, nullable=True)  # Store detailed test case results
+    execution_time = Column(Float, nullable=True)  # Execution time in seconds
+    memory_usage = Column(Float, nullable=True)  # Memory usage in MB
+    overall_status = Column(String, nullable=True)  # 'pass', 'fail', 'partial'
+    error_message = Column(Text, nullable=True)  # Error message if execution fails
+    
     user = relationship("User", back_populates="submissions")
     problem = relationship("Problem", back_populates="submissions")
 

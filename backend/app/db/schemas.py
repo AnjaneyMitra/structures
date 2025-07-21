@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 import datetime
 
 class UserBase(BaseModel):
@@ -48,15 +48,23 @@ class SubmissionBase(BaseModel):
 
 class SubmissionCreate(SubmissionBase):
     problem_id: int
+    sample_only: Optional[bool] = False  # For running only sample test case
 
 class SubmissionOut(SubmissionBase):
     id: int
     user_id: int
     problem_id: int
-    result: str
-    runtime: Optional[str]
+    result: str  # Legacy field
+    runtime: Optional[str]  # Legacy field
     submission_time: datetime.datetime
-    test_case_results: Optional[list["TestCaseResult"]] = None
+    
+    # New fields for enhanced test case validation
+    test_case_results: Optional[Dict[str, Any]] = None  # Detailed test case results
+    execution_time: Optional[float] = None  # Execution time in seconds
+    memory_usage: Optional[float] = None  # Memory usage in MB
+    overall_status: Optional[str] = None  # 'pass', 'fail', 'partial'
+    error_message: Optional[str] = None  # Error message if execution fails
+    
     class Config:
         orm_mode = True
 
@@ -65,7 +73,8 @@ class TestCaseResult(BaseModel):
     expected: str
     output: str
     passed: bool
-    runtime: str
+    runtime: Optional[float] = None
+    error: Optional[str] = None
 
 class RoomBase(BaseModel):
     code: Optional[str] = None
