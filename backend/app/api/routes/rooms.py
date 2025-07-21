@@ -4,6 +4,7 @@ from ...db import models, schemas
 from ...api import deps
 import random, string
 import time
+from app.main import sio
 
 router = APIRouter()
 
@@ -73,24 +74,18 @@ def execute_code_in_room(room_code: str, data: dict = Body(...), db: Session = D
     if user not in room.participants:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    # Import the code execution logic from submissions
     from ...code_runner.executor import CodeExecutor
     from ...db.models import Problem
-    
     problem = db.query(Problem).filter(Problem.id == room.problem_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
-    
     code = data.get("code", "")
     language = data.get("language", "python")
     sample_only = data.get("sample_only", True)
-    
+    share_run_output = data.get("share_run_output", False)
     try:
-        # Initialize code executor
         executor = CodeExecutor(timeout=5, memory_limit_mb=128)
-        
         if sample_only and problem.sample_input and problem.sample_output:
-            # Run only sample test case
             test_case_data = [{
                 'input': problem.sample_input,
                 'output': problem.sample_output
@@ -98,7 +93,6 @@ def execute_code_in_room(room_code: str, data: dict = Body(...), db: Session = D
             execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
             execution_result = execution_results
         else:
-            # Run all test cases
             test_cases = problem.test_cases
             test_case_data = []
             for tc in test_cases:
@@ -108,11 +102,15 @@ def execute_code_in_room(room_code: str, data: dict = Body(...), db: Session = D
                 })
             execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
             execution_result = execution_results
-        
-        # TODO: Broadcast execution result to room
-        # Note: Socket emission removed to avoid circular import
-        # Will implement via separate socket handler
-        
+        # Emit run output to all users if share_run_output is true
+        if share_run_output:
+            import asyncio
+            asyncio.create_task(sio.emit("run_output_shared", {
+                "room": room_code,
+                "user_id": user.id,
+                "username": user.username,
+                "result": execution_result
+            }, room=room_code))
         return execution_result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
@@ -124,23 +122,15 @@ def submit_code_in_room(room_code: str, data: dict = Body(...), db: Session = De
         raise HTTPException(status_code=404, detail="Room not found")
     if user not in room.participants:
         raise HTTPException(status_code=403, detail="Access denied")
-    
-    # Create a submission for the room's problem
     from ...code_runner.executor import CodeExecutor
     from ...db.models import Problem, Submission
-    
     problem = db.query(Problem).filter(Problem.id == room.problem_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
-    
     code = data.get("code", "")
     language = data.get("language", "python")
-    
     try:
-        # Initialize code executor
         executor = CodeExecutor(timeout=5, memory_limit_mb=128)
-        
-        # Execute against all test cases
         test_cases = problem.test_cases
         test_case_data = []
         for tc in test_cases:
@@ -148,42 +138,39 @@ def submit_code_in_room(room_code: str, data: dict = Body(...), db: Session = De
                 'input': tc.input,
                 'output': tc.output
             })
-        
         execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
         results = execution_results.get('test_case_results', [])
         total_time = execution_results.get('total_execution_time', 0)
-        all_passed = execution_results.get('all_passed', False)
-        
-        # Create submission record
+        overall_status = execution_results.get('overall_status', 'fail')
         submission = Submission(
             user_id=user.id,
             problem_id=room.problem_id,
             code=code,
             language=language,
-            result="pass" if all_passed else "fail",  # Legacy field
+            result=overall_status,  # Legacy field
             runtime=f"{total_time:.3f}s",  # Legacy field
             test_case_results=results,
             execution_time=total_time,
-            overall_status="pass" if all_passed else "fail"
+            overall_status=overall_status
         )
-        
         db.add(submission)
         db.commit()
         db.refresh(submission)
-        
         submission_result = {
             "id": submission.id,
+            "user_id": user.id,
+            "username": user.username,
             "test_case_results": results,
             "overall_status": submission.overall_status,
             "execution_time": submission.execution_time
         }
-        
-        # TODO: Broadcast submission result to room
-        # Note: Socket emission removed to avoid circular import
-        # Will implement via separate socket handler
-        
+        # Broadcast new submission to all users in the room
+        import asyncio
+        asyncio.create_task(sio.emit("room_submission", {
+            "room": room_code,
+            "submission": submission_result
+        }, room=room_code))
         return submission_result
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Submission failed: {str(e)}")
 
