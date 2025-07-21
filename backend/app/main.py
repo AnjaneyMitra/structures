@@ -4,10 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
 from .api.routes import auth, problems, submissions, profile, rooms
 import socketio
-from starlette.middleware import Middleware
-from starlette.applications import Starlette
-from starlette.routing import Mount
-from starlette.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
 from app.db.models import Room, User
@@ -132,8 +128,8 @@ async def code_executed(sid, data):
     result = data.get("result")
     sample_only = data.get("sample_only", True)
     await sio.emit("code_executed", {
-        "sid": sid, 
-        "username": username, 
+        "sid": sid,
+        "username": username,
         "result": result,
         "sample_only": sample_only
     }, room=room)
@@ -149,4 +145,7 @@ async def code_submitted(sid, data):
         "username": username,
         "result": result,
         "passed": passed
-    }, room=room) 
+    }, room=room)
+
+# Ensure this is at the very end of the file, at top-level scope
+sio_app = socketio.ASGIApp(sio, app) 
