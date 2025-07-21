@@ -47,6 +47,10 @@ app.include_router(submissions.router, prefix="/api/submissions", tags=["submiss
 app.include_router(profile.router, prefix="/api/profile", tags=["profile"])
 app.include_router(rooms.router, prefix="/api/rooms", tags=["rooms"])
 
+@app.get("/")
+def read_root():
+    return {"message": "DSA App API is running!", "status": "ok"}
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
