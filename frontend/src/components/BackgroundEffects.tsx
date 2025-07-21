@@ -123,9 +123,6 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
           left: 0,
           width: '100%',
           height: '100%',
-          background: `
-            polygon(50% 0%, 0% 100%, 100% 100%)
-          `,
           clipPath: `
             polygon(
               0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%
