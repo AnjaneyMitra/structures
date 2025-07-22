@@ -7,7 +7,9 @@ from ...core import auth
 router = APIRouter()
 
 @router.get("/", response_model=schemas.UserOut)
-def get_profile(user=Depends(deps.get_current_user)):
+def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
+    # Refresh user from database to get latest XP
+    db.refresh(user)
     return user
 
 @router.get("/submissions/")
@@ -31,17 +33,42 @@ def get_user_submissions(user=Depends(deps.get_current_user), db: Session = Depe
             "test_case_results": sub.test_case_results,
             "error_message": sub.error_message,
             "execution_time": sub.execution_time,
-            "memory_usage": sub.memory_usage
+            "memory_usage": sub.memory_usage,
+            "xp_awarded": sub.xp_awarded or 0
         })
     return result
 
 @router.get("/stats/", response_model=dict)
 def get_user_stats(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
     total_submissions = db.query(models.Submission).filter(models.Submission.user_id == user.id).count()
-    problems_solved = db.query(models.Submission.problem_id).filter(models.Submission.user_id == user.id, models.Submission.result == "pass").distinct().count()
+    problems_solved = db.query(models.Submission.problem_id).filter(models.Submission.user_id == user.id, models.Submission.overall_status == "pass").distinct().count()
+    
+    # Calculate XP breakdown by difficulty
+    easy_solved = db.query(models.Submission.problem_id).join(models.Problem).filter(
+        models.Submission.user_id == user.id,
+        models.Submission.overall_status == "pass",
+        models.Problem.difficulty == "easy"
+    ).distinct().count()
+    
+    medium_solved = db.query(models.Submission.problem_id).join(models.Problem).filter(
+        models.Submission.user_id == user.id,
+        models.Submission.overall_status == "pass",
+        models.Problem.difficulty == "medium"
+    ).distinct().count()
+    
+    hard_solved = db.query(models.Submission.problem_id).join(models.Problem).filter(
+        models.Submission.user_id == user.id,
+        models.Submission.overall_status == "pass",
+        models.Problem.difficulty == "hard"
+    ).distinct().count()
+    
     return {
         "total_submissions": total_submissions,
-        "problems_solved": problems_solved
+        "problems_solved": problems_solved,
+        "total_xp": user.total_xp or 0,
+        "easy_solved": easy_solved,
+        "medium_solved": medium_solved,
+        "hard_solved": hard_solved
     }
 
 @router.put("/username")

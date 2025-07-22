@@ -4,12 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   MagnifyingGlassIcon as SearchIcon, 
   BoltIcon, 
-  CheckCircleIcon
+  CheckCircleIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 
 interface UserProfile {
   id: number;
   username: string;
+  total_xp: number;
 }
 
 interface Problem {
@@ -29,7 +31,7 @@ const TailwindDashboardPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number } | null>(null);
+  const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
   const [quickSearch, setQuickSearch] = useState('');
   const navigate = useNavigate();
 
@@ -137,7 +139,20 @@ const TailwindDashboardPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Placeholder cards for future metrics */}
+                  {/* Total XP Card */}
+                  <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Total XP</p>
+                        <p className="text-3xl font-bold text-yellow-600">{stats.total_xp || 0}</p>
+                      </div>
+                      <div className="p-3 bg-yellow-500/10 rounded-lg">
+                        <StarIcon className="h-8 w-8 text-yellow-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Placeholder card for future metric */}
                   <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
                     <div className="flex items-center justify-between">
                       <div>

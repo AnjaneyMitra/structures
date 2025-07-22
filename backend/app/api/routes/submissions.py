@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from ...db import models, schemas
 from ...api import deps
 from ...code_runner.executor import CodeExecutor
+from ...utils.xp_calculator import calculate_xp_for_problem, should_award_xp
 import datetime
 
 router = APIRouter()
@@ -83,6 +84,18 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 # failed_cases=failed_cases
             )
         else:
+            # Calculate XP if problem is solved successfully
+            xp_awarded = 0
+            if execution_results['overall_status'] == 'pass' and should_award_xp(user.id, problem.id, db):
+                xp_awarded = calculate_xp_for_problem(problem.difficulty)
+                old_xp = user.total_xp or 0
+                # Update user's total XP
+                user.total_xp = old_xp + xp_awarded
+                db.add(user)
+                print(f"🎉 XP AWARDED: User {user.id} earned {xp_awarded} XP for {problem.difficulty} problem. Total XP: {old_xp} -> {user.total_xp}")
+            else:
+                print(f"❌ NO XP: User {user.id}, Status: {execution_results['overall_status']}, Should award: {should_award_xp(user.id, problem.id, db) if execution_results['overall_status'] == 'pass' else 'N/A (not passed)'}")
+            
             # Create new submission in database
             new_submission = models.Submission(
                 user_id=user.id,
@@ -95,11 +108,14 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 execution_time=execution_results['total_execution_time'],
                 memory_usage=max_memory_usage,
                 overall_status=execution_results['overall_status'],
-                error_message=top_error_message
+                error_message=top_error_message,
+                xp_awarded=xp_awarded
             )
             db.add(new_submission)
             db.commit()
             db.refresh(new_submission)
+            if xp_awarded > 0:
+                db.refresh(user)  # Refresh user to get updated total_xp
             return schemas.SubmissionOut(
                 id=new_submission.id,
                 user_id=new_submission.user_id,
@@ -113,7 +129,8 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 execution_time=new_submission.execution_time,
                 memory_usage=new_submission.memory_usage,
                 overall_status=new_submission.overall_status,
-                error_message=new_submission.error_message
+                error_message=new_submission.error_message,
+                xp_awarded=new_submission.xp_awarded
             )
     except Exception as e:
         print(f"Submission error: {str(e)}")

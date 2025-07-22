@@ -10,6 +10,7 @@ class UserCreate(UserBase):
 
 class UserOut(UserBase):
     id: int
+    total_xp: int = 0
     class Config:
         orm_mode = True
 
@@ -42,6 +43,7 @@ class SubmissionOut(SubmissionBase):
     result: str
     runtime: Optional[str]
     submission_time: datetime.datetime
+    xp_awarded: int = 0
     class Config:
         orm_mode = True
 

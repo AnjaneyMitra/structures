@@ -300,6 +300,9 @@ Good luck! 🚀`);
       
       if (overallStatus === 'pass') {
         summaryMessage += `\n🎉 All tests passed! Great job!`;
+        if (res.data.xp_awarded && res.data.xp_awarded > 0) {
+          summaryMessage += `\n⭐ +${res.data.xp_awarded} XP earned!`;
+        }
       } else if (passedCount > 0) {
         summaryMessage += `\n⚠️ Some tests failed. Check the results below.`;
       } else {
