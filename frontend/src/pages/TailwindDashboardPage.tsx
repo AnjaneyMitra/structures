@@ -4,12 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   MagnifyingGlassIcon as SearchIcon, 
   BoltIcon, 
-  CheckCircleIcon
+  CheckCircleIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 
 interface UserProfile {
   id: number;
   username: string;
+  total_xp: number;
 }
 
 interface Problem {
@@ -29,7 +31,7 @@ const TailwindDashboardPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number } | null>(null);
+  const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
   const [quickSearch, setQuickSearch] = useState('');
   const navigate = useNavigate();
 
@@ -104,7 +106,17 @@ const TailwindDashboardPage: React.FC = () => {
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-card rounded-lg border p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total XP</p>
+                  <p className="text-3xl font-bold text-yellow-600">{stats.total_xp || 0}</p>
+                </div>
+                <StarIcon className="h-8 w-8 text-yellow-500" />
+              </div>
+            </div>
+            
             <div className="bg-card rounded-lg border p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>

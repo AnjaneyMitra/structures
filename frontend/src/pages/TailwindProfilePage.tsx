@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { UserIcon, PencilIcon, CheckIcon, XMarkIcon, TrophyIcon, ChartBarIcon, CodeBracketIcon } from '@heroicons/react/24/outline';
+import { UserIcon, PencilIcon, CheckIcon, XMarkIcon, TrophyIcon, ChartBarIcon, CodeBracketIcon, StarIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
 interface Submission {
@@ -13,11 +13,22 @@ interface Submission {
   submission_time: string;
   language: string;
   code: string;
+  xp_awarded?: number;
 }
 
 interface UserProfile {
   id: number;
   username: string;
+  total_xp: number;
+}
+
+interface UserStats {
+  total_submissions: number;
+  problems_solved: number;
+  total_xp: number;
+  easy_solved: number;
+  medium_solved: number;
+  hard_solved: number;
 }
 
 const TailwindProfilePage: React.FC = () => {
@@ -25,7 +36,7 @@ const TailwindProfilePage: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number } | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [editing, setEditing] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [updateError, setUpdateError] = useState('');
@@ -53,15 +64,11 @@ const TailwindProfilePage: React.FC = () => {
         });
         setSubmissions(submissionsRes.data);
 
-        // Calculate stats
-        const totalSubmissions = submissionsRes.data.length;
-        const problemsSolved = new Set(
-          submissionsRes.data
-            .filter((sub: Submission) => typeof sub.result === 'string' && sub.result.toLowerCase() === 'pass')
-            .map((sub: Submission) => sub.problem_id)
-        ).size;
-        
-        setStats({ total_submissions: totalSubmissions, problems_solved: problemsSolved });
+        // Fetch stats from API
+        const statsRes = await axios.get('https://structures-production.up.railway.app/api/profile/stats/', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStats(statsRes.data);
       } catch (err) {
         setError('Failed to load profile data.');
       } finally {
@@ -171,7 +178,13 @@ const TailwindProfilePage: React.FC = () => {
                     </button>
                   </div>
                 )}
-                <p className="text-muted-foreground">Competitive Programmer</p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-muted-foreground">Competitive Programmer</p>
+                  <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 px-2 py-1 rounded-full">
+                    <StarIcon className="h-4 w-4 text-yellow-500" />
+                    <span className="text-sm font-medium text-yellow-600">{user?.total_xp || 0} XP</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -191,14 +204,14 @@ const TailwindProfilePage: React.FC = () => {
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-card border border-border rounded-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Submissions</p>
-                  <p className="text-2xl font-bold text-card-foreground">{stats.total_submissions}</p>
+                  <p className="text-sm text-muted-foreground">Total XP</p>
+                  <p className="text-2xl font-bold text-yellow-600">{stats.total_xp}</p>
                 </div>
-                <CodeBracketIcon className="h-8 w-8 text-primary" />
+                <StarIcon className="h-8 w-8 text-yellow-500" />
               </div>
             </div>
             
@@ -215,14 +228,59 @@ const TailwindProfilePage: React.FC = () => {
             <div className="bg-card border border-border rounded-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
+                  <p className="text-sm text-muted-foreground">Total Submissions</p>
+                  <p className="text-2xl font-bold text-card-foreground">{stats.total_submissions}</p>
+                </div>
+                <CodeBracketIcon className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            
+            <div className="bg-card border border-border rounded-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-sm text-muted-foreground">Success Rate</p>
                   <p className="text-2xl font-bold text-card-foreground">
                     {stats.total_submissions > 0 
-                      ? Math.round((submissions.filter(s => s.result === 'Passed').length / stats.total_submissions) * 100)
+                      ? Math.round((stats.problems_solved / stats.total_submissions) * 100)
                       : 0}%
                   </p>
                 </div>
                 <ChartBarIcon className="h-8 w-8 text-green-500" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* XP Breakdown */}
+        {stats && (
+          <div className="bg-card border border-border rounded-lg p-6 mb-8">
+            <h3 className="text-lg font-semibold text-card-foreground mb-4">XP Breakdown by Difficulty</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <div>
+                  <p className="text-sm text-green-700 dark:text-green-300">Easy Problems</p>
+                  <p className="text-xl font-bold text-green-800 dark:text-green-200">{stats.easy_solved}</p>
+                  <p className="text-xs text-green-600 dark:text-green-400">{stats.easy_solved * 50} XP</p>
+                </div>
+                <div className="text-green-500 text-2xl font-bold">50</div>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                <div>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">Medium Problems</p>
+                  <p className="text-xl font-bold text-yellow-800 dark:text-yellow-200">{stats.medium_solved}</p>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-400">{stats.medium_solved * 100} XP</p>
+                </div>
+                <div className="text-yellow-500 text-2xl font-bold">100</div>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                <div>
+                  <p className="text-sm text-red-700 dark:text-red-300">Hard Problems</p>
+                  <p className="text-xl font-bold text-red-800 dark:text-red-200">{stats.hard_solved}</p>
+                  <p className="text-xs text-red-600 dark:text-red-400">{stats.hard_solved * 150} XP</p>
+                </div>
+                <div className="text-red-500 text-2xl font-bold">150</div>
               </div>
             </div>
           </div>
@@ -272,6 +330,7 @@ const TailwindProfilePage: React.FC = () => {
                           <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Problem</th>
                           <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Language</th>
                           <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Result</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">XP</th>
                           <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Runtime</th>
                           <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Submitted</th>
                         </tr>
@@ -303,6 +362,16 @@ const TailwindProfilePage: React.FC = () => {
                               <span className={`font-medium ${getResultColor(submission.result)}`}>
                                 {submission.result}
                               </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              {submission.xp_awarded && submission.xp_awarded > 0 ? (
+                                <div className="flex items-center space-x-1">
+                                  <StarIcon className="h-4 w-4 text-yellow-500" />
+                                  <span className="text-yellow-600 font-medium">+{submission.xp_awarded}</span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
                             </td>
                             <td className="py-3 px-4 text-muted-foreground font-mono text-sm">
                               {submission.runtime}

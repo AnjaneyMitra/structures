@@ -33,6 +33,15 @@ app.add_middleware(
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+# Run XP migration
+try:
+    from .db.migrate_xp import migrate_xp_fields
+    migrate_xp_fields()
+    print("✅ XP migration completed successfully")
+except Exception as e:
+    print(f"⚠️ XP migration warning: {e}")
+    # Don't fail startup if migration has issues
+
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(problems.router, prefix="/api/problems", tags=["problems"])

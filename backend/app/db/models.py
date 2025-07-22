@@ -12,6 +12,7 @@ class User(Base):
     oauth_provider = Column(String, nullable=True)  # e.g., 'google'
     oauth_sub = Column(String, nullable=True)  # Google's unique user id
     is_admin = Column(Boolean, default=False)  # Admin flag
+    total_xp = Column(Integer, default=0)  # Total XP earned
     submissions = relationship("Submission", back_populates="user")
 
 class Problem(Base):
@@ -43,6 +44,7 @@ class Submission(Base):
     memory_usage = Column(Float, nullable=True)  # Memory usage in MB
     overall_status = Column(String, nullable=True)  # 'pass', 'fail', 'partial'
     error_message = Column(Text, nullable=True)  # Error message if execution fails
+    xp_awarded = Column(Integer, default=0)  # XP awarded for this submission
     
     user = relationship("User", back_populates="submissions")
     problem = relationship("Problem", back_populates="submissions")
