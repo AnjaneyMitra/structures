@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, Paper, TextField, Typography, Stack, Alert, InputAdornment, Divider } from '@mui/material';
+import { 
+  Box, Button, TextField, Typography, Stack, Alert, InputAdornment, 
+  Card, CardContent, Divider, CircularProgress
+} from '@mui/material';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
 import GoogleIcon from '@mui/icons-material/Google';
+import CodeIcon from '@mui/icons-material/Code';
+import LoginIcon from '@mui/icons-material/Login';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 
 const LoginPage: React.FC = () => {
@@ -12,6 +21,8 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +36,8 @@ const LoginPage: React.FC = () => {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
       localStorage.setItem('token', res.data.access_token);
-      window.location.href = '/dashboard';
+      localStorage.setItem('username', username);
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed');
     } finally {
@@ -53,13 +65,13 @@ const LoginPage: React.FC = () => {
   }, []);
 
   return (
-    <Box 
-      sx={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
+    <>
+      <Box sx={{ 
+        minHeight: '100vh',
+        bgcolor: '#0a0a0a',
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'background.default',
         position: 'relative',
         '&::before': {
           content: '""',
@@ -68,117 +80,209 @@ const LoginPage: React.FC = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: (theme) => theme.palette.mode === 'dark'
-            ? 'radial-gradient(circle at 30% 70%, rgba(129, 140, 248, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(244, 114, 182, 0.08) 0%, transparent 50%)'
-            : 'radial-gradient(circle at 30% 70%, rgba(79, 70, 229, 0.05) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.05) 0%, transparent 50%)',
+          background: 'radial-gradient(circle at 30% 70%, rgba(0, 212, 170, 0.05) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 50%)',
           pointerEvents: 'none',
         },
-      }}
-    >
-      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-        <Paper 
-          elevation={2}
-          sx={{ 
-            p: { xs: 4, md: 6 }, 
-            borderRadius: 4, 
-            textAlign: 'center',
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              mb: 1, 
-              fontWeight: 600, 
-              color: 'text.primary',
-            }}
-          >
-            Welcome Back
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            Sign in to continue coding together
-          </Typography>
-          
-          <form onSubmit={handleSubmit}>
-            <Stack spacing={3}>
-              <TextField
-                label="Username"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                required
-                autoFocus
-                fullWidth
-                size="medium"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                fullWidth
-                size="medium"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LockIcon color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+      }}>
+        <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 400, px: 3 }}>
+          {/* Header */}
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} sx={{ mb: 2 }}>
+              <CodeIcon sx={{ color: '#00d4aa', fontSize: 40 }} />
+              <Typography variant="h4" fontWeight={700} sx={{ color: 'white' }}>
+                CodeLab
+              </Typography>
+            </Stack>
+            <Typography variant="body1" sx={{ color: '#a0aec0' }}>
+              Sign in to your account
+            </Typography>
+          </Box>
+
+          {/* Login Card */}
+          <Card sx={{ 
+            bgcolor: '#1a1a1a',
+            border: '1px solid #2d3748',
+            borderRadius: 3,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }}>
+            <CardContent sx={{ p: 4 }}>
               {error && (
                 <Alert 
                   severity="error" 
                   sx={{ 
-                    borderRadius: 3,
-                    boxShadow: '0 4px 20px rgba(239, 68, 68, 0.1)',
+                    mb: 3,
+                    bgcolor: 'rgba(255, 107, 107, 0.1)',
+                    border: '1px solid #ff6b6b',
+                    color: '#ff6b6b',
+                    '& .MuiAlert-icon': { color: '#ff6b6b' }
                   }}
                 >
                   {error}
                 </Alert>
               )}
+
+              {/* Google Login */}
               <Button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                sx={{ 
-                  fontWeight: 500, 
-                  py: 1.5,
-                }}
                 fullWidth
-              >
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
-              
-              <Divider sx={{ my: 3 }}>
-                <Typography variant="body2" color="text.secondary">
-                  or
-                </Typography>
-              </Divider>
-              
-              <Button
                 variant="outlined"
+                size="large"
                 startIcon={<GoogleIcon />}
                 onClick={handleGoogleLogin}
-                sx={{ 
-                  fontWeight: 500, 
+                sx={{
+                  mb: 3,
                   py: 1.5,
+                  borderColor: '#4a5568',
+                  color: '#e2e8f0',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: '#6b7280',
+                    bgcolor: '#2d3748'
+                  }
                 }}
-                fullWidth
               >
                 Continue with Google
               </Button>
-            </Stack>
-          </form>
-        </Paper>
-      </Container>
-    </Box>
+
+              <Divider sx={{ 
+                mb: 3, 
+                borderColor: '#2d3748',
+                '&::before, &::after': {
+                  borderColor: '#2d3748'
+                }
+              }}>
+                <Typography variant="body2" sx={{ color: '#6b7280', px: 2 }}>
+                  or
+                </Typography>
+              </Divider>
+
+              {/* Login Form */}
+              <Box component="form" onSubmit={handleSubmit}>
+                <Stack spacing={3}>
+                  <TextField
+                    fullWidth
+                    label="Username"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                    disabled={loading}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: '#2d3748',
+                        color: 'white',
+                        '& fieldset': { borderColor: '#4a5568' },
+                        '&:hover fieldset': { borderColor: '#00d4aa' },
+                        '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+                      },
+                      '& .MuiInputLabel-root': { color: '#a0aec0' },
+                      '& .MuiInputLabel-root.Mui-focused': { color: '#00d4aa' }
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon sx={{ color: '#a0aec0' }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: '#2d3748',
+                        color: 'white',
+                        '& fieldset': { borderColor: '#4a5568' },
+                        '&:hover fieldset': { borderColor: '#00d4aa' },
+                        '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+                      },
+                      '& .MuiInputLabel-root': { color: '#a0aec0' },
+                      '& .MuiInputLabel-root.Mui-focused': { color: '#00d4aa' }
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LockIcon sx={{ color: '#a0aec0' }} />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Button
+                            onClick={() => setShowPassword(!showPassword)}
+                            sx={{ 
+                              minWidth: 'auto',
+                              p: 0.5,
+                              color: '#a0aec0',
+                              '&:hover': { color: '#00d4aa' }
+                            }}
+                          >
+                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </Button>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    disabled={loading}
+                    startIcon={loading ? <CircularProgress size={20} /> : <LoginIcon />}
+                    sx={{
+                      py: 1.5,
+                      bgcolor: '#00d4aa',
+                      '&:hover': { bgcolor: '#00b894' },
+                      '&:disabled': { bgcolor: '#4a5568', color: '#6b7280' },
+                      fontWeight: 600,
+                      fontSize: 16
+                    }}
+                  >
+                    {loading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </Stack>
+              </Box>
+
+              <Divider sx={{ 
+                my: 3, 
+                borderColor: '#2d3748'
+              }} />
+
+              {/* Register Link */}
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ color: '#a0aec0', mb: 2 }}>
+                  Don't have an account?
+                </Typography>
+                <Button
+                  component={Link}
+                  to="/register"
+                  variant="outlined"
+                  fullWidth
+                  startIcon={<AppRegistrationIcon />}
+                  sx={{
+                    borderColor: '#4a5568',
+                    color: 'text.primary',
+                  }}
+                >
+                  Register
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
+      <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Typography variant="body2" sx={{ color: '#6b7280' }}>
+          © 2024 CodeLab. Built for developers, by developers.
+        </Typography>
+      </Box>
+    </>
   );
 };
 

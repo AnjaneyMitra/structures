@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, CircularProgress, Alert, Chip, Stack, Button, Divider, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { 
+  Box, Typography, CircularProgress, Alert, Chip, Stack, Button, 
+  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab, Divider
+} from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BoltIcon from '@mui/icons-material/Bolt';
@@ -10,6 +13,11 @@ import MonacoEditor from '@monaco-editor/react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import TimerIcon from '@mui/icons-material/Timer';
+import CodeIcon from '@mui/icons-material/Code';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import HistoryIcon from '@mui/icons-material/History';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 interface TestCase {
   id: number;
@@ -45,10 +53,22 @@ interface SubmissionResult {
   average_execution_time: number;
 }
 
-const difficultyColors: Record<string, any> = {
-  Easy: { color: 'success', icon: <BoltIcon fontSize="small" /> },
-  Medium: { color: 'warning', icon: <AssignmentTurnedInIcon fontSize="small" /> },
-  Hard: { color: 'error', icon: <EmojiEventsIcon fontSize="small" /> },
+const difficultyConfig: Record<string, any> = {
+  Easy: { 
+    color: '#00d4aa', 
+    bgcolor: 'rgba(0, 212, 170, 0.1)', 
+    icon: <CheckCircleIcon fontSize="small" /> 
+  },
+  Medium: { 
+    color: '#ffa726', 
+    bgcolor: 'rgba(255, 167, 38, 0.1)', 
+    icon: <AssignmentTurnedInIcon fontSize="small" /> 
+  },
+  Hard: { 
+    color: '#ff6b6b', 
+    bgcolor: 'rgba(255, 107, 107, 0.1)', 
+    icon: <EmojiEventsIcon fontSize="small" /> 
+  },
 };
 
 const languageOptions = [
@@ -68,6 +88,8 @@ const ProblemDetailPage: React.FC = () => {
   const [submitError, setSubmitError] = useState('');
   const [runResult, setRunResult] = useState<TestCaseResult | null>(null);
   const [running, setRunning] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -144,173 +166,490 @@ const ProblemDetailPage: React.FC = () => {
     }
   };
 
-  if (loading) return <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CircularProgress /></Box>;
-  if (error) return <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Alert severity="error">{error}</Alert></Box>;
+  if (loading) return (
+    <Box sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      bgcolor: '#0a0a0a',
+      color: 'white'
+    }}>
+      <Stack alignItems="center" spacing={2}>
+        <CircularProgress sx={{ color: '#00d4aa' }} />
+        <Typography variant="h6">Loading problem...</Typography>
+      </Stack>
+    </Box>
+  );
+
+  if (error) return (
+    <Box sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      bgcolor: '#0a0a0a',
+      color: 'white',
+      p: 4
+    }}>
+      <Alert 
+        severity="error" 
+        sx={{ 
+          bgcolor: 'rgba(255, 107, 107, 0.1)',
+          border: '1px solid #ff6b6b',
+          color: '#ff6b6b',
+          '& .MuiAlert-icon': { color: '#ff6b6b' }
+        }}
+      >
+        {error}
+      </Alert>
+    </Box>
+  );
+
   if (!problem) return null;
 
-  const diff = difficultyColors[problem.difficulty] || { color: 'default', icon: null };
+  const diffConfig = difficultyConfig[problem.difficulty] || difficultyConfig.Easy;
 
   return (
-    <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
-      <Paper elevation={3} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, background: '#fff', boxShadow: '0 2px 12px 0 rgba(108,99,255,0.07)' }}>
-        <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-          <Typography variant="h4" fontWeight={700} color="primary">{problem.title}</Typography>
-          <Chip label={problem.difficulty} color={diff.color} icon={diff.icon} sx={{ fontWeight: 700 }} />
-        </Stack>
-        <Typography variant="body1" mb={3} sx={{ color: 'text.secondary', fontSize: '1.1rem' }}>{problem.description}</Typography>
-        <Divider sx={{ my: 3 }} />
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4} mb={3}>
-          <Box flex={1}>
-            <Typography variant="subtitle1" fontWeight={600} mb={1}>Sample Input</Typography>
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', background: '#f7f7fa', fontSize: '1.05rem' }}>{problem.sample_input}</Paper>
-            <Typography variant="subtitle1" fontWeight={600} mb={1}>Sample Output</Typography>
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', background: '#f7f7fa', fontSize: '1.05rem' }}>{problem.sample_output}</Paper>
-          </Box>
-          <Box flex={1}>
-            <Typography variant="subtitle1" fontWeight={600} mb={1}>Test Cases ({problem.test_cases.length})</Typography>
-            <Stack spacing={1}>
-              {problem.test_cases.map((tc, index) => (
-                <Paper key={tc.id} variant="outlined" sx={{ p: 2, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', background: '#f7f7fa', display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Chip label={`#${index + 1}`} size="small" color="primary" />
-                  <Box>
-                    <b>Input:</b> {tc.input}<br />
-                    <b>Output:</b> {tc.output}
-                  </Box>
-                </Paper>
+    <Box sx={{ 
+      height: '100vh', 
+      bgcolor: '#0a0a0a', 
+      color: 'white',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
+      {/* Header */}
+      <Box sx={{ 
+        borderBottom: '1px solid #2d3748',
+        px: 4,
+        py: 2,
+        bgcolor: '#1a1a1a'
+      }}>
+        <Stack direction="row" alignItems="center" spacing={3}>
+          <CodeIcon sx={{ color: '#00d4aa', fontSize: 28 }} />
+          <Typography variant="h5" fontWeight={700} sx={{ color: 'white' }}>
+            {problem.id}. {problem.title}
+          </Typography>
+          <Chip
+            icon={diffConfig.icon}
+            label={problem.difficulty}
+            sx={{
+              bgcolor: diffConfig.bgcolor,
+              color: diffConfig.color,
+              border: `1px solid ${diffConfig.color}`,
+              fontWeight: 600,
+              '& .MuiChip-icon': { color: diffConfig.color }
+            }}
+          />
+          <Box sx={{ flexGrow: 1 }} />
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <Select
+              value={language}
+              onChange={e => {
+                const newLang = e.target.value;
+                setLanguage(newLang);
+                const langOption = languageOptions.find(l => l.value === newLang);
+                if (langOption) setCode(langOption.defaultCode);
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: '#2d3748',
+                  color: 'white',
+                  '& fieldset': { borderColor: '#4a5568' },
+                  '&:hover fieldset': { borderColor: '#00d4aa' },
+                  '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+                },
+                '& .MuiSelect-icon': { color: '#a0aec0' }
+              }}
+            >
+              {languageOptions.map(lang => (
+                <MenuItem 
+                  key={lang.value} 
+                  value={lang.value}
+                  sx={{ 
+                    bgcolor: '#2d3748', 
+                    color: 'white',
+                    '&:hover': { bgcolor: '#374151' },
+                    '&.Mui-selected': { bgcolor: '#00d4aa', '&:hover': { bgcolor: '#00b894' } }
+                  }}
+                >
+                  {lang.label}
+                </MenuItem>
               ))}
-            </Stack>
-          </Box>
+            </Select>
+          </FormControl>
         </Stack>
-        <Divider sx={{ my: 3 }} />
-        <Box mt={4}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" mb={2}>
-            <FormControl sx={{ minWidth: 140 }} size="small">
-              <InputLabel id="lang-label">Language</InputLabel>
-              <Select
-                labelId="lang-label"
-                value={language}
-                label="Language"
-                onChange={e => setLanguage(e.target.value as string)}
+      </Box>
+
+      {/* Main Content */}
+      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left Panel - Problem Description */}
+        <Box sx={{ 
+          width: sidebarOpen ? 450 : 0,
+          transition: 'width 0.3s ease',
+          borderRight: '1px solid #2d3748',
+          bgcolor: '#1a1a1a',
+          overflow: 'hidden'
+        }}>
+          {sidebarOpen && (
+            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Tabs 
+                value={activeTab} 
+                onChange={(_, newValue) => setActiveTab(newValue)}
+                sx={{ 
+                  borderBottom: '1px solid #2d3748',
+                  '& .MuiTab-root': { 
+                    color: '#a0aec0',
+                    fontWeight: 600,
+                    minHeight: 48
+                  },
+                  '& .Mui-selected': { color: '#00d4aa' },
+                  '& .MuiTabs-indicator': { backgroundColor: '#00d4aa' }
+                }}
               >
-                {languageOptions.map(lang => (
-                  <MenuItem key={lang.value} value={lang.value}>{lang.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Typography variant="subtitle2" color="text.secondary" sx={{ ml: { sm: 2 } }}>
-              Monaco Editor (VS Code style)
-            </Typography>
-          </Stack>
-          <Paper variant="outlined" sx={{ p: 0, minHeight: 320, background: '#f7f7fa', borderRadius: 3, overflow: 'hidden', mb: 2 }}>
-            <MonacoEditor
-              height="320px"
-              language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
-              value={code}
-              theme="vs-light"
-              options={{ fontSize: 16, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on', smoothScrolling: true, fontLigatures: true }}
-              onChange={v => setCode(v || '')}
-            />
-          </Paper>
-        </Box>
-        <Box mt={4} textAlign="right">
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<PlayArrowIcon />}
-            sx={{ fontWeight: 700, borderRadius: 2, px: 4, mr: 2 }}
-            onClick={handleRun}
-            disabled={running}
-          >
-            {running ? 'Running...' : 'Run Code'}
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<PlayArrowIcon />}
-            sx={{ fontWeight: 700, borderRadius: 2, px: 4 }}
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting ? 'Submitting...' : 'Submit Solution'}
-          </Button>
-        </Box>
-        
-        {/* Sample Run Result */}
-        {runResult && (
-          <Box mt={3}>
-            <Typography variant="subtitle1" fontWeight={700} mb={1}>Sample Run Result</Typography>
-            <Paper variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: runResult.passed ? '#e7fbe7' : '#fff0f0', borderLeft: runResult.passed ? '6px solid #4caf50' : '6px solid #f44336' }}>
-              {runResult.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
-              <Box flex={1}>
-                <Typography variant="subtitle2" color={runResult.passed ? 'success.main' : 'error.main'} fontWeight={700}>
-                  {runResult.passed ? 'Passed' : 'Failed'}
-                </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Input: {runResult.input}</Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Expected: {runResult.expected}</Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Output: {runResult.output}</Typography>
-                <Stack direction="row" spacing={2} alignItems="center" mt={1}>
-                  <Chip icon={<TimerIcon />} label={`${runResult.execution_time.toFixed(3)}s`} size="small" />
-                </Stack>
-                {runResult.error && (
-                  <Alert severity="error" sx={{ mt: 1 }}>{runResult.error}</Alert>
+                <Tab icon={<AssignmentIcon />} label="Description" />
+                <Tab icon={<HistoryIcon />} label="Submissions" />
+              </Tabs>
+              
+              <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+                {/* Description Tab */}
+                {activeTab === 0 && (
+                  <Stack spacing={3}>
+                    <Typography variant="body1" sx={{ color: '#e2e8f0', lineHeight: 1.7 }}>
+                      {problem.description}
+                    </Typography>
+                    
+                    {problem.sample_input && problem.sample_output && (
+                      <Card sx={{ bgcolor: '#2d3748', border: '1px solid #4a5568' }}>
+                        <CardContent sx={{ p: 3 }}>
+                          <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                            Example:
+                          </Typography>
+                          <Stack spacing={2}>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                                Input:
+                              </Typography>
+                              <Box sx={{ 
+                                p: 2, 
+                                mt: 1,
+                                bgcolor: '#1a1a1a', 
+                                border: '1px solid #4a5568',
+                                borderRadius: 1,
+                                fontFamily: 'JetBrains Mono, monospace',
+                                fontSize: 14,
+                                color: '#e2e8f0'
+                              }}>
+                                {problem.sample_input}
+                              </Box>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                                Output:
+                              </Typography>
+                              <Box sx={{ 
+                                p: 2, 
+                                mt: 1,
+                                bgcolor: '#1a1a1a', 
+                                border: '1px solid #4a5568',
+                                borderRadius: 1,
+                                fontFamily: 'JetBrains Mono, monospace',
+                                fontSize: 14,
+                                color: '#e2e8f0'
+                              }}>
+                                {problem.sample_output}
+                              </Box>
+                            </Box>
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </Stack>
+                )}
+                
+                {/* Submissions Tab */}
+                {activeTab === 1 && (
+                  <Box>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                      Your Submissions
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#a0aec0' }}>
+                      Submit your solution to see your submission history here.
+                    </Typography>
+                  </Box>
                 )}
               </Box>
-            </Paper>
-          </Box>
-        )}
-        
-        {/* Submission Results */}
-        {results && (
-          <Box mt={4}>
-            <Typography variant="h6" fontWeight={700} mb={2}>Submission Results</Typography>
-            
-            {/* Overall Results Summary */}
-            <Paper variant="outlined" sx={{ p: 3, mb: 3, background: results.overall_status === 'pass' ? '#e7fbe7' : results.overall_status === 'partial' ? '#fff3e0' : '#fff0f0' }}>
-              <Stack direction="row" spacing={3} alignItems="center" mb={2}>
-                <Chip 
-                  label={results.overall_status.toUpperCase()} 
-                  color={results.overall_status === 'pass' ? 'success' : results.overall_status === 'partial' ? 'warning' : 'error'} 
-                  size="medium"
-                />
-                <Typography variant="h6">
-                  {results.passed_test_cases} / {results.total_test_cases} test cases passed
-                </Typography>
-              </Stack>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Chip icon={<TimerIcon />} label={`Total: ${results.total_execution_time.toFixed(3)}s`} />
-                <Chip icon={<TimerIcon />} label={`Avg: ${results.average_execution_time.toFixed(3)}s`} />
-              </Stack>
-            </Paper>
-            
-            {/* Individual Test Case Results */}
-            <Stack spacing={2}>
-              {results.test_case_results.map((result, index) => (
-                <Paper key={index} variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: result.passed ? '#e7fbe7' : '#fff0f0', borderLeft: result.passed ? '6px solid #4caf50' : '6px solid #f44336' }}>
-                  {result.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
-                  <Box flex={1}>
-                    <Stack direction="row" spacing={2} alignItems="center" mb={1}>
-                      <Typography variant="subtitle2" color={result.passed ? 'success.main' : 'error.main'} fontWeight={700}>
-                        Test Case #{index + 1} - {result.passed ? 'Passed' : 'Failed'}
-                      </Typography>
-                      <Chip icon={<TimerIcon />} label={`${result.execution_time.toFixed(3)}s`} size="small" />
-                    </Stack>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Input: {result.input}</Typography>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Expected: {result.expected}</Typography>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>Output: {result.output}</Typography>
-                    {result.error && (
-                      <Alert severity="error" sx={{ mt: 1 }}>{result.error}</Alert>
-                    )}
-                  </Box>
-                </Paper>
-              ))}
+            </Box>
+          )}
+        </Box>
+
+        {/* Main Coding Area */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* Code Editor Header */}
+          <Box sx={{ 
+            borderBottom: '1px solid #2d3748',
+            px: 3,
+            py: 1.5,
+            bgcolor: '#1a1a1a',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Button
+                variant="text"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                sx={{ 
+                  color: '#a0aec0',
+                  minWidth: 'auto',
+                  p: 1
+                }}
+              >
+                {sidebarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </Button>
+              <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+                Solution.{language === 'python' ? 'py' : 'js'}
+              </Typography>
             </Stack>
           </Box>
-        )}
-        
-        {submitError && (
-          <Alert severity="error" sx={{ mt: 3 }}>{submitError}</Alert>
-        )}
-      </Paper>
+
+          {/* Monaco Editor */}
+          <Box sx={{ flex: 1, position: 'relative' }}>
+            <MonacoEditor
+              height="100%"
+              language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
+              value={code}
+              theme="vs-dark"
+              options={{
+                fontSize: 14,
+                fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                smoothScrolling: true,
+                fontLigatures: true,
+                padding: { top: 16, bottom: 16 },
+                lineNumbers: 'on',
+                renderLineHighlight: 'all',
+                selectOnLineNumbers: true,
+                automaticLayout: true,
+                tabSize: 4,
+                insertSpaces: true,
+                bracketPairColorization: { enabled: true }
+              }}
+              onChange={val => setCode(val || '')}
+            />
+          </Box>
+
+          {/* Console/Output Area */}
+          <Box sx={{ 
+            height: 250,
+            borderTop: '1px solid #2d3748',
+            bgcolor: '#1a1a1a',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Box sx={{ 
+              px: 3,
+              py: 1.5,
+              borderBottom: '1px solid #2d3748',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+                Console
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="outlined"
+                  startIcon={<PlayArrowIcon />}
+                  onClick={handleRun}
+                  disabled={running}
+                  size="small"
+                  sx={{
+                    borderColor: '#4a5568',
+                    color: '#a0aec0',
+                    '&:hover': {
+                      borderColor: '#00d4aa',
+                      color: '#00d4aa',
+                      bgcolor: 'rgba(0, 212, 170, 0.1)'
+                    }
+                  }}
+                >
+                  {running ? 'Running...' : 'Run'}
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<CheckCircleIcon />}
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  size="small"
+                  sx={{
+                    bgcolor: '#00d4aa',
+                    '&:hover': { bgcolor: '#00b894' },
+                    fontWeight: 600
+                  }}
+                >
+                  {submitting ? 'Submitting...' : 'Submit'}
+                </Button>
+              </Stack>
+            </Box>
+            
+            <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+              {/* Run Result */}
+              {runResult && (
+                <Card sx={{ 
+                  mb: 2,
+                  bgcolor: runResult.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                  border: `1px solid ${runResult.passed ? '#00d4aa' : '#ff6b6b'}`
+                }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                      {runResult.passed ? 
+                        <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 20 }} /> : 
+                        <CancelIcon sx={{ color: '#ff6b6b', fontSize: 20 }} />
+                      }
+                      <Typography variant="subtitle2" fontWeight={700} sx={{ 
+                        color: runResult.passed ? '#00d4aa' : '#ff6b6b' 
+                      }}>
+                        {runResult.passed ? 'Test Passed' : 'Test Failed'}
+                      </Typography>
+                      <Chip 
+                        icon={<TimerIcon />}
+                        label={`${runResult.execution_time}ms`} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: '#2d3748', 
+                          color: '#a0aec0',
+                          fontSize: 11
+                        }} 
+                      />
+                    </Stack>
+                    <Stack spacing={1}>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                          Input:
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'JetBrains Mono, monospace',
+                          color: '#e2e8f0',
+                          bgcolor: '#2d3748',
+                          p: 1,
+                          borderRadius: 1,
+                          mt: 0.5
+                        }}>
+                          {runResult.input}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                          Expected:
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'JetBrains Mono, monospace',
+                          color: '#e2e8f0',
+                          bgcolor: '#2d3748',
+                          p: 1,
+                          borderRadius: 1,
+                          mt: 0.5
+                        }}>
+                          {runResult.expected}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                          Output:
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'JetBrains Mono, monospace',
+                          color: runResult.passed ? '#00d4aa' : '#ff6b6b',
+                          bgcolor: '#2d3748',
+                          p: 1,
+                          borderRadius: 1,
+                          mt: 0.5
+                        }}>
+                          {runResult.output}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Submission Results */}
+              {results && (
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                    Submission Results ({results.passed_test_cases}/{results.total_test_cases} passed)
+                  </Typography>
+                  <Stack spacing={2}>
+                    {results.test_case_results.map((result, i) => (
+                      <Card key={i} sx={{ 
+                        bgcolor: result.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                        border: `1px solid ${result.passed ? '#00d4aa' : '#ff6b6b'}`
+                      }}>
+                        <CardContent sx={{ p: 2 }}>
+                          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                            {result.passed ? 
+                              <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 18 }} /> : 
+                              <CancelIcon sx={{ color: '#ff6b6b', fontSize: 18 }} />
+                            }
+                            <Typography variant="body2" fontWeight={600} sx={{ 
+                              color: result.passed ? '#00d4aa' : '#ff6b6b' 
+                            }}>
+                              Test Case {i + 1}
+                            </Typography>
+                            <Chip 
+                              icon={<TimerIcon />}
+                              label={`${result.execution_time}ms`} 
+                              size="small" 
+                              sx={{ 
+                                bgcolor: '#2d3748', 
+                                color: '#a0aec0',
+                                fontSize: 10,
+                                height: 20
+                              }} 
+                            />
+                          </Stack>
+                          {!result.passed && (
+                            <Typography variant="caption" sx={{ 
+                              color: '#e2e8f0',
+                              fontFamily: 'JetBrains Mono, monospace',
+                              display: 'block',
+                              bgcolor: '#2d3748',
+                              p: 1,
+                              borderRadius: 1
+                            }}>
+                              Expected: {result.expected} | Got: {result.output}
+                            </Typography>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+
+              {/* Error Messages */}
+              {submitError && (
+                <Alert 
+                  severity="error" 
+                  sx={{ 
+                    bgcolor: 'rgba(255, 107, 107, 0.1)',
+                    border: '1px solid #ff6b6b',
+                    color: '#ff6b6b',
+                    '& .MuiAlert-icon': { color: '#ff6b6b' }
+                  }}
+                >
+                  {submitError}
+                </Alert>
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };

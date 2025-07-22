@@ -1,21 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Paper, Stack, Chip, CircularProgress, Alert, MenuItem, Button } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Box, Typography, Paper, Stack, Chip, CircularProgress, Alert, MenuItem, Button,
+  Divider, Card, CardContent, Tab, Tabs, Badge, IconButton, TextField, Tooltip, Avatar,
+  Snackbar, Drawer, List, ListItem, ListItemText, ListItemIcon, Collapse, Dialog,
+  DialogTitle, DialogContent, DialogActions
+} from '@mui/material';
 import MonacoEditor from '@monaco-editor/react';
 import io from 'socket.io-client';
 
 import SendIcon from '@mui/icons-material/Send';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import axios from 'axios';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 import HistoryIcon from '@mui/icons-material/History';
+import PeopleIcon from '@mui/icons-material/People';
+import ChatIcon from '@mui/icons-material/Chat';
+import CodeIcon from '@mui/icons-material/Code';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import axios from 'axios';
+import MuiAlert from '@mui/material/Alert';
 
 const SOCKET_URL = 'https://structures-production.up.railway.app';
 
@@ -46,6 +55,7 @@ function stringToColor(str: string) {
 
 const CollaborativeRoomPage: React.FC = () => {
   const { code: roomCode, id: problemId } = useParams<{ code: string; id?: string }>();
+  const navigate = useNavigate();
   const [code, setCode] = useState(languageOptions[0].defaultCode);
   const [language, setLanguage] = useState(languageOptions[0].value);
   const [connected, setConnected] = useState(false);
@@ -79,7 +89,12 @@ const CollaborativeRoomPage: React.FC = () => {
   const [roomLoading, setRoomLoading] = useState(true);
   const [roomError, setRoomError] = useState('');
   const [problemData, setProblemData] = useState<any>(null);
-  const [showProblem, setShowProblem] = useState(false);
+  const [showProblem, setShowProblem] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showTestCases, setShowTestCases] = useState(false);
+  const [consoleOutput, setConsoleOutput] = useState<string>('');
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const [sharingRun, setSharingRun] = useState(false);
   const [roomSubmissions, setRoomSubmissions] = useState<any[]>([]);
   const [loadingRoomSubmissions, setLoadingRoomSubmissions] = useState(true);
@@ -164,7 +179,7 @@ const CollaborativeRoomPage: React.FC = () => {
     // Get username from localStorage or profile API
     const stored = localStorage.getItem('username');
     if (stored) setUsername(stored);
-    
+
     // Fetch room data and users
     const fetchRoomData = async () => {
       setRoomLoading(true);
@@ -183,7 +198,7 @@ const CollaborativeRoomPage: React.FC = () => {
         setRoomUsers(usersRes.data);
         // Initialize users list with room participants
         setUsers(usersRes.data.map((u: any) => u.username));
-        
+
         // Fetch problem details
         if (roomRes.data.problem_id) {
           try {
@@ -202,7 +217,7 @@ const CollaborativeRoomPage: React.FC = () => {
         setRoomLoading(false);
       }
     };
-    
+
     if (roomCode) {
       fetchRoomData();
     }
@@ -310,7 +325,7 @@ const CollaborativeRoomPage: React.FC = () => {
       );
       const result = res.data.test_case_results ? res.data.test_case_results[0] : null;
       setRunResult(result);
-      
+
       // Emit socket event for real-time updates
       if (socketRef.current) {
         socketRef.current.emit('code_executed', {
@@ -345,7 +360,7 @@ const CollaborativeRoomPage: React.FC = () => {
         }
       );
       setResults(res.data.test_case_results || []);
-      
+
       // Emit socket event for real-time updates
       if (socketRef.current) {
         socketRef.current.emit('code_submitted', {
@@ -381,358 +396,775 @@ const CollaborativeRoomPage: React.FC = () => {
     }
   };
 
+  const handleExitRoom = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`https://structures-production.up.railway.app/api/rooms/${roomCode}/leave`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Emit leave room event to socket
+      if (socketRef.current) {
+        socketRef.current.emit('leave_room', { room: roomCode });
+        socketRef.current.disconnect();
+      }
+
+      // Navigate back to rooms page
+      navigate('/rooms');
+    } catch (err) {
+      console.error('Failed to leave room:', err);
+      // Still navigate back even if API call fails
+      navigate('/rooms');
+    }
+  };
+
   if (roomLoading) {
     return (
-      <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto', textAlign: 'center' }}>
-        <CircularProgress size={60} />
-        <Typography variant="h6" sx={{ mt: 2 }}>Loading room...</Typography>
+      <Box sx={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: '#0a0a0a',
+        color: 'white'
+      }}>
+        <Stack alignItems="center" spacing={2}>
+          <CircularProgress size={60} sx={{ color: '#00d4aa' }} />
+          <Typography variant="h6">Loading collaborative room...</Typography>
+        </Stack>
       </Box>
     );
   }
 
   if (roomError) {
     return (
-      <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {roomError}
-        </Alert>
-        <Button variant="contained" onClick={() => window.location.href = '/rooms'}>
-          Back to Rooms
-        </Button>
+      <Box sx={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: '#0a0a0a',
+        color: 'white',
+        p: 4
+      }}>
+        <Stack alignItems="center" spacing={3}>
+          <Alert severity="error" sx={{ mb: 2, bgcolor: '#2d1b1b', color: '#ff6b6b' }}>
+            {roomError}
+          </Alert>
+          <Button
+            variant="contained"
+            onClick={() => window.location.href = '/rooms'}
+            sx={{
+              bgcolor: '#00d4aa',
+              '&:hover': { bgcolor: '#00b894' },
+              px: 4,
+              py: 1.5,
+              borderRadius: 2
+            }}
+          >
+            Back to Rooms
+          </Button>
+        </Stack>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={4}>
-        <Paper elevation={3} sx={{ flex: 2, p: { xs: 2, md: 4 }, borderRadius: 4, background: '#fff', boxShadow: '0 2px 12px 0 rgba(108,99,255,0.07)' }}>
-          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-            <Typography variant="h5" fontWeight={700} color="primary">Room: {roomCode}</Typography>
-            <Chip label={connected ? 'Connected' : 'Disconnected'} color={connected ? 'success' : 'error'} />
-            <Chip label={`Users: ${Math.max(users.length, roomUsers.length)}`} color="info" />
-            {roomData && (
-              <Chip 
-                label={`Problem #${roomData.problem_id}`} 
-                color="secondary" 
-                variant="outlined"
-                onClick={() => setShowProblem(!showProblem)}
-                sx={{ cursor: 'pointer' }}
-              />
-            )}
-            {problemData && (
-              <Button 
-                variant="text" 
-                size="small" 
-                onClick={() => setShowProblem(!showProblem)}
-                sx={{ textTransform: 'none' }}
-              >
-                {showProblem ? 'Hide Problem' : 'Show Problem'}
-              </Button>
-            )}
-            <Stack direction="row" spacing={-1} ml={2}>
-              {users.map((u, i) => (
-                <Tooltip key={u} title={u}><Avatar sx={{ width: 28, height: 28, bgcolor: stringToColor(u), fontSize: 14, border: '2px solid #fff', zIndex: users.length - i }}>{u.slice(0, 2)}</Avatar></Tooltip>
-              ))}
-            </Stack>
-            <TextField
-              select
-              size="small"
-              label="Language"
-              value={language}
-              onChange={e => handleLanguageChange(e.target.value)}
-              sx={{ minWidth: 120, ml: 2 }}
-            >
-              {languageOptions.map(lang => (
-                <MenuItem key={lang.value} value={lang.value}>{lang.label}</MenuItem>
-              ))}
-            </TextField>
-            <Button onClick={handleUndo} disabled={undoStack.length === 0} sx={{ ml: 2 }}>Undo</Button>
-            <Button onClick={handleRedo} disabled={redoStack.length === 0}>Redo</Button>
-          </Stack>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          
-          {showProblem && problemData && (
-            <Paper variant="outlined" sx={{ p: 3, mb: 3, background: '#f8f9ff', border: '1px solid #e0e7ff' }}>
-              <Typography variant="h6" fontWeight={700} color="primary" mb={2}>
-                {problemData.title}
-              </Typography>
-              <Chip label={problemData.difficulty} color={
-                problemData.difficulty === 'Easy' ? 'success' : 
-                problemData.difficulty === 'Medium' ? 'warning' : 'error'
-              } size="small" sx={{ mb: 2 }} />
-              <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
-                {problemData.description}
-              </Typography>
-              {problemData.sample_input && problemData.sample_output && (
-                <Box>
-                  <Typography variant="subtitle2" fontWeight={700} mb={1}>Sample:</Typography>
-                  <Stack direction="row" spacing={2}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">Input:</Typography>
-                      <Paper variant="outlined" sx={{ p: 1, fontFamily: 'monospace', fontSize: 14, background: '#fff' }}>
-                        {problemData.sample_input}
-                      </Paper>
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">Output:</Typography>
-                      <Paper variant="outlined" sx={{ p: 1, fontFamily: 'monospace', fontSize: 14, background: '#fff' }}>
-                        {problemData.sample_output}
-                      </Paper>
-                    </Box>
-                  </Stack>
-                </Box>
-              )}
-            </Paper>
-          )}
-          <MonacoEditor
-            height="400px"
-            language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
-            value={selectedUser && userCodeHistory[selectedUser] && selectedHistoryIndex[selectedUser] !== undefined
-              ? userCodeHistory[selectedUser][selectedHistoryIndex[selectedUser] ?? userCodeHistory[selectedUser].length - 1]
-              : (selectedUser && userCodes[selectedUser] !== undefined ? userCodes[selectedUser] : code)}
-            theme="vs-light"
-            options={{ fontSize: 16, fontFamily: 'JetBrains Mono, Fira Mono, IBM Plex Mono, monospace', minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on', smoothScrolling: true, fontLigatures: true, readOnly: !!selectedUser && selectedUser !== username }}
-            onChange={val => {
-              if (!selectedUser || selectedUser === username) handleCodeChange(val);
+    <Box sx={{ 
+      height: '100vh', 
+      bgcolor: '#0a0a0a', 
+      color: 'white',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
+      {/* Header */}
+      <Box sx={{ 
+        borderBottom: '1px solid #2d3748',
+        px: 3,
+        py: 2,
+        bgcolor: '#1a1a1a'
+      }}>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <CodeIcon sx={{ color: '#00d4aa', fontSize: 28 }} />
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#00d4aa' }}>
+            Room {roomCode}
+          </Typography>
+          <Chip 
+            label={connected ? 'Connected' : 'Disconnected'} 
+            color={connected ? 'success' : 'error'}
+            size="small"
+            sx={{ 
+              bgcolor: connected ? '#00d4aa' : '#ff6b6b',
+              color: 'white',
+              fontWeight: 600
             }}
           />
-          <Box mt={2} textAlign="right">
-            <Button
-              variant="outlined"
-              color="secondary"
-              startIcon={<PlayArrowIcon />}
-              sx={{ fontWeight: 700, borderRadius: 2, px: 4, mr: 2 }}
-              onClick={() => handleRun(false)}
-              disabled={running || sharingRun}
-            >
-              {running ? 'Running...' : 'Run Code'}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<PlayArrowIcon />}
-              sx={{ fontWeight: 700, borderRadius: 2, px: 4, mr: 2 }}
-              onClick={() => handleRun(true)}
-              disabled={sharingRun || running}
-            >
-              {sharingRun ? 'Sharing...' : 'Share Run Output'}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<PlayArrowIcon />}
-              sx={{ fontWeight: 700, borderRadius: 2, px: 4 }}
-              onClick={handleSubmit}
-              disabled={submitting}
-            >
-              {submitting ? 'Submitting...' : 'Submit Solution'}
-            </Button>
-          </Box>
-          {runResult && (
-            <Box mt={3}>
-              <Typography variant="subtitle1" fontWeight={700} mb={1}>Sample Run Result</Typography>
-              <Paper variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: runResult.passed ? '#e7fbe7' : '#fff0f0' }}>
-                {runResult.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
-                <Box>
-                  <Typography variant="subtitle2" color={runResult.passed ? 'success.main' : 'error.main'} fontWeight={700}>
-                    {runResult.passed ? 'Passed' : 'Failed'}
-                  </Typography>
-                  <Typography variant="body2">Input: <code>{runResult.input}</code></Typography>
-                  <Typography variant="body2">Expected: <code>{runResult.expected}</code></Typography>
-                  <Typography variant="body2">Output: <code>{runResult.output}</code></Typography>
-                  <Typography variant="body2">Runtime: {runResult.runtime}</Typography>
-                </Box>
-              </Paper>
-            </Box>
-          )}
-          {results && (
-            <Box mt={4}>
-              <Typography variant="h6" fontWeight={700} mb={2}>Submission Results</Typography>
-              <Stack spacing={2}>
-                {results.map((r, i) => (
-                  <Paper key={i} variant="outlined" sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, background: r.passed ? '#e7fbe7' : '#fff0f0' }}>
-                    {r.passed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
-                    <Box>
-                      <Typography variant="subtitle2" color={r.passed ? 'success.main' : 'error.main'} fontWeight={700}>
-                        {r.passed ? 'Passed' : 'Failed'}
-                      </Typography>
-                      <Typography variant="body2">Input: <code>{r.input}</code></Typography>
-                      <Typography variant="body2">Expected: <code>{r.expected}</code></Typography>
-                      <Typography variant="body2">Output: <code>{r.output}</code></Typography>
-                      <Typography variant="body2">Runtime: {r.runtime}</Typography>
-                    </Box>
-                  </Paper>
-                ))}
-              </Stack>
-            </Box>
-          )}
-          {submitError && (
-            <Alert severity="error" sx={{ mt: 3 }}>{submitError}</Alert>
-          )}
-        </Paper>
-        <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 4, minWidth: 320, maxHeight: 500, display: 'flex', flexDirection: 'column', background: '#f7f7fa', boxShadow: '0 2px 12px 0 rgba(108,99,255,0.07)' }}>
-          <Typography variant="h6" fontWeight={700} mb={2} color="primary">Users in Room ({Math.max(users.length, roomUsers.length)})</Typography>
-          <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-            {/* Show room participants from backend */}
-            {roomUsers.map(u => (
-              <Chip
-                key={u.id}
-                avatar={<Avatar sx={{ bgcolor: stringToColor(u.username), width: 24, height: 24, fontSize: 14 }}>{u.username.slice(0, 2)}</Avatar>}
-                label={u.username === username ? `${u.username} (You)` : u.username}
-                color={selectedUser === u.username ? 'primary' : 'default'}
-                onClick={() => {
-                  setSelectedUser(u.username === selectedUser ? null : u.username);
-                  setSelectedHistoryIndex({});
-                  if (u.username !== selectedUser) fetchUserSubmissions(u.username);
-                  else setShowSubmissions(false);
-                }}
-                sx={{ 
-                  fontWeight: 600, 
-                  cursor: 'pointer', 
-                  mb: 1, 
-                  border: activeUser === u.username ? '2px solid #4caf50' : undefined, 
-                  background: activeUser === u.username ? '#e7fbe7' : undefined,
-                  opacity: users.includes(u.username) ? 1 : 0.6 // Show offline users with reduced opacity
-                }}
-                variant={activeUser === u.username ? 'filled' : 'outlined'}
-                icon={<HistoryIcon fontSize="small" />}
-              />
-            ))}
-            {/* Show any additional connected users not in room participants */}
-            {users.filter(u => !roomUsers.some(ru => ru.username === u)).map(u => (
-              <Chip
-                key={u}
-                avatar={<Avatar sx={{ bgcolor: stringToColor(u), width: 24, height: 24, fontSize: 14 }}>{u.slice(0, 2)}</Avatar>}
-                label={`${u} (Guest)`}
-                color="warning"
-                sx={{ fontWeight: 600, mb: 1, opacity: 0.8 }}
-                variant="outlined"
-              />
-            ))}
-          </Stack>
-          {showSubmissions && (
-            <Box mb={2}>
-              <Typography variant="subtitle2" fontWeight={700} mb={1}>Submission History for {selectedUser}</Typography>
-              {loadingSubmissions ? <CircularProgress size={20} /> : (
-                <Stack spacing={1}>
-                  {userSubmissions.length === 0 && <Typography variant="body2" color="text.secondary">No submissions yet.</Typography>}
-                  {userSubmissions.map((sub, idx) => (
-                    <Paper key={idx} variant="outlined" sx={{ p: 1, fontSize: 13, background: sub.result === 'pass' ? '#e7fbe7' : '#fff0f0', borderLeft: sub.result === 'pass' ? '4px solid #4caf50' : '4px solid #f44336' }}>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Chip label={sub.result} color={sub.result === 'pass' ? 'success' : 'error'} size="small" />
-                        <Typography variant="body2" fontWeight={700}>{new Date(sub.submission_time).toLocaleString()}</Typography>
-                        <Chip label={sub.language} size="small" />
-                      </Stack>
-                      <Typography variant="body2" sx={{ mt: 1, fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'pre-wrap' }}>{sub.code}</Typography>
-                    </Paper>
-                  ))}
-                </Stack>
-              )}
-            </Box>
-          )}
-          {selectedUser && userCodeHistory[selectedUser] && userCodeHistory[selectedUser].length > 1 && (
-            <Box mb={2}>
-              <Typography variant="subtitle2" fontWeight={700} mb={1}>Code History for {selectedUser}</Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                {userCodeHistory[selectedUser].map((snap, idx) => (
-                  <Button
-                    key={idx}
-                    size="small"
-                    variant={selectedHistoryIndex[selectedUser] === idx ? 'contained' : 'outlined'}
-                    color={selectedHistoryIndex[selectedUser] === idx ? 'primary' : 'inherit'}
-                    onClick={() => {
-                      setSelectedHistoryIndex(prev => ({ ...prev, [selectedUser]: idx }));
-                      if (selectedUser === username) setCode(snap);
-                    }}
-                    sx={{ fontFamily: 'JetBrains Mono, monospace', minWidth: 36 }}
-                  >
-                    {idx + 1}
-                  </Button>
-                ))}
-              </Stack>
-              <Typography variant="caption" color="text.secondary">Click a snapshot to view. If it's your code, you can restore it.</Typography>
-            </Box>
-          )}
-          <Typography variant="h6" fontWeight={700} mb={2} color="primary">Chat</Typography>
-          <Box ref={chatBoxRef} sx={{ flex: 1, overflowY: 'auto', mb: 1, pr: 1, borderRadius: 2, background: '#fafdff', boxShadow: 'inset 0 1px 4px #e0e7ff' }}>
-            {chatMessages.map((msg, idx) => (
-              <Box key={idx} sx={{ mb: 1, display: 'flex', alignItems: 'center', transition: 'background 0.2s', '&:hover': { background: '#f0f4ff' } }}>
-                <Avatar sx={{ width: 24, height: 24, bgcolor: '#6C63FF', fontSize: 12, mr: 1 }}>{msg.username ? msg.username.slice(0, 2) : msg.sid.slice(-2)}</Avatar>
-                <Typography variant="body2" sx={{ wordBreak: 'break-word', color: '#333', fontWeight: 700 }}>{msg.username || msg.sid}:</Typography>
-                <Typography variant="body2" sx={{ wordBreak: 'break-word', color: '#333', ml: 1 }}>{msg.message}</Typography>
-              </Box>
-            ))}
-          </Box>
-          <Stack direction="row" spacing={1}>
-            <TextField
-              size="small"
-              fullWidth
-              placeholder="Type a message..."
-              value={chatInput}
-              onChange={e => setChatInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleSendMessage(); }}
-              sx={{ bgcolor: '#fff', borderRadius: 2 }}
+          <Badge badgeContent={Math.max(users.length, roomUsers.length)} color="primary">
+            <PeopleIcon sx={{ color: '#a0aec0' }} />
+          </Badge>
+          {problemData && (
+            <Chip 
+              label={problemData.title}
+              sx={{ 
+                bgcolor: '#2d3748', 
+                color: 'white',
+                fontWeight: 600,
+                maxWidth: 200
+              }}
             />
-            <IconButton color="primary" onClick={handleSendMessage} disabled={!chatInput.trim()} sx={{ transition: 'background 0.2s', '&:hover': { background: '#e0e7ff' } }}>
-              <SendIcon />
-            </IconButton>
-          </Stack>
-        </Paper>
-      </Stack>
-      <Snackbar open={openNotif} autoHideDuration={3000} onClose={() => setOpenNotif(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <MuiAlert elevation={6} variant="filled" onClose={() => setOpenNotif(false)} severity="info">
-          {notifications[notifications.length - 1]}
-        </MuiAlert>
-      </Snackbar>
-      {/* Room Submission History */}
-      <Box mt={4}>
-        <Typography variant="h6" fontWeight={700} mb={2}>Room Submission History</Typography>
-        {loadingRoomSubmissions ? (
-          <CircularProgress size={24} />
-        ) : roomSubmissions.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">No submissions yet.</Typography>
-        ) : (
-          <Stack spacing={2}>
-            {roomSubmissions.map((sub, idx) => (
-              <Paper key={idx} variant="outlined" sx={{ p: 2, background: sub.overall_status === 'pass' ? '#e7fbe7' : '#fff0f0', borderLeft: sub.overall_status === 'pass' ? '4px solid #4caf50' : '4px solid #f44336' }}>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Chip label={sub.overall_status} color={sub.overall_status === 'pass' ? 'success' : 'error'} size="small" />
-                  <Typography variant="subtitle2" fontWeight={700}>{sub.username}</Typography>
-                  <Typography variant="body2" color="text.secondary">{sub.execution_time ? `${sub.execution_time.toFixed(3)}s` : ''}</Typography>
-                  <Typography variant="body2" color="text.secondary">{sub.submission_time ? new Date(sub.submission_time).toLocaleString() : ''}</Typography>
-                  <Button size="small" onClick={() => setExpandedSubmission(expandedSubmission === idx ? null : idx)}>
-                    {expandedSubmission === idx ? 'Hide' : 'Show'} Details
-                  </Button>
-                </Stack>
-                {expandedSubmission === idx && (
-                  <Box mt={2}>
-                    <Typography variant="subtitle2" fontWeight={700}>Code:</Typography>
-                    <Paper variant="outlined" sx={{ p: 1, fontFamily: 'JetBrains Mono, monospace', fontSize: 13, background: '#f4f4fa', whiteSpace: 'pre-wrap', wordBreak: 'break-all', mb: 2 }}>
-                      {sub.code}
-                    </Paper>
-                    <Typography variant="subtitle2" fontWeight={700}>Test Case Results:</Typography>
-                    <Stack spacing={1}>
-                      {sub.test_case_results && Array.isArray(sub.test_case_results) && sub.test_case_results.map((r: any, i: number) => (
-                        <Paper key={i} variant="outlined" sx={{ p: 1, background: r.passed ? '#e7fbe7' : '#fff0f0', borderLeft: r.passed ? '4px solid #4caf50' : '4px solid #f44336' }}>
-                          <Stack direction="row" spacing={1} alignItems="center">
-                            <Chip label={r.passed ? 'Passed' : 'Failed'} color={r.passed ? 'success' : 'error'} size="small" />
-                            <Typography variant="body2">Input: <code>{r.input}</code></Typography>
-                            <Typography variant="body2">Expected: <code>{r.expected}</code></Typography>
-                            <Typography variant="body2">Output: <code>{r.output}</code></Typography>
-                            <Typography variant="body2">Runtime: {r.runtime}</Typography>
-                            {r.error && <Alert severity="error" sx={{ ml: 2 }}>{r.error}</Alert>}
+          )}
+          <Box sx={{ flexGrow: 1 }} />
+          
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => setExitDialogOpen(true)}
+            sx={{
+              borderColor: '#4a5568',
+              color: '#a0aec0',
+              '&:hover': {
+                borderColor: '#ff6b6b',
+                color: '#ff6b6b',
+                bgcolor: 'rgba(255, 107, 107, 0.1)'
+              }
+            }}
+          >
+            Exit Room
+          </Button>
+          <TextField
+            select
+            size="small"
+            value={language}
+            onChange={e => handleLanguageChange(e.target.value)}
+            sx={{ 
+              minWidth: 120,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: '#2d3748',
+                color: 'white',
+                '& fieldset': { borderColor: '#4a5568' },
+                '&:hover fieldset': { borderColor: '#00d4aa' },
+                '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+              },
+              '& .MuiInputLabel-root': { color: '#a0aec0' },
+              '& .MuiSelect-icon': { color: '#a0aec0' }
+            }}
+          >
+            {languageOptions.map(lang => (
+              <MenuItem key={lang.value} value={lang.value} sx={{ bgcolor: '#2d3748', color: 'white' }}>
+                {lang.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
+      </Box>
+
+      {/* Main Content */}
+      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left Panel - Problem & Description */}
+        <Box sx={{ 
+          width: sidebarOpen ? 400 : 0,
+          transition: 'width 0.3s ease',
+          borderRight: '1px solid #2d3748',
+          bgcolor: '#1a1a1a',
+          overflow: 'hidden'
+        }}>
+          {sidebarOpen && (
+            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Tabs 
+                value={activeTab} 
+                onChange={(_, newValue) => setActiveTab(newValue)}
+                sx={{ 
+                  borderBottom: '1px solid #2d3748',
+                  '& .MuiTab-root': { 
+                    color: '#a0aec0',
+                    fontWeight: 600,
+                    minHeight: 48
+                  },
+                  '& .Mui-selected': { color: '#00d4aa' },
+                  '& .MuiTabs-indicator': { backgroundColor: '#00d4aa' }
+                }}
+              >
+                <Tab icon={<AssignmentIcon />} label="Problem" />
+                <Tab icon={<PeopleIcon />} label="Users" />
+                <Tab icon={<ChatIcon />} label="Chat" />
+              </Tabs>
+              
+              <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+                {/* Problem Tab */}
+                {activeTab === 0 && problemData && (
+                  <Stack spacing={3}>
+                    <Box>
+                      <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 1 }}>
+                        {problemData.title}
+                      </Typography>
+                      <Chip 
+                        label={problemData.difficulty}
+                        size="small"
+                        sx={{
+                          bgcolor: problemData.difficulty === 'Easy' ? '#00d4aa' : 
+                                  problemData.difficulty === 'Medium' ? '#ffa726' : '#ff6b6b',
+                          color: 'white',
+                          fontWeight: 600
+                        }}
+                      />
+                    </Box>
+                    
+                    <Typography variant="body2" sx={{ color: '#e2e8f0', lineHeight: 1.6 }}>
+                      {problemData.description}
+                    </Typography>
+                    
+                    {problemData.sample_input && problemData.sample_output && (
+                      <Card sx={{ bgcolor: '#2d3748', border: '1px solid #4a5568' }}>
+                        <CardContent sx={{ p: 2 }}>
+                          <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                            Example:
+                          </Typography>
+                          <Stack spacing={2}>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                                Input:
+                              </Typography>
+                              <Paper sx={{ 
+                                p: 1.5, 
+                                mt: 0.5,
+                                bgcolor: '#1a1a1a', 
+                                border: '1px solid #4a5568',
+                                fontFamily: 'JetBrains Mono, monospace',
+                                fontSize: 13,
+                                color: '#e2e8f0'
+                              }}>
+                                {problemData.sample_input}
+                              </Paper>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                                Output:
+                              </Typography>
+                              <Paper sx={{ 
+                                p: 1.5, 
+                                mt: 0.5,
+                                bgcolor: '#1a1a1a', 
+                                border: '1px solid #4a5568',
+                                fontFamily: 'JetBrains Mono, monospace',
+                                fontSize: 13,
+                                color: '#e2e8f0'
+                              }}>
+                                {problemData.sample_output}
+                              </Paper>
+                            </Box>
                           </Stack>
-                        </Paper>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </Stack>
+                )}
+                
+                {/* Users Tab */}
+                {activeTab === 1 && (
+                  <Stack spacing={2}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa' }}>
+                      Room Participants ({Math.max(users.length, roomUsers.length)})
+                    </Typography>
+                    {roomUsers.map(u => (
+                      <Card key={u.id} sx={{ 
+                        bgcolor: '#2d3748', 
+                        border: '1px solid #4a5568',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        '&:hover': { bgcolor: '#374151', borderColor: '#00d4aa' }
+                      }}>
+                        <CardContent sx={{ p: 2 }}>
+                          <Stack direction="row" alignItems="center" spacing={2}>
+                            <Avatar sx={{ 
+                              bgcolor: stringToColor(u.username), 
+                              width: 32, 
+                              height: 32,
+                              fontSize: 14,
+                              fontWeight: 700
+                            }}>
+                              {u.username.slice(0, 2).toUpperCase()}
+                            </Avatar>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="body2" fontWeight={600} sx={{ color: 'white' }}>
+                                {u.username === username ? `${u.username} (You)` : u.username}
+                              </Typography>
+                              <Stack direction="row" alignItems="center" spacing={1}>
+                                <FiberManualRecordIcon 
+                                  sx={{ 
+                                    fontSize: 8, 
+                                    color: users.includes(u.username) ? '#00d4aa' : '#6b7280' 
+                                  }} 
+                                />
+                                <Typography variant="caption" sx={{ 
+                                  color: users.includes(u.username) ? '#00d4aa' : '#6b7280' 
+                                }}>
+                                  {users.includes(u.username) ? 'Online' : 'Offline'}
+                                </Typography>
+                              </Stack>
+                            </Box>
+                            {activeUser === u.username && (
+                              <Chip 
+                                label="Coding" 
+                                size="small" 
+                                sx={{ 
+                                  bgcolor: '#00d4aa', 
+                                  color: 'white',
+                                  fontSize: 11,
+                                  height: 20
+                                }} 
+                              />
+                            )}
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Stack>
+                )}
+                
+                {/* Chat Tab */}
+                {activeTab === 2 && (
+                  <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                      Team Chat
+                    </Typography>
+                    <Box sx={{ 
+                      flex: 1, 
+                      overflowY: 'auto', 
+                      mb: 2,
+                      bgcolor: '#2d3748',
+                      borderRadius: 2,
+                      p: 2,
+                      border: '1px solid #4a5568'
+                    }}>
+                      {chatMessages.map((msg, idx) => (
+                        <Box key={idx} sx={{ mb: 2 }}>
+                          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                            <Avatar sx={{ 
+                              width: 20, 
+                              height: 20, 
+                              bgcolor: stringToColor(msg.username || msg.sid),
+                              fontSize: 10
+                            }}>
+                              {(msg.username || msg.sid).slice(0, 2).toUpperCase()}
+                            </Avatar>
+                            <Typography variant="caption" fontWeight={600} sx={{ color: '#00d4aa' }}>
+                              {msg.username || msg.sid}
+                            </Typography>
+                          </Stack>
+                          <Typography variant="body2" sx={{ 
+                            color: '#e2e8f0', 
+                            ml: 3,
+                            wordBreak: 'break-word'
+                          }}>
+                            {msg.message}
+                          </Typography>
+                        </Box>
                       ))}
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        placeholder="Type a message..."
+                        value={chatInput}
+                        onChange={e => setChatInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') handleSendMessage(); }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: '#2d3748',
+                            color: 'white',
+                            '& fieldset': { borderColor: '#4a5568' },
+                            '&:hover fieldset': { borderColor: '#00d4aa' },
+                            '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+                          }
+                        }}
+                      />
+                      <IconButton 
+                        onClick={handleSendMessage} 
+                        disabled={!chatInput.trim()}
+                        sx={{ 
+                          bgcolor: '#00d4aa',
+                          color: 'white',
+                          '&:hover': { bgcolor: '#00b894' },
+                          '&:disabled': { bgcolor: '#4a5568', color: '#6b7280' }
+                        }}
+                      >
+                        <SendIcon fontSize="small" />
+                      </IconButton>
                     </Stack>
                   </Box>
                 )}
-              </Paper>
-            ))}
-          </Stack>
-        )}
+              </Box>
+            </Box>
+          )}
+        </Box>
+
+        {/* Main Coding Area */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* Code Editor Header */}
+          <Box sx={{ 
+            borderBottom: '1px solid #2d3748',
+            px: 3,
+            py: 1.5,
+            bgcolor: '#1a1a1a',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Button
+                variant="text"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                sx={{ 
+                  color: '#a0aec0',
+                  minWidth: 'auto',
+                  p: 1
+                }}
+              >
+                {sidebarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </Button>
+              <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+                Solution.{language === 'python' ? 'py' : 'js'}
+              </Typography>
+            </Stack>
+            
+            <Stack direction="row" spacing={2}>
+              <Button
+                onClick={handleUndo}
+                disabled={undoStack.length === 0}
+                size="small"
+                sx={{ 
+                  color: '#a0aec0',
+                  '&:disabled': { color: '#4a5568' }
+                }}
+              >
+                Undo
+              </Button>
+              <Button
+                onClick={handleRedo}
+                disabled={redoStack.length === 0}
+                size="small"
+                sx={{ 
+                  color: '#a0aec0',
+                  '&:disabled': { color: '#4a5568' }
+                }}
+              >
+                Redo
+              </Button>
+            </Stack>
+          </Box>
+
+          {/* Monaco Editor */}
+          <Box sx={{ flex: 1, position: 'relative' }}>
+            <MonacoEditor
+              height="100%"
+              language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
+              value={selectedUser && userCodeHistory[selectedUser] && selectedHistoryIndex[selectedUser] !== undefined
+                ? userCodeHistory[selectedUser][selectedHistoryIndex[selectedUser] ?? userCodeHistory[selectedUser].length - 1]
+                : (selectedUser && userCodes[selectedUser] !== undefined ? userCodes[selectedUser] : code)}
+              theme="vs-dark"
+              options={{
+                fontSize: 14,
+                fontFamily: 'JetBrains Mono, Fira Code, monospace',
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                smoothScrolling: true,
+                fontLigatures: true,
+                readOnly: !!selectedUser && selectedUser !== username,
+                padding: { top: 16, bottom: 16 },
+                lineNumbers: 'on',
+                renderLineHighlight: 'all',
+                selectOnLineNumbers: true,
+                automaticLayout: true,
+                tabSize: 4,
+                insertSpaces: true,
+                bracketPairColorization: { enabled: true }
+              }}
+              onChange={val => {
+                if (!selectedUser || selectedUser === username) handleCodeChange(val);
+              }}
+            />
+          </Box>
+
+          {/* Console/Output Area */}
+          <Box sx={{ 
+            height: 200,
+            borderTop: '1px solid #2d3748',
+            bgcolor: '#1a1a1a',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Box sx={{ 
+              px: 3,
+              py: 1.5,
+              borderBottom: '1px solid #2d3748',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+                Console
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="outlined"
+                  startIcon={<PlayArrowIcon />}
+                  onClick={() => handleRun()}
+                  disabled={running}
+                  size="small"
+                  sx={{
+                    borderColor: '#4a5568',
+                    color: '#a0aec0',
+                    '&:hover': {
+                      borderColor: '#00d4aa',
+                      color: '#00d4aa',
+                      bgcolor: 'rgba(0, 212, 170, 0.1)'
+                    }
+                  }}
+                >
+                  {running ? 'Running...' : 'Run'}
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<CheckCircleIcon />}
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  size="small"
+                  sx={{
+                    bgcolor: '#00d4aa',
+                    '&:hover': { bgcolor: '#00b894' },
+                    fontWeight: 600
+                  }}
+                >
+                  {submitting ? 'Submitting...' : 'Submit'}
+                </Button>
+              </Stack>
+            </Box>
+            
+            <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+              {/* Run Result */}
+              {runResult && (
+                <Card sx={{ 
+                  mb: 2,
+                  bgcolor: runResult.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                  border: `1px solid ${runResult.passed ? '#00d4aa' : '#ff6b6b'}`
+                }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                      {runResult.passed ? 
+                        <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 20 }} /> : 
+                        <CancelIcon sx={{ color: '#ff6b6b', fontSize: 20 }} />
+                      }
+                      <Typography variant="subtitle2" fontWeight={700} sx={{ 
+                        color: runResult.passed ? '#00d4aa' : '#ff6b6b' 
+                      }}>
+                        {runResult.passed ? 'Test Passed' : 'Test Failed'}
+                      </Typography>
+                      <Chip 
+                        label={runResult.runtime} 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: '#2d3748', 
+                          color: '#a0aec0',
+                          fontSize: 11
+                        }} 
+                      />
+                    </Stack>
+                    <Stack spacing={1}>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                          Input:
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'JetBrains Mono, monospace',
+                          color: '#e2e8f0',
+                          bgcolor: '#2d3748',
+                          p: 1,
+                          borderRadius: 1,
+                          mt: 0.5
+                        }}>
+                          {runResult.input}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                          Expected:
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'JetBrains Mono, monospace',
+                          color: '#e2e8f0',
+                          bgcolor: '#2d3748',
+                          p: 1,
+                          borderRadius: 1,
+                          mt: 0.5
+                        }}>
+                          {runResult.expected}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                          Output:
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          fontFamily: 'JetBrains Mono, monospace',
+                          color: runResult.passed ? '#00d4aa' : '#ff6b6b',
+                          bgcolor: '#2d3748',
+                          p: 1,
+                          borderRadius: 1,
+                          mt: 0.5
+                        }}>
+                          {runResult.output}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Submission Results */}
+              {results && results.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                    Submission Results
+                  </Typography>
+                  <Stack spacing={2}>
+                    {results.map((r, i) => (
+                      <Card key={i} sx={{ 
+                        bgcolor: r.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                        border: `1px solid ${r.passed ? '#00d4aa' : '#ff6b6b'}`
+                      }}>
+                        <CardContent sx={{ p: 2 }}>
+                          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                            {r.passed ? 
+                              <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 18 }} /> : 
+                              <CancelIcon sx={{ color: '#ff6b6b', fontSize: 18 }} />
+                            }
+                            <Typography variant="body2" fontWeight={600} sx={{ 
+                              color: r.passed ? '#00d4aa' : '#ff6b6b' 
+                            }}>
+                              Test Case {i + 1}
+                            </Typography>
+                            <Chip 
+                              label={r.runtime} 
+                              size="small" 
+                              sx={{ 
+                                bgcolor: '#2d3748', 
+                                color: '#a0aec0',
+                                fontSize: 10,
+                                height: 20
+                              }} 
+                            />
+                          </Stack>
+                          {!r.passed && (
+                            <Typography variant="caption" sx={{ 
+                              color: '#e2e8f0',
+                              fontFamily: 'JetBrains Mono, monospace',
+                              display: 'block',
+                              bgcolor: '#2d3748',
+                              p: 1,
+                              borderRadius: 1
+                            }}>
+                              Expected: {r.expected} | Got: {r.output}
+                            </Typography>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+
+              {/* Error Messages */}
+              {submitError && (
+                <Alert 
+                  severity="error" 
+                  sx={{ 
+                    bgcolor: 'rgba(255, 107, 107, 0.1)',
+                    border: '1px solid #ff6b6b',
+                    color: '#ff6b6b',
+                    '& .MuiAlert-icon': { color: '#ff6b6b' }
+                  }}
+                >
+                  {submitError}
+                </Alert>
+              )}
+            </Box>
+          </Box>
+        </Box>
       </Box>
+
+      {/* Notifications */}
+      <Snackbar 
+        open={openNotif} 
+        autoHideDuration={3000} 
+        onClose={() => setOpenNotif(false)} 
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MuiAlert 
+          elevation={6} 
+          variant="filled" 
+          onClose={() => setOpenNotif(false)} 
+          severity="info"
+          sx={{ 
+            bgcolor: '#00d4aa',
+            color: 'white'
+          }}
+        >
+          {notifications[notifications.length - 1]}
+        </MuiAlert>
+      </Snackbar>
+
+      {/* Exit Room Confirmation Dialog */}
+      <Dialog 
+        open={exitDialogOpen} 
+        onClose={() => setExitDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1a1a',
+            border: '1px solid #2d3748',
+            borderRadius: 3
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white', borderBottom: '1px solid #2d3748' }}>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <ExitToAppIcon sx={{ color: '#ff6b6b' }} />
+            <Typography variant="h6" fontWeight={700}>
+              Exit Room
+            </Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography sx={{ color: '#e2e8f0' }}>
+            Are you sure you want to leave this collaborative room? Your progress will be saved, but you'll need the room code to rejoin.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ borderTop: '1px solid #2d3748', pt: 2, px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setExitDialogOpen(false)}
+            sx={{ color: '#a0aec0', '&:hover': { bgcolor: '#2d3748' } }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={() => {
+              setExitDialogOpen(false);
+              handleExitRoom();
+            }}
+            variant="contained"
+            startIcon={<ExitToAppIcon />}
+            sx={{
+              bgcolor: '#ff6b6b',
+              '&:hover': { bgcolor: '#e53e3e' },
+              fontWeight: 600
+            }}
+          >
+            Exit Room
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
