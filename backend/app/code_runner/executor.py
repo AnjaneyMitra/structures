@@ -126,44 +126,19 @@ import json
 {user_code}
 
 def parse_input(input_str):
-    # Try to parse as JSON first (handles lists, objects, etc.)
-    try:
-        parsed = json.loads(input_str)
-        # If it's a list, return it as a single argument (the list itself)
-        if isinstance(parsed, list):
+    # Handle multi-line input (common for problems with multiple parameters)
+    lines = [line.strip() for line in input_str.strip().split('\n') if line.strip()]
+    
+    if len(lines) == 0:
+        return []
+    elif len(lines) == 1:
+        # Single line - try to parse as JSON first, then as simple value
+        line = lines[0]
+        try:
+            parsed = json.loads(line)
             return [parsed]
-        else:
-            return [parsed]
-    except:
-        # If JSON parsing fails, try to parse as simple values
-        lines = [line.strip() for line in input_str.strip().split('\\n') if line.strip()]
-        if len(lines) == 1:
-            # Single line input - could be space-separated or single value
-            parts = [x.strip() for x in lines[0].split() if x.strip()]
-            if len(parts) == 1:
-                # Single value
-                def try_num(x):
-                    try:
-                        return int(x)
-                    except:
-                        try:
-                            return float(x)
-                        except:
-                            return x
-                return [try_num(parts[0])]
-            else:
-                # Multiple space-separated values - return as list
-                def try_num(x):
-                    try:
-                        return int(x)
-                    except:
-                        try:
-                            return float(x)
-                        except:
-                            return x
-                return [[try_num(x) for x in parts]]
-        else:
-            # Multiple lines - each line is a separate argument
+        except:
+            # Try to parse as number or string
             def try_num(x):
                 try:
                     return int(x)
@@ -172,7 +147,27 @@ def parse_input(input_str):
                         return float(x)
                     except:
                         return x
-            return [try_num(line) for line in lines]
+            return [try_num(line)]
+    else:
+        # Multiple lines - each line is a separate argument
+        args = []
+        for line in lines:
+            try:
+                # Try to parse each line as JSON (handles arrays, objects, etc.)
+                parsed = json.loads(line)
+                args.append(parsed)
+            except:
+                # If JSON parsing fails, try to parse as number or string
+                def try_num(x):
+                    try:
+                        return int(x)
+                    except:
+                        try:
+                            return float(x)
+                        except:
+                            return x
+                args.append(try_num(line))
+        return args
 
 if __name__ == "__main__":
     input_str = sys.stdin.read().strip()

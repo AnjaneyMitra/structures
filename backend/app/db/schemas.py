@@ -59,7 +59,7 @@ class SubmissionOut(SubmissionBase):
     submission_time: datetime.datetime
     
     # New fields for enhanced test case validation
-    test_case_results: Optional[Dict[str, Any]] = None  # Detailed test case results
+    test_case_results: Optional[List[Dict[str, Any]]] = None  # Detailed test case results
     execution_time: Optional[float] = None  # Execution time in seconds
     memory_usage: Optional[float] = None  # Memory usage in MB
     overall_status: Optional[str] = None  # 'pass', 'fail', 'partial'
