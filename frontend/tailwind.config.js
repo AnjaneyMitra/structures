@@ -50,8 +50,9 @@ module.exports = {
         DEFAULT: 'var(--radius)',
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular'],
+        sans: ['Outfit', 'ui-sans-serif', 'system-ui'],
+        serif: ['ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+        mono: ['monospace'],
       },
     },
   },
