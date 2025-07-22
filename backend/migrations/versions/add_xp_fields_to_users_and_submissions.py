@@ -20,13 +20,32 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add XP fields to users and submissions tables."""
-    # Add total_xp column to users table
-    op.add_column('users', sa.Column('total_xp', sa.Integer(), nullable=True, default=0))
+    # Use raw SQL with IF NOT EXISTS to avoid duplicate column errors
+    op.execute("""
+        DO $$ 
+        BEGIN 
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns 
+                WHERE table_name = 'users' AND column_name = 'total_xp'
+            ) THEN
+                ALTER TABLE users ADD COLUMN total_xp INTEGER DEFAULT 0;
+            END IF;
+        END $$;
+    """)
     
-    # Add xp_awarded column to submissions table
-    op.add_column('submissions', sa.Column('xp_awarded', sa.Integer(), nullable=True, default=0))
+    op.execute("""
+        DO $$ 
+        BEGIN 
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns 
+                WHERE table_name = 'submissions' AND column_name = 'xp_awarded'
+            ) THEN
+                ALTER TABLE submissions ADD COLUMN xp_awarded INTEGER DEFAULT 0;
+            END IF;
+        END $$;
+    """)
     
-    # Update existing records to have 0 XP (using raw SQL for better compatibility)
+    # Update existing records to have 0 XP (safe to run multiple times)
     op.execute("UPDATE users SET total_xp = 0 WHERE total_xp IS NULL")
     op.execute("UPDATE submissions SET xp_awarded = 0 WHERE xp_awarded IS NULL")
 
