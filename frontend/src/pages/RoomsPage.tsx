@@ -77,8 +77,8 @@ const RoomsPage: React.FC = () => {
       });
       setRooms(roomsRes.data);
       setJoinCode('');
-      // Navigate to the joined room
-      navigate(`/rooms/${response.data.code}`);
+      // Navigate to the joined room, including the problem ID
+      navigate(`/rooms/${response.data.code}/${response.data.problem_id}`);
     } catch (err) {
       setError('Failed to join room.');
     } finally {
@@ -102,7 +102,8 @@ const RoomsPage: React.FC = () => {
       setCreating(false);
       setCreateOpen(false);
       setSelectedProblem('');
-      navigate(`/rooms/${res.data.code}`);
+      // Also navigate with problem ID here
+      navigate(`/rooms/${res.data.code}/${res.data.problem_id}`);
     } catch (err: any) {
       setCreateError(err.response?.data?.detail || 'Failed to create room.');
       setCreating(false);

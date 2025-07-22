@@ -174,7 +174,7 @@ function getJSReturnType(problemData: any): string {
 }
 
 const CollaborativeRoomPage: React.FC = () => {
-  const { code: roomCode, id: problemId } = useParams<{ code: string; id?: string }>();
+  const { code: roomCode, problem_id: problemId } = useParams<{ code: string; problem_id: string }>();
   const navigate = useNavigate();
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState(languageOptions[0].value);
@@ -341,34 +341,28 @@ const CollaborativeRoomPage: React.FC = () => {
       setRoomError('');
       try {
         const token = localStorage.getItem('token');
-        const [roomRes, usersRes] = await Promise.all([
+        const [roomRes, usersRes, problemRes] = await Promise.all([
           axios.get(`https://structures-production.up.railway.app/api/rooms/code/${roomCode}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(`https://structures-production.up.railway.app/api/rooms/${roomCode}/users`, {
             headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`https://structures-production.up.railway.app/api/problems/${problemId}`, {
+            headers: { Authorization: `Bearer ${token}` },
           })
         ]);
         setRoomData(roomRes.data);
         setRoomUsers(usersRes.data);
-        // Initialize users list with room participants
         setUsers(usersRes.data.map((u: any) => u.username));
-
-        // Fetch problem details
-        if (roomRes.data.problem_id) {
-          try {
-            const problemRes = await axios.get(`https://structures-production.up.railway.app/api/problems/${roomRes.data.problem_id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            setProblemData(problemRes.data);
-            
-            // Initialize code with problem-specific template if code is empty
-            if (!code.trim()) {
-              const template = generateProblemTemplate(problemRes.data, language);
-              setCode(template);
-              
-              // Show helpful message in console
-              setConsoleOutput(`Welcome to the collaborative room! 
+        setProblemData(problemRes.data);
+        
+        // Initialize code with problem-specific template if code is empty
+        if (!code.trim()) {
+          const template = generateProblemTemplate(problemRes.data, language);
+          setCode(template);
+          
+          setConsoleOutput(`Welcome to the collaborative room! 
 
 📝 Your code editor has been initialized with a solution template.
 🔧 Modify the solution function to solve the problem.
@@ -377,10 +371,6 @@ const CollaborativeRoomPage: React.FC = () => {
 ✅ Use "Submit" to test against all test cases.
 
 Good luck! 🚀`);
-            }
-          } catch (err) {
-            console.error('Failed to fetch problem data:', err);
-          }
         }
       } catch (err: any) {
         console.error('Failed to fetch room data:', err);
@@ -390,10 +380,10 @@ Good luck! 🚀`);
       }
     };
 
-    if (roomCode) {
+    if (roomCode && problemId) {
       fetchRoomData();
     }
-  }, [roomCode]);
+  }, [roomCode, problemId]);
 
   // Fetch room submissions on mount
   useEffect(() => {
