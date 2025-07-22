@@ -10,14 +10,21 @@
   --popover-foreground: 0 0% 32.1569%;
   --primary: 151.3274 66.8639% 66.8627%;
   --primary-foreground: 153.3333 13.0435% 13.5294%;
+  --primary-dark: 151.3274 66.8639% 56.8627%;
+  --primary-hover: 151.3274 66.8639% 66.8627% / 0.1;
   --secondary: 0 0% 99.2157%;
   --secondary-foreground: 0 0% 9.0196%;
   --muted: 0 0% 92.9412%;
   --muted-foreground: 0 0% 12.5490%;
   --accent: 0 0% 92.9412%;
   --accent-foreground: 0 0% 12.5490%;
+  --accent-hover: 0 0% 92.9412% / 0.1;
   --destructive: 9.8901 81.9820% 43.5294%;
   --destructive-foreground: 0 100% 99.4118%;
+  --success: 151.3274 66.8639% 66.8627%;
+  --success-foreground: 153.3333 13.0435% 13.5294%;
+  --success-bg: 151.3274 66.8639% 66.8627% / 0.1;
+  --destructive-bg: 9.8901 81.9820% 43.5294% / 0.1;
   --border: 0 0% 87.4510%;
   --input: 0 0% 96.4706%;
   --ring: 151.3274 66.8639% 66.8627%;
@@ -127,14 +134,21 @@ body {
   --popover-foreground: 0 0% 66.2745%;
   --primary: 154.8980 100.0000% 19.2157%;
   --primary-foreground: 152.7273 19.2982% 88.8235%;
+  --primary-dark: 154.8980 100.0000% 15.2157%;
+  --primary-hover: 154.8980 100.0000% 19.2157% / 0.1;
   --secondary: 0 0% 14.1176%;
   --secondary-foreground: 0 0% 98.0392%;
   --muted: 0 0% 12.1569%;
   --muted-foreground: 0 0% 63.5294%;
   --accent: 0 0% 19.2157%;
   --accent-foreground: 0 0% 98.0392%;
+  --accent-hover: 0 0% 19.2157% / 0.1;
   --destructive: 6.6667 60.0000% 20.5882%;
   --destructive-foreground: 12.0000 12.1951% 91.9608%;
+  --success: 154.8980 100.0000% 19.2157%;
+  --success-foreground: 152.7273 19.2982% 88.8235%;
+  --success-bg: 154.8980 100.0000% 19.2157% / 0.1;
+  --destructive-bg: 6.6667 60.0000% 20.5882% / 0.1;
   --border: 0 0% 16.0784%;
   --input: 0 0% 14.1176%;
   --ring: 141.8919 69.1589% 58.0392%;
@@ -283,13 +297,13 @@ body {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid hsl(var(--primary) / 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"] .glass {
   background: rgba(18, 41, 30, 0.2);
-  border: 1px solid rgba(75, 181, 67, 0.3);
+  border: 1px solid hsl(var(--primary) / 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -297,7 +311,7 @@ body {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid hsl(var(--primary) / 0.3);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   transition: all var(--transition-base);
@@ -305,7 +319,7 @@ body {
 
 [data-theme="dark"] .glass-card {
   background: rgba(18, 41, 30, 0.8);
-  border: 1px solid rgba(75, 181, 67, 0.4);
+  border: 1px solid hsl(var(--primary) / 0.4);
 }
 
 .glass-card:hover {
