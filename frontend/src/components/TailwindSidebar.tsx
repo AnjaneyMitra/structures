@@ -53,7 +53,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
     } h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 sidebar-transition transition-all duration-300 ease-in-out`}>
       
       {/* Header */}
-      <div className={`relative z-10 ${sidebarOpen ? 'p-6' : 'p-4'} border-b border-card-foreground/10 transition-all duration-300`}>
+      <div className={`relative z-10 ${sidebarOpen ? 'px-6 pt-6 pb-4' : 'p-4'} border-b border-card-foreground/10 transition-all duration-300`}>
         <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
           {sidebarOpen ? (
             <>
@@ -89,7 +89,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className={`relative z-10 flex-1 ${sidebarOpen ? 'p-4' : 'p-2'} transition-all duration-300`}>
+      <nav className={`relative z-10 flex-1 ${sidebarOpen ? 'px-4 pt-2 pb-4' : 'p-2'} transition-all duration-300`}>
         <ul className={`${sidebarOpen ? 'space-y-2' : 'space-y-3'}`}>
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -99,7 +99,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 <Link
                   to={item.path}
                   className={`flex items-center ${
-                    sidebarOpen ? 'space-x-3 px-4 py-3' : 'justify-center px-3 py-3'
+                    sidebarOpen ? 'space-x-3 px-4 py-3' : 'justify-center p-3'
                   } rounded-xl sidebar-nav-item sidebar-focus group transition-all duration-200 ${
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
