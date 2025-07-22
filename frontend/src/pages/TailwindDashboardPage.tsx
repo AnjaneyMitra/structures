@@ -91,90 +91,143 @@ const TailwindDashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Good morning, {user?.username ? formatUsername(user.username) : ''}
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Ready to solve some problems today?
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-card rounded-lg border p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Problems Solved</p>
-                  <p className="text-3xl font-bold text-primary">{stats.problems_solved}</p>
-                </div>
-                <CheckCircleIcon className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-            
-            <div className="bg-card rounded-lg border p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Submissions</p>
-                  <p className="text-3xl font-bold text-accent">{stats.total_submissions}</p>
-                </div>
-                <BoltIcon className="h-8 w-8 text-accent" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Quick Search */}
-        <div className="mb-8">
-          <div className="relative max-w-2xl">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Quick search problems... (e.g. 'Linked List', 'Binary Tree') - Press Enter to search"
-              value={quickSearch}
-              onChange={(e) => setQuickSearch(e.target.value)}
-              onKeyDown={handleQuickSearch}
-              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-            />
-          </div>
-        </div>
-
-        {/* Featured Problems */}
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-6">Featured Problems</h2>
+      {/* Main Container with 12-column grid system */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-12 gap-6">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {problems.map((problem) => (
-              <div key={problem.id} className="bg-card rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-bold text-card-foreground flex-1 pr-3">
-                    {problem.title}
-                  </h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
-                    {problem.difficulty}
-                  </span>
+          {/* Welcome Header - Full Width */}
+          <section className="col-span-12 mb-8">
+            <div className="bg-card/30 backdrop-blur-sm rounded-xl p-8 border border-border/50">
+              <h1 className="text-4xl font-bold text-foreground mb-3">
+                Good morning, {user?.username ? formatUsername(user.username) : ''}
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Ready to solve some problems today?
+              </p>
+            </div>
+          </section>
+
+          {/* Stats Cards Section - Full Width with 24px horizontal, 32px vertical gutters */}
+          {stats && (
+            <section className="col-span-12 mb-8">
+              <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
+                <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Problems Solved</p>
+                        <p className="text-3xl font-bold text-primary">{stats.problems_solved}</p>
+                      </div>
+                      <div className="p-3 bg-primary/10 rounded-lg">
+                        <CheckCircleIcon className="h-8 w-8 text-primary" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Total Submissions</p>
+                        <p className="text-3xl font-bold text-accent">{stats.total_submissions}</p>
+                      </div>
+                      <div className="p-3 bg-accent/10 rounded-lg">
+                        <BoltIcon className="h-8 w-8 text-accent" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Placeholder cards for future metrics */}
+                  <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Success Rate</p>
+                        <p className="text-3xl font-bold text-muted-foreground">--%</p>
+                      </div>
+                      <div className="p-3 bg-muted/10 rounded-lg">
+                        <div className="h-8 w-8 bg-muted/20 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Streak</p>
+                        <p className="text-3xl font-bold text-muted-foreground">--</p>
+                      </div>
+                      <div className="p-3 bg-muted/10 rounded-lg">
+                        <div className="h-8 w-8 bg-muted/20 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Link
-                  to={`/problems/${problem.id}`}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg transition-colors duration-200 inline-block text-center"
+              </div>
+            </section>
+          )}
+
+          {/* Quick Search Section - Centered with responsive width */}
+          <section className="col-span-12 mb-8">
+            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
+              <h2 className="text-xl font-semibold text-foreground mb-6 text-center">Find Problems</h2>
+              <div className="flex justify-center">
+                <div className="relative w-full max-w-2xl">
+                  <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Quick search problems... (e.g. 'Linked List', 'Binary Tree') - Press Enter to search"
+                    value={quickSearch}
+                    onChange={(e) => setQuickSearch(e.target.value)}
+                    onKeyDown={handleQuickSearch}
+                    className="w-full pl-12 pr-4 py-4 bg-card border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Featured Problems Section - Full Width */}
+          <section className="col-span-12">
+            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
+                <div className="h-px flex-1 bg-gradient-to-r from-border/50 to-transparent ml-6"></div>
+              </div>
+              
+              {/* 12-column grid for problem cards with consistent 24px gutters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+                {problems.map((problem) => (
+                  <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group">
+                    <div className="flex items-start justify-between mb-6">
+                      <h3 className="text-lg font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
+                        {problem.title}
+                      </h3>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
+                        {problem.difficulty}
+                      </span>
+                    </div>
+                    <Link
+                      to={`/problems/${problem.id}`}
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-4 rounded-xl transition-all duration-200 inline-block text-center hover:shadow-md"
+                    >
+                      Solve Problem
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              
+              {/* View All Problems Button - Centered */}
+              <div className="flex justify-center pt-4 border-t border-border/30">
+                <Link 
+                  to="/problems"
+                  className="inline-flex items-center px-8 py-4 border-2 border-primary text-primary bg-transparent rounded-xl hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-semibold hover:shadow-lg"
                 >
-                  Solve
+                  View All Problems
                 </Link>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-8 text-center">
-            <Link 
-              to="/problems"
-              className="inline-flex items-center px-6 py-3 border border-primary text-primary bg-transparent rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors duration-200 font-medium"
-            >
-              View All Problems
-            </Link>
-          </div>
+            </div>
+          </section>
+
         </div>
       </div>
     </div>
