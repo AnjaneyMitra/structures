@@ -7,7 +7,7 @@ from ...api import deps
 
 router = APIRouter()
 
-@router.post("/request", response_model=schemas.FriendshipOut)
+@router.post("/request")
 def send_friend_request(
     request: schemas.FriendRequestCreate,
     user=Depends(deps.get_current_user),
@@ -48,17 +48,17 @@ def send_friend_request(
     db.commit()
     db.refresh(friendship)
     
-    return schemas.FriendshipOut(
-        id=friendship.id,
-        requester_id=friendship.requester_id,
-        addressee_id=friendship.addressee_id,
-        status=friendship.status,
-        created_at=friendship.created_at,
-        requester_username=user.username,
-        addressee_username=target_user.username
-    )
+    return {
+        "id": friendship.id,
+        "requester_id": friendship.requester_id,
+        "addressee_id": friendship.addressee_id,
+        "status": friendship.status,
+        "created_at": friendship.created_at,
+        "requester_username": user.username,
+        "addressee_username": target_user.username
+    }
 
-@router.get("/requests/received", response_model=List[schemas.FriendshipOut])
+@router.get("/requests/received")
 def get_received_friend_requests(
     user=Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db)
@@ -72,19 +72,19 @@ def get_received_friend_requests(
     result = []
     for req in requests:
         requester = db.query(models.User).filter(models.User.id == req.requester_id).first()
-        result.append(schemas.FriendshipOut(
-            id=req.id,
-            requester_id=req.requester_id,
-            addressee_id=req.addressee_id,
-            status=req.status,
-            created_at=req.created_at,
-            requester_username=requester.username,
-            addressee_username=user.username
-        ))
+        result.append({
+            "id": req.id,
+            "requester_id": req.requester_id,
+            "addressee_id": req.addressee_id,
+            "status": req.status,
+            "created_at": req.created_at,
+            "requester_username": requester.username,
+            "addressee_username": user.username
+        })
     
     return result
 
-@router.get("/requests/sent", response_model=List[schemas.FriendshipOut])
+@router.get("/requests/sent")
 def get_sent_friend_requests(
     user=Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db)
@@ -98,15 +98,15 @@ def get_sent_friend_requests(
     result = []
     for req in requests:
         addressee = db.query(models.User).filter(models.User.id == req.addressee_id).first()
-        result.append(schemas.FriendshipOut(
-            id=req.id,
-            requester_id=req.requester_id,
-            addressee_id=req.addressee_id,
-            status=req.status,
-            created_at=req.created_at,
-            requester_username=user.username,
-            addressee_username=addressee.username
-        ))
+        result.append({
+            "id": req.id,
+            "requester_id": req.requester_id,
+            "addressee_id": req.addressee_id,
+            "status": req.status,
+            "created_at": req.created_at,
+            "requester_username": user.username,
+            "addressee_username": addressee.username
+        })
     
     return result
 
@@ -152,7 +152,7 @@ def reject_friend_request(
     
     return {"message": "Friend request rejected"}
 
-@router.get("/", response_model=List[schemas.FriendOut])
+@router.get("/")
 def get_friends(
     user=Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db)
@@ -174,11 +174,11 @@ def get_friends(
         friend = db.query(models.User).filter(models.User.id == friend_id).first()
         
         if friend:
-            friends.append(schemas.FriendOut(
-                id=friend.id,
-                username=friend.username,
-                total_xp=friend.total_xp or 0
-            ))
+            friends.append({
+                "id": friend.id,
+                "username": friend.username,
+                "total_xp": friend.total_xp or 0
+            })
     
     # Sort by XP descending
     friends.sort(key=lambda x: x.total_xp, reverse=True)
@@ -207,7 +207,7 @@ def remove_friend(
     
     return {"message": "Friend removed successfully"}
 
-@router.get("/leaderboard", response_model=List[schemas.LeaderboardEntry])
+@router.get("/leaderboard")
 def get_friends_leaderboard(
     user=Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db)
@@ -252,13 +252,13 @@ def get_friends_leaderboard(
     # Add ranks
     result = []
     for i, entry in enumerate(leaderboard):
-        result.append(schemas.LeaderboardEntry(
-            rank=i + 1,
-            id=entry["id"],
-            username=entry["username"],
-            total_xp=entry["total_xp"],
-            problems_solved=entry["problems_solved"]
-        ))
+        result.append({
+            "rank": i + 1,
+            "id": entry["id"],
+            "username": entry["username"],
+            "total_xp": entry["total_xp"],
+            "problems_solved": entry["problems_solved"]
+        })
     
     return result
 
