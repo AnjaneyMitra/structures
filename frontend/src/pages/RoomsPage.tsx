@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid, CircularProgress, Alert, Button, Stack, TextField, Chip, Avatar, Tooltip } from '@mui/material';
+import { 
+  Box, Typography, Card, CardContent, CircularProgress, Alert, Button, Stack, 
+  TextField, Chip, Avatar, Tooltip, Dialog, DialogTitle, DialogContent, 
+  DialogActions, MenuItem, Paper, Divider, Badge, IconButton
+} from '@mui/material';
 import axios from 'axios';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import PersonIcon from '@mui/icons-material/Person';
 import KeyIcon from '@mui/icons-material/VpnKey';
+import CodeIcon from '@mui/icons-material/Code';
+import PeopleIcon from '@mui/icons-material/People';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useNavigate } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import MenuItem from '@mui/material/MenuItem';
 
 interface Room {
   id: number;
@@ -94,79 +97,360 @@ const RoomsPage: React.FC = () => {
     }
   };
 
-  if (loading) return <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CircularProgress /></Box>;
-  if (error) return <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Alert severity="error">{error}</Alert></Box>;
+  if (loading) return (
+    <Box sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      bgcolor: '#0a0a0a',
+      color: 'white'
+    }}>
+      <Stack alignItems="center" spacing={2}>
+        <CircularProgress sx={{ color: '#00d4aa' }} />
+        <Typography variant="h6">Loading rooms...</Typography>
+      </Stack>
+    </Box>
+  );
+
+  if (error) return (
+    <Box sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      bgcolor: '#0a0a0a',
+      color: 'white',
+      p: 4
+    }}>
+      <Alert 
+        severity="error" 
+        sx={{ 
+          bgcolor: 'rgba(255, 107, 107, 0.1)',
+          border: '1px solid #ff6b6b',
+          color: '#ff6b6b',
+          '& .MuiAlert-icon': { color: '#ff6b6b' }
+        }}
+      >
+        {error}
+      </Alert>
+    </Box>
+  );
 
   return (
-    <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1200, mx: 'auto' }}>
-      <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <GroupWorkIcon color="primary" sx={{ fontSize: 36 }} />
-        <Typography variant="h4" fontWeight={700} color="primary">Your Rooms</Typography>
-        <Box flexGrow={1} />
-        <TextField
-          label="Join Room by Code"
-          value={joinCode}
-          onChange={e => setJoinCode(e.target.value)}
-          size="small"
-          sx={{ minWidth: 200, background: '#f7f7fa', borderRadius: 2 }}
-          InputProps={{ startAdornment: <KeyIcon color="action" sx={{ mr: 1 }} /> }}
-        />
-        <Button variant="contained" onClick={handleJoin} disabled={joining || !joinCode} sx={{ fontWeight: 700, borderRadius: 2, px: 3 }} startIcon={<MeetingRoomIcon />}>
-          Join
-        </Button>
-        <Button variant="outlined" sx={{ fontWeight: 700, borderRadius: 2, px: 3 }} startIcon={<AddCircleOutlineIcon />} onClick={() => setCreateOpen(true)}>
-          Create Room
-        </Button>
-      </Stack>
-      <Grid container spacing={3}>
-        {rooms.map((room) => (
-          <Grid item xs={12} sm={6} md={4} key={room.id}>
-            <Card elevation={2} sx={{ borderRadius: 4, height: '100%', background: '#fff', boxShadow: '0 2px 12px 0 rgba(108,99,255,0.07)', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 4px 24px 0 rgba(108,99,255,0.13)' } }}>
-              <CardContent>
-                <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-                  <Typography variant="h6" fontWeight={700} sx={{ flexGrow: 1 }}>Room Code: {room.code}</Typography>
-                  <Tooltip title="Copy Room Code"><Chip icon={<KeyIcon />} label={room.code} size="small" color="info" sx={{ fontWeight: 700 }} /></Tooltip>
-                </Stack>
-                <Typography variant="body2" color="text.secondary" mb={2}>Problem ID: <b>{room.problem_id}</b></Typography>
-                <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-                  {room.participants.map(p => (
-                    <Chip
-                      key={p.id}
-                      avatar={<Avatar sx={{ bgcolor: '#6C63FF', width: 24, height: 24, fontSize: 14 }}><PersonIcon fontSize="small" /></Avatar>}
-                      label={p.username}
+    <Box sx={{ 
+      minHeight: '100vh',
+      bgcolor: '#0a0a0a',
+      color: 'white'
+    }}>
+      {/* Header */}
+      <Box sx={{ 
+        borderBottom: '1px solid #2d3748',
+        px: 4,
+        py: 3,
+        bgcolor: '#1a1a1a'
+      }}>
+        <Stack direction="row" alignItems="center" spacing={3} sx={{ mb: 3 }}>
+          <GroupWorkIcon sx={{ color: '#00d4aa', fontSize: 32 }} />
+          <Typography variant="h4" fontWeight={700} sx={{ color: '#00d4aa' }}>
+            Collaborative Rooms
+          </Typography>
+          <Badge badgeContent={rooms.length} color="primary">
+            <Chip 
+              label="Active" 
+              sx={{ 
+                bgcolor: '#2d3748', 
+                color: '#a0aec0',
+                fontWeight: 600
+              }} 
+            />
+          </Badge>
+        </Stack>
+        
+        <Stack direction="row" spacing={2} alignItems="center">
+          <TextField
+            placeholder="Enter room code..."
+            value={joinCode}
+            onChange={e => setJoinCode(e.target.value)}
+            size="small"
+            sx={{
+              minWidth: 250,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: '#2d3748',
+                color: 'white',
+                '& fieldset': { borderColor: '#4a5568' },
+                '&:hover fieldset': { borderColor: '#00d4aa' },
+                '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+              }
+            }}
+            InputProps={{
+              startAdornment: <KeyIcon sx={{ color: '#a0aec0', mr: 1 }} />
+            }}
+          />
+          
+          <Button
+            variant="outlined"
+            onClick={handleJoin}
+            disabled={joining || !joinCode}
+            startIcon={<MeetingRoomIcon />}
+            sx={{
+              borderColor: '#4a5568',
+              color: '#a0aec0',
+              '&:hover': {
+                borderColor: '#00d4aa',
+                color: '#00d4aa',
+                bgcolor: 'rgba(0, 212, 170, 0.1)'
+              },
+              '&:disabled': {
+                borderColor: '#4a5568',
+                color: '#6b7280'
+              }
+            }}
+          >
+            {joining ? 'Joining...' : 'Join Room'}
+          </Button>
+          
+          <Button
+            variant="contained"
+            onClick={() => setCreateOpen(true)}
+            startIcon={<AddCircleOutlineIcon />}
+            sx={{
+              bgcolor: '#00d4aa',
+              '&:hover': { bgcolor: '#00b894' },
+              fontWeight: 600
+            }}
+          >
+            Create Room
+          </Button>
+        </Stack>
+      </Box>
+
+      {/* Rooms Grid */}
+      <Box sx={{ p: 4 }}>
+        {rooms.length === 0 ? (
+          <Box sx={{ 
+            textAlign: 'center', 
+            py: 8,
+            color: '#a0aec0'
+          }}>
+            <GroupWorkIcon sx={{ fontSize: 64, color: '#4a5568', mb: 2 }} />
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              No rooms yet
+            </Typography>
+            <Typography variant="body2">
+              Create your first collaborative room to start coding together
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gap: 3
+          }}>
+            {rooms.map((room) => (
+              <Card key={room.id} sx={{ 
+                bgcolor: '#1a1a1a',
+                border: '1px solid #2d3748',
+                borderRadius: 3,
+                transition: 'all 0.2s',
+                '&:hover': { 
+                  borderColor: '#00d4aa',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 25px rgba(0, 212, 170, 0.15)'
+                }
+              }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                    <Box sx={{ 
+                      p: 1.5,
+                      bgcolor: '#2d3748',
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <CodeIcon sx={{ color: '#00d4aa', fontSize: 24 }} />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" fontWeight={700} sx={{ color: 'white' }}>
+                        {room.code}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#a0aec0' }}>
+                        Problem #{room.problem_id}
+                      </Typography>
+                    </Box>
+                    <Chip 
+                      label={room.code}
                       size="small"
-                      sx={{ fontWeight: 600, bgcolor: '#f7f7fa', color: 'primary.main', mr: 1, mb: 1 }}
+                      sx={{ 
+                        bgcolor: '#2d3748',
+                        color: '#00d4aa',
+                        fontFamily: 'JetBrains Mono, monospace',
+                        fontWeight: 700
+                      }}
                     />
-                  ))}
-                </Stack>
-                <Button variant="contained" size="medium" sx={{ mt: 1, borderRadius: 2, fontWeight: 700 }} startIcon={<MeetingRoomIcon />} onClick={() => navigate(`/rooms/${room.code}`)}>Enter Room</Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-      <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Create New Room</DialogTitle>
-        <DialogContent>
+                  </Stack>
+                  
+                  <Divider sx={{ borderColor: '#2d3748', my: 2 }} />
+                  
+                  <Box sx={{ mb: 3 }}>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+                      <PeopleIcon sx={{ color: '#a0aec0', fontSize: 16 }} />
+                      <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+                        Participants ({room.participants.length})
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                      {room.participants.slice(0, 3).map(p => (
+                        <Tooltip key={p.id} title={p.username}>
+                          <Avatar sx={{ 
+                            width: 28, 
+                            height: 28,
+                            bgcolor: '#00d4aa',
+                            fontSize: 12,
+                            fontWeight: 700
+                          }}>
+                            {p.username.slice(0, 2).toUpperCase()}
+                          </Avatar>
+                        </Tooltip>
+                      ))}
+                      {room.participants.length > 3 && (
+                        <Avatar sx={{ 
+                          width: 28, 
+                          height: 28,
+                          bgcolor: '#4a5568',
+                          fontSize: 10,
+                          color: '#a0aec0'
+                        }}>
+                          +{room.participants.length - 3}
+                        </Avatar>
+                      )}
+                    </Stack>
+                  </Box>
+                  
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => navigate(`/rooms/${room.code}`)}
+                    startIcon={<PlayArrowIcon />}
+                    sx={{
+                      bgcolor: '#00d4aa',
+                      '&:hover': { bgcolor: '#00b894' },
+                      fontWeight: 600,
+                      py: 1.5
+                    }}
+                  >
+                    Enter Room
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        )}
+      </Box>
+      <Dialog 
+        open={createOpen} 
+        onClose={() => setCreateOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1a1a',
+            border: '1px solid #2d3748',
+            borderRadius: 3
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          color: 'white',
+          borderBottom: '1px solid #2d3748',
+          pb: 2
+        }}>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <AddCircleOutlineIcon sx={{ color: '#00d4aa' }} />
+            <Typography variant="h6" fontWeight={700}>
+              Create New Room
+            </Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
           <TextField
             select
             label="Select Problem"
             value={selectedProblem}
             onChange={e => setSelectedProblem(Number(e.target.value))}
             fullWidth
-            sx={{ mt: 2 }}
             disabled={creating}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: '#2d3748',
+                color: 'white',
+                '& fieldset': { borderColor: '#4a5568' },
+                '&:hover fieldset': { borderColor: '#00d4aa' },
+                '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+              },
+              '& .MuiInputLabel-root': { color: '#a0aec0' },
+              '& .MuiSelect-icon': { color: '#a0aec0' }
+            }}
           >
             {problems.map(p => (
-              <MenuItem key={p.id} value={p.id}>{p.title}</MenuItem>
+              <MenuItem 
+                key={p.id} 
+                value={p.id}
+                sx={{ 
+                  bgcolor: '#2d3748', 
+                  color: 'white',
+                  '&:hover': { bgcolor: '#374151' },
+                  '&.Mui-selected': { bgcolor: '#00d4aa', '&:hover': { bgcolor: '#00b894' } }
+                }}
+              >
+                {p.title}
+              </MenuItem>
             ))}
           </TextField>
-          {createError && <Alert severity="error" sx={{ mt: 2 }}>{createError}</Alert>}
+          {createError && (
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mt: 2,
+                bgcolor: 'rgba(255, 107, 107, 0.1)',
+                border: '1px solid #ff6b6b',
+                color: '#ff6b6b',
+                '& .MuiAlert-icon': { color: '#ff6b6b' }
+              }}
+            >
+              {createError}
+            </Alert>
+          )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCreateOpen(false)} disabled={creating}>Cancel</Button>
-          <Button onClick={handleCreateRoom} variant="contained" disabled={creating || !selectedProblem}>
-            {creating ? 'Creating...' : 'Create'}
+        <DialogActions sx={{ 
+          borderTop: '1px solid #2d3748',
+          pt: 2,
+          px: 3,
+          pb: 3
+        }}>
+          <Button 
+            onClick={() => setCreateOpen(false)} 
+            disabled={creating}
+            sx={{ 
+              color: '#a0aec0',
+              '&:hover': { bgcolor: '#2d3748' }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleCreateRoom} 
+            variant="contained" 
+            disabled={creating || !selectedProblem}
+            sx={{
+              bgcolor: '#00d4aa',
+              '&:hover': { bgcolor: '#00b894' },
+              '&:disabled': { bgcolor: '#4a5568', color: '#6b7280' },
+              fontWeight: 600
+            }}
+          >
+            {creating ? 'Creating...' : 'Create Room'}
           </Button>
         </DialogActions>
       </Dialog>
