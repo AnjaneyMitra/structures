@@ -72,17 +72,20 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
       <div className={`relative z-10 ${sidebarOpen ? 'p-6' : 'p-4'} border-b border-card-foreground/10 transition-all duration-300`}>
         <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
           {sidebarOpen ? (
-            <div className={`w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300`}>
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300">
               <CodeBracketIcon className="h-6 w-6 text-white transition-all duration-300" />
             </div>
           ) : (
             <button
               onClick={handleToggle}
-              className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group"
+              className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group relative overflow-hidden"
               title="Expand sidebar"
             >
-              <CodeBracketIcon className="h-5 w-5 text-white transition-all duration-300 group-hover:opacity-0 group-hover:scale-75" />
-              <ChevronRightIcon className="h-5 w-5 text-white absolute transition-all duration-300 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100" />
+              {/* Default icon - slides out on hover */}
+              <CodeBracketIcon className="h-5 w-5 text-white transition-all duration-300 transform group-hover:-translate-x-8 group-hover:opacity-0" />
+              
+              {/* Hover icon - slides in on hover */}
+              <ChevronRightIcon className="h-5 w-5 text-white absolute transition-all duration-300 transform translate-x-8 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </button>
           )}
           {sidebarOpen && (
