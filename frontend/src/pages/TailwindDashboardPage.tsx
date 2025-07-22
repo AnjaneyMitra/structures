@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  MagnifyingGlassIcon as SearchIcon, 
   BoltIcon, 
   CheckCircleIcon,
   StarIcon
@@ -32,9 +31,7 @@ const TailwindDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
-  const [quickSearch, setQuickSearch] = useState('');
   const [loadingProblem, setLoadingProblem] = useState<number | null>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,12 +58,6 @@ const TailwindDashboardPage: React.FC = () => {
     };
     fetchData();
   }, []);
-
-  const handleQuickSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      navigate(`/problems?search=${encodeURIComponent(quickSearch)}`);
-    }
-  };
 
   const handleProblemClick = (problemId: number) => {
     setLoadingProblem(problemId);
@@ -119,10 +110,10 @@ const TailwindDashboardPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Stats Cards Section - Full Width with 24px horizontal, 32px vertical gutters */}
+          {/* Stats Cards Section - Charcoal background for progress */}
           {stats && (
             <section className="col-span-12 mb-8">
-              <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
+              <div className="bg-[#121212] backdrop-blur-sm rounded-xl p-8 border border-border/30">
                 <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
@@ -191,56 +182,9 @@ const TailwindDashboardPage: React.FC = () => {
             </section>
           )}
 
-          {/* Quick Search Section - Centered with responsive width */}
-          <section className="col-span-12 mb-8">
-            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
-              <h2 className="text-xl font-semibold text-foreground mb-6 text-center">Find Problems</h2>
-              <div className="flex justify-center">
-                <div className="relative w-full max-w-2xl">
-                  {/* Floating Label */}
-                  <label 
-                    className={`absolute left-4 transition-all duration-200 pointer-events-none ${
-                      searchFocused || quickSearch 
-                        ? 'top-2 text-xs text-primary bg-card px-1 z-10' 
-                        : 'top-1/2 transform -translate-y-1/2 text-base text-muted-foreground'
-                    }`}
-                  >
-                    Search problems
-                  </label>
-                  <input
-                    type="text"
-                    value={quickSearch}
-                    onChange={(e) => setQuickSearch(e.target.value)}
-                    onKeyDown={handleQuickSearch}
-                    onFocus={() => setSearchFocused(true)}
-                    onBlur={() => setSearchFocused(false)}
-                    className="w-full pl-4 pr-14 py-4 bg-card border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-foreground"
-                  />
-                  {/* Inline Action Button - Magnifier Icon */}
-                  <button
-                    onClick={() => {
-                      if (quickSearch.trim()) {
-                        navigate(`/problems?search=${encodeURIComponent(quickSearch)}`);
-                      } else {
-                        navigate('/problems');
-                      }
-                    }}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-all duration-200 group"
-                  >
-                    <SearchIcon className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
-                  </button>
-                  {/* Helper Text Below */}
-                  <p className="text-xs text-white/50 mt-2 text-center">
-                    Press Enter to search or browse all problems
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Featured Problems Section - Full Width */}
+          {/* Featured Problems Section - Pure black background */}
           <section className="col-span-12">
-            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
+            <div className="bg-black backdrop-blur-sm rounded-xl p-8 border border-border/30">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
                 <Link 
