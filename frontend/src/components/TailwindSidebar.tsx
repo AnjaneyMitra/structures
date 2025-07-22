@@ -48,127 +48,90 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className={`${
-      sidebarOpen ? 'w-[280px]' : 'w-[72px]'
-    } h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 sidebar-transition transition-all duration-300 ease-in-out`}>
-      
-      {/* Header */}
-      <div className={`relative z-10 ${sidebarOpen ? 'px-6 pt-6 pb-4' : 'p-4'} border-b border-card-foreground/10 transition-all duration-300`}>
-        <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
-          {sidebarOpen ? (
-            <>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300">
-                <CodeBracketIcon className="h-6 w-6 text-white transition-all duration-300" />
+    <>
+      <div className={`${
+        sidebarOpen ? 'w-[280px]' : 'w-[72px]'
+      } h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300 ease-in-out`}>
+        
+        {/* Header */}
+        <div className="relative z-10 flex items-center h-[88px] px-4 border-b border-card-foreground/10">
+          <div className={`flex items-center gap-3 overflow-hidden`}>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                <CodeBracketIcon className="h-6 w-6 text-white" />
               </div>
-              <div className="transition-opacity duration-300 opacity-100">
-                <h1 className="text-xl font-bold text-foreground">Structures</h1>
-                <p className="text-sm text-muted-foreground">Code & Collaborate</p>
+              <div className={`transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+                <h1 className="text-xl font-bold text-foreground whitespace-nowrap">Structures</h1>
+                <p className="text-sm text-muted-foreground whitespace-nowrap">Code & Collaborate</p>
               </div>
-              <button
-                className="absolute top-4 right-4 z-20 p-2 bg-card border border-border rounded-lg hover:bg-primary/10 sidebar-button-hover sidebar-focus transition-all duration-200"
-                onClick={handleToggle}
-                title="Collapse sidebar"
-              >
-                <ChevronLeftIcon className="h-5 w-5 text-primary" />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleToggle}
-              className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group relative overflow-hidden"
-              title="Expand sidebar"
-            >
-              {/* Default icon - slides out on hover */}
-              <CodeBracketIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform group-hover:-translate-x-10 group-hover:opacity-0" />
-              
-              {/* Hover icon - slides in on hover */}
-              <ChevronRightIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
-            </button>
-          )}
+          </div>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className={`relative z-10 flex-1 ${sidebarOpen ? 'px-4 pt-2 pb-4' : 'p-2'} transition-all duration-300`}>
-        <ul className={`${sidebarOpen ? 'space-y-2' : 'space-y-3'}`}>
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const IconComponent = item.icon;
             return (
-              <li key={item.path}>
+              <li key={item.path} className="list-none">
                 <Link
                   to={item.path}
-                  className={`flex items-center ${
-                    sidebarOpen ? 'space-x-3 px-4 py-3' : 'justify-center p-3'
-                  } rounded-xl sidebar-nav-item sidebar-focus group transition-all duration-200 ${
+                  className={`flex items-center h-[52px] rounded-xl group transition-all duration-200 overflow-hidden ${
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
                       : 'text-card-foreground hover:bg-card hover:shadow-md'
                   }`}
                   title={!sidebarOpen ? item.label : undefined}
                 >
-                  <IconComponent className={`${sidebarOpen ? 'h-5 w-5' : 'h-6 w-6'} transition-all duration-200 ${
-                    isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-card-foreground'
-                  }`} />
-                  {sidebarOpen && (
-                    <span className="font-medium transition-colors duration-200">{item.label}</span>
-                  )}
+                  <div className="flex items-center justify-center w-[56px] h-[52px] flex-shrink-0">
+                    <IconComponent className={`h-6 w-6 transition-all duration-200 ${
+                      isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-card-foreground'
+                    }`} />
+                  </div>
+                  <span className={`font-medium transition-opacity duration-200 whitespace-nowrap ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+                    {item.label}
+                  </span>
                 </Link>
               </li>
             );
           })}
-        </ul>
-      </nav>
+        </nav>
 
-      {/* User Section */}
-      <div className={`relative z-10 ${sidebarOpen ? 'p-4' : 'p-2'} border-t border-card-foreground/10 transition-all duration-300`}>
-        {/* User Profile */}
-        {sidebarOpen ? (
-          <div className="flex items-center space-x-3 p-3 rounded-xl bg-card/50 border border-card-foreground/10 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted-foreground/20 rounded-full flex items-center justify-center">
+        {/* User Section */}
+        <div className="p-4 border-t border-card-foreground/10">
+          <div className={`flex items-center overflow-hidden`}>
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-muted to-muted-foreground/20 rounded-full flex-shrink-0" title={user.name}>
               <UserIcon className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-card-foreground truncate">
+            <div className={`pl-3 flex-1 min-w-0 transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+              <p className="text-sm font-medium text-card-foreground truncate whitespace-nowrap">
                 {user.name}
               </p>
-              <p className="text-xs text-muted-foreground">Online</p>
+              <p className="text-xs text-muted-foreground whitespace-nowrap">Online</p>
             </div>
           </div>
-        ) : (
-          <div className="flex justify-center mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted-foreground/20 rounded-full flex items-center justify-center" title={user.name}>
-              <UserIcon className="h-5 w-5 text-muted-foreground" />
-            </div>
-          </div>
-        )}
-        
-        {/* Actions */}
-        <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'flex-col space-y-2'}`}>
-          <div className={sidebarOpen ? '' : 'order-2'}>
+          
+          <div className={`flex items-center justify-between mt-4 transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
             <TailwindThemeToggle />
+            <button
+              onClick={handleLogout}
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
+              title="Logout"
+            >
+              <Cog6ToothIcon className="h-5 w-5" />
+            </button>
           </div>
-          <button
-            onClick={handleLogout}
-            className={`p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200 ${
-              !sidebarOpen ? 'order-1' : ''
-            }`}
-            title="Logout"
-          >
-            <Cog6ToothIcon className="h-5 w-5" />
-          </button>
         </div>
-        
-        {/* Footer */}
-        {sidebarOpen && (
-          <div className="mt-4 pt-4 border-t border-card-foreground/10">
-            <p className="text-xs text-muted-foreground text-center">
-              Structures v1.0
-            </p>
-          </div>
-        )}
       </div>
-    </div>
+      {/* Toggle Button */}
+      <button
+        className="absolute top-7 left-[72px] -translate-x-1/2 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 transition-all duration-300 ease-in-out"
+        style={{ left: sidebarOpen ? '280px' : '72px' }}
+        onClick={handleToggle}
+        title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+      >
+        <ChevronLeftIcon className={`h-4 w-4 text-primary transition-transform duration-300 ${!sidebarOpen && 'rotate-180'}`} />
+      </button>
+    </>
   );
 };
 
