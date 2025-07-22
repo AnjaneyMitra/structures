@@ -33,6 +33,7 @@ const TailwindDashboardPage: React.FC = () => {
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
   const [quickSearch, setQuickSearch] = useState('');
+  const [loadingProblem, setLoadingProblem] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,6 +65,14 @@ const TailwindDashboardPage: React.FC = () => {
     if (event.key === 'Enter') {
       navigate(`/problems?search=${encodeURIComponent(quickSearch)}`);
     }
+  };
+
+  const handleProblemClick = (problemId: number) => {
+    setLoadingProblem(problemId);
+    // Simulate a brief loading state before navigation
+    setTimeout(() => {
+      navigate(`/problems/${problemId}`);
+    }, 150);
   };
 
   const formatUsername = (username: string) => {
@@ -190,12 +199,15 @@ const TailwindDashboardPage: React.FC = () => {
                   <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder="Quick search problems... (e.g. 'Linked List', 'Binary Tree') - Press Enter to search"
+                    placeholder="Quick search problems... (e.g. 'Linked List', 'Binary Tree')"
                     value={quickSearch}
                     onChange={(e) => setQuickSearch(e.target.value)}
                     onKeyDown={handleQuickSearch}
                     className="w-full pl-12 pr-4 py-4 bg-card border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-foreground placeholder:text-muted-foreground"
                   />
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Press Enter to search or browse all problems
+                  </p>
                 </div>
               </div>
             </div>
@@ -208,7 +220,7 @@ const TailwindDashboardPage: React.FC = () => {
                 <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
                 <Link 
                   to="/problems"
-                  className="inline-flex items-center px-6 py-2.5 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary transition-all duration-200 font-medium text-sm"
+                  className="inline-flex items-center px-6 py-2.5 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary hover:scale-105 active:scale-95 transition-all duration-200 font-medium text-sm"
                 >
                   View All Problems
                 </Link>
@@ -226,12 +238,20 @@ const TailwindDashboardPage: React.FC = () => {
                         {problem.difficulty}
                       </span>
                     </div>
-                    <Link
-                      to={`/problems/${problem.id}`}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 px-4 rounded-xl transition-all duration-200 inline-block text-center hover:shadow-lg shadow-md"
+                    <button
+                      onClick={() => handleProblemClick(problem.id)}
+                      disabled={loadingProblem === problem.id}
+                      className="w-full bg-primary hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] text-primary-foreground font-bold py-3 px-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      Solve Problem
-                    </Link>
+                      {loadingProblem === problem.id ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                          <span>Loading...</span>
+                        </>
+                      ) : (
+                        'Solve Problem'
+                      )}
+                    </button>
                   </div>
                 ))}
               </div>
