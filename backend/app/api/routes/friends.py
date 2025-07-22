@@ -9,13 +9,13 @@ router = APIRouter()
 
 @router.post("/request")
 def send_friend_request(
-    request: schemas.FriendRequestCreate,
+    request: dict = Body(...),
     user=Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db)
 ):
     """Send a friend request to another user."""
     # Find the target user
-    target_user = db.query(models.User).filter(models.User.username == request.username).first()
+    target_user = db.query(models.User).filter(models.User.username == request["username"]).first()
     if not target_user:
         raise HTTPException(status_code=404, detail="User not found")
     
