@@ -12,3 +12,4 @@ node_modules/
 .vscode/
 .idea/ 
 UI_REDESIGN_SUMMARY.md
+*.md
