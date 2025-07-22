@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Container, Paper, Typography, Stack, Button, Grid } from '@mui/material';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TailwindDashboardPage from './pages/TailwindDashboardPage';
@@ -211,10 +211,33 @@ function Landing() {
 }
 
 function AppLayout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Determine if we are on a problem or room page for auto-collapse
+  const isProblemPage = /^\/problems\/[\w-]+$/.test(location.pathname);
+  const isRoomPage = /^\/rooms\/[\w-]+\/[\w-]+$/.test(location.pathname);
+
+  // Auto-collapse sidebar on problem/room pages
+  useEffect(() => {
+    if (isProblemPage || isRoomPage) {
+      setSidebarOpen(false);
+    } else {
+      setSidebarOpen(true);
+    }
+  }, [location.pathname, isProblemPage, isRoomPage]);
+
   return (
     <div className="flex">
-      <TailwindSidebar />
-      <main className="flex-grow ml-[280px] min-h-screen bg-background relative">
+      <TailwindSidebar 
+        open={sidebarOpen} 
+        onToggle={setSidebarOpen}
+      />
+      <main 
+        className={`flex-grow min-h-screen bg-background relative page-transition ${
+          sidebarOpen ? 'ml-[280px]' : 'ml-0'
+        }`}
+      >
         {/* Background Effects */}
         <div className="absolute inset-0 opacity-30 pointer-events-none">
           <div className="absolute inset-0" style={{
@@ -235,7 +258,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             }}
           />
         </div>
-        <div className="relative z-10">
+        <div className="relative z-10 page-slide-in">
           {children}
         </div>
       </main>

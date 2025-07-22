@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
   HomeIcon, 
@@ -21,29 +21,19 @@ const navItems = [
 interface SidebarProps {
   open?: boolean;
   onClose?: () => void;
+  onToggle?: (open: boolean) => void;
 }
 
-export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
+export const TailwindSidebar: React.FC<SidebarProps> = ({ 
+  open = true, 
+  onClose, 
+  onToggle 
+}) => {
   const location = useLocation();
   const user = { name: localStorage.getItem('username') || 'User', avatar: '' };
 
-  // Determine if we are on a problem or room page
-  const isProblemPage = /^\/problems\/[\w-]+$/.test(location.pathname);
-  const isRoomPage = /^\/rooms\/[\w-]+\/[\w-]+$/.test(location.pathname);
-
-  // Sidebar open state: autocollapse on problem/room pages, else open
-  const [sidebarOpen, setSidebarOpen] = useState(
-    !(isProblemPage || isRoomPage)
-  );
-
-  // Update sidebar open state on route change
-  useEffect(() => {
-    if (isProblemPage || isRoomPage) {
-      setSidebarOpen(false);
-    } else {
-      setSidebarOpen(true);
-    }
-  }, [location.pathname, isProblemPage, isRoomPage]);
+  // Use the open prop from parent instead of internal state
+  const sidebarOpen = open;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -51,12 +41,18 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
     window.location.href = '/login';
   };
 
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle(!sidebarOpen);
+    }
+  };
+
   // If sidebar is collapsed, show a floating expand button
   if (!sidebarOpen) {
     return (
       <button
-        className="fixed top-4 left-4 z-[100] p-2 bg-card border border-border rounded-lg shadow-lg hover:bg-primary/10 transition-colors"
-        onClick={() => setSidebarOpen(true)}
+        className="fixed top-4 left-4 z-[100] p-2 bg-card border border-border rounded-lg shadow-lg hover:bg-primary/10 floating-expand-button sidebar-focus"
+        onClick={handleToggle}
         title="Expand sidebar"
       >
         <Bars3Icon className="h-6 w-6 text-primary" />
@@ -65,11 +61,11 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
   }
 
   return (
-    <div className="w-[280px] h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300">
+    <div className="w-[280px] h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 sidebar-transition">
       {/* Collapse button */}
       <button
-        className="absolute top-4 right-4 z-20 p-2 bg-card border border-border rounded-lg hover:bg-primary/10 transition-colors"
-        onClick={() => setSidebarOpen(false)}
+        className="absolute top-4 right-4 z-20 p-2 bg-card border border-border rounded-lg hover:bg-primary/10 sidebar-button-hover sidebar-focus"
+        onClick={handleToggle}
         title="Collapse sidebar"
       >
         <ChevronLeftIcon className="h-5 w-5 text-primary" />
@@ -98,16 +94,16 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl sidebar-nav-item sidebar-focus group ${
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
                       : 'text-card-foreground hover:bg-card hover:shadow-md'
                   }`}
                 >
-                  <IconComponent className={`h-5 w-5 ${
+                  <IconComponent className={`h-5 w-5 transition-colors duration-200 ${
                     isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-card-foreground'
                   }`} />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium transition-colors duration-200">{item.label}</span>
                 </Link>
               </li>
             );
