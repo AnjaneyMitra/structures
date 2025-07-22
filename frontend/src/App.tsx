@@ -5,10 +5,10 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TailwindDashboardPage from './pages/TailwindDashboardPage';
 import TailwindProblemsPage from './pages/TailwindProblemsPage';
+import TailwindRoomsPage from './pages/TailwindRoomsPage';
+import TailwindProfilePage from './pages/TailwindProfilePage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
-import RoomsPage from './pages/RoomsPage';
-import ProfilePage from './pages/ProfilePage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
 
 function Landing() {
@@ -254,9 +254,9 @@ function AppRoutes() {
       <Route path="/dashboard" element={<AppLayout><TailwindDashboardPage /></AppLayout>} />
       <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
       <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
-      <Route path="/rooms" element={<AppLayout><RoomsPage /></AppLayout>} />
+      <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
       <Route path="/rooms/:code" element={<CollaborativeRoomPage />} />
-      <Route path="/profile" element={<AppLayout><ProfilePage /></AppLayout>} />
+      <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
     </Routes>
   );
 }
