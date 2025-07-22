@@ -66,7 +66,20 @@ const TailwindRoomsPage: React.FC = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      navigate(`/room/${joinCode}`);
+      // Find the room in the list to get the problem_id
+      const joinedRoom = rooms.find(r => r.code === joinCode);
+      if (joinedRoom) {
+        navigate(`/rooms/${joinedRoom.code}/${joinedRoom.problem_id}`);
+      } else {
+        // fallback: reload rooms and try again
+        const res = await axios.get('https://structures-production.up.railway.app/api/rooms/', { headers: { Authorization: `Bearer ${token}` } });
+        const updatedRoom = res.data.find((r: any) => r.code === joinCode);
+        if (updatedRoom) {
+          navigate(`/rooms/${updatedRoom.code}/${updatedRoom.problem_id}`);
+        } else {
+          setError('Joined room, but could not find problem.');
+        }
+      }
     } catch (err) {
       setError('Failed to join room. Check the code and try again.');
     } finally {
@@ -86,7 +99,7 @@ const TailwindRoomsPage: React.FC = () => {
         { problem_id: selectedProblem },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      navigate(`/room/${res.data.code}`);
+      navigate(`/rooms/${res.data.code}/${res.data.problem_id}`);
     } catch (err) {
       setCreateError('Failed to create room.');
     } finally {
@@ -204,7 +217,7 @@ const TailwindRoomsPage: React.FC = () => {
                 <div
                   key={room.id}
                   className="bg-card/50 border border-border rounded-lg p-4 hover:bg-card/70 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/room/${room.code}`)}
+                  onClick={() => navigate(`/rooms/${room.code}/${room.problem_id}`)}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-2">
