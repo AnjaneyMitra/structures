@@ -33,18 +33,6 @@ app.add_middleware(
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Run XP migration - this adds columns that were added after initial deployment
-try:
-    from .db.migrate_xp import migrate_xp_fields
-    print("🔄 Running XP migration...")
-    migrate_xp_fields()
-    print("✅ XP migration completed successfully")
-except Exception as e:
-    print(f"❌ XP migration failed: {e}")
-    import traceback
-    traceback.print_exc()
-    # Don't fail startup, but log the error clearly
-
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(problems.router, prefix="/api/problems", tags=["problems"])
