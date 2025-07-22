@@ -56,18 +56,31 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
         {/* Header */}
         <div className="relative z-10 flex items-center h-[88px] px-4 border-b border-card-foreground/10">
           <div className={`flex items-center gap-3 overflow-hidden`}>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                <CodeBracketIcon className="h-6 w-6 text-white" />
-              </div>
-              <div className={`transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-                <h1 className="text-xl font-bold text-foreground whitespace-nowrap">Structures</h1>
-                <p className="text-sm text-muted-foreground whitespace-nowrap">Code & Collaborate</p>
-              </div>
+            {sidebarOpen ? (
+              <>
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                  <CodeBracketIcon className="h-6 w-6 text-white" />
+                </div>
+                <div className={`transition-opacity duration-200 opacity-100`}>
+                  <h1 className="text-xl font-bold text-foreground whitespace-nowrap">Structures</h1>
+                  <p className="text-sm text-muted-foreground whitespace-nowrap">Code & Collaborate</p>
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={handleToggle}
+                className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group relative overflow-hidden"
+                title="Expand sidebar"
+              >
+                <CodeBracketIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform group-hover:-translate-x-10 group-hover:opacity-0" />
+                <ChevronRightIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-2 space-y-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const IconComponent = item.icon;
@@ -123,14 +136,15 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
       {/* Toggle Button */}
-      <button
-        className="absolute top-7 left-[72px] -translate-x-1/2 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 transition-all duration-300 ease-in-out"
-        style={{ left: sidebarOpen ? '280px' : '72px' }}
-        onClick={handleToggle}
-        title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-      >
-        <ChevronLeftIcon className={`h-4 w-4 text-primary transition-transform duration-300 ${!sidebarOpen && 'rotate-180'}`} />
-      </button>
+      {sidebarOpen && (
+        <button
+          className="absolute top-7 left-[280px] -translate-x-1/2 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 transition-all duration-300 ease-in-out"
+          onClick={handleToggle}
+          title="Collapse sidebar"
+        >
+          <ChevronLeftIcon className={`h-4 w-4 text-primary transition-transform duration-300`} />
+        </button>
+      )}
     </>
   );
 };
