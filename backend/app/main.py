@@ -33,14 +33,17 @@ app.add_middleware(
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Run XP migration
+# Run XP migration - this adds columns that were added after initial deployment
 try:
     from .db.migrate_xp import migrate_xp_fields
+    print("🔄 Running XP migration...")
     migrate_xp_fields()
     print("✅ XP migration completed successfully")
 except Exception as e:
-    print(f"⚠️ XP migration warning: {e}")
-    # Don't fail startup if migration has issues
+    print(f"❌ XP migration failed: {e}")
+    import traceback
+    traceback.print_exc()
+    # Don't fail startup, but log the error clearly
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
@@ -56,6 +59,39 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/xp-status")
+def xp_status():
+    """Check if XP fields are properly set up in the database."""
+    from sqlalchemy import text
+    from .db.base import engine
+    
+    try:
+        with engine.connect() as conn:
+            # Check if total_xp column exists
+            result = conn.execute(text("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = 'users' AND column_name = 'total_xp'
+            """))
+            users_has_xp = bool(result.fetchone())
+            
+            # Check if xp_awarded column exists
+            result = conn.execute(text("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = 'submissions' AND column_name = 'xp_awarded'
+            """))
+            submissions_has_xp = bool(result.fetchone())
+            
+            return {
+                "xp_system_ready": users_has_xp and submissions_has_xp,
+                "users_table_has_xp": users_has_xp,
+                "submissions_table_has_xp": submissions_has_xp,
+                "status": "ready" if (users_has_xp and submissions_has_xp) else "migration_needed"
+            }
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
 
 # Socket.io events
 usernames = {}
