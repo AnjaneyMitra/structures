@@ -3,38 +3,36 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
-  darkMode: 'class',
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
       colors: {
-        // Primary Theme Colors
-        background: '#f8f9fa',
-        foreground: '#0c0c1d',
+        // CSS Variable-based colors for proper dark mode support
+        background: 'var(--color-background)',
+        foreground: 'var(--color-foreground)',
         primary: {
-          DEFAULT: '#ff00c8',
-          foreground: '#ffffff',
+          DEFAULT: 'var(--color-primary)',
+          foreground: 'var(--color-primary-foreground)',
         },
-        // Secondary & Accent Colors
         secondary: {
-          DEFAULT: '#f0f0ff',
-          foreground: '#0c0c1d',
+          DEFAULT: 'var(--color-secondary)',
+          foreground: 'var(--color-secondary-foreground)',
         },
         accent: {
-          DEFAULT: '#00ffcc',
-          foreground: '#0c0c1d',
+          DEFAULT: 'var(--color-accent)',
+          foreground: 'var(--color-accent-foreground)',
         },
-        // UI Component Colors
         card: {
-          DEFAULT: '#ffffff',
-          foreground: '#0c0c1d',
+          DEFAULT: 'var(--color-card)',
+          foreground: 'var(--color-card-foreground)',
         },
         popover: {
-          DEFAULT: '#ffffff',
-          foreground: '#0c0c1d',
+          DEFAULT: 'var(--color-popover)',
+          foreground: 'var(--color-popover-foreground)',
         },
         muted: {
-          DEFAULT: '#f0f0ff',
-          foreground: '#0c0c1d',
+          DEFAULT: 'var(--color-muted)',
+          foreground: 'var(--color-muted-foreground)',
         },
         // Additional semantic colors
         destructive: {
@@ -43,7 +41,7 @@ module.exports = {
         },
         border: '#e5e7eb',
         input: '#f3f4f6',
-        ring: '#ff00c8',
+        ring: 'var(--color-primary)',
       },
       borderRadius: {
         lg: '0.5rem',
