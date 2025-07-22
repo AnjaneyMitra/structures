@@ -118,95 +118,98 @@ class CodeExecutor:
         start_time = time.time()
         tmp_file_path = None
         try:
-            # Prepare the wrapper code that captures both function output and print statements
-            wrapper_code = f"""
-import sys
-import json
-
-{user_code}
-
-def parse_input(input_str):
-    # Handle multi-line input (common for problems with multiple parameters)
-    lines = [line.strip() for line in input_str.strip().split('\n') if line.strip()]
-    
-    if len(lines) == 0:
-        return []
-    elif len(lines) == 1:
-        # Single line - try to parse as JSON first, then as simple value
-        line = lines[0]
-        try:
-            parsed = json.loads(line)
-            return [parsed]
-        except:
-            # Try to parse as number or string
-            def try_num(x):
-                try:
-                    return int(x)
-                except:
-                    try:
-                        return float(x)
-                    except:
-                        return x
-            return [try_num(line)]
-    else:
-        # Multiple lines - each line is a separate argument
-        args = []
-        for line in lines:
-            try:
-                # Try to parse each line as JSON (handles arrays, objects, etc.)
-                parsed = json.loads(line)
-                args.append(parsed)
-            except:
-                # If JSON parsing fails, try to parse as number or string
-                def try_num(x):
-                    try:
-                        return int(x)
-                    except:
-                        try:
-                            return float(x)
-                        except:
-                            return x
-                args.append(try_num(line))
-        return args
-
-if __name__ == "__main__":
-    input_str = sys.stdin.read().strip()
-    if input_str:
-        args = parse_input(input_str)
-        if not isinstance(args, list):
-            args = [args]
-    else:
-        args = []
-    
-    try:
-        # Check if the function exists
-        if '{function_name}' not in globals():
-            print("__EXCEPTION__Function '{function_name}' is not defined. Make sure you have a function named '{function_name}' in your code.", file=sys.stderr)
-            sys.exit(1)
-            
-        result = {function_name}(*args)
-        
-        # Output the result directly
-        if result is not None:
-            if isinstance(result, (str, int, float, bool)):
-                print(result)
-            elif isinstance(result, (list, dict)):
-                print(json.dumps(result))
-            else:
-                print(str(result))
-        else:
-            print("")
-            
-    except TypeError as error:
-        if "takes" in str(error) and "positional argument" in str(error):
-            print("__EXCEPTION__Function signature mismatch. Check that your solution function accepts the correct number of parameters for the given input.", file=sys.stderr)
-        else:
-            print("__EXCEPTION__" + str(error), file=sys.stderr)
-        sys.exit(1)
-    except Exception as error:
-        print("__EXCEPTION__" + str(error), file=sys.stderr)
-        sys.exit(1)
-"""
+            # Build the wrapper code as a list of lines to avoid triple-quote issues
+            wrapper_lines = [
+                "import sys",
+                "import json",
+                "",
+            ]
+            wrapper_lines.append(user_code)
+            wrapper_lines.append("")
+            wrapper_lines.extend([
+                "def parse_input(input_str):",
+                "    # Handle multi-line input (common for problems with multiple parameters)",
+                "    lines = [line.strip() for line in input_str.strip().split('\\n') if line.strip()]",
+                "    ",
+                "    if len(lines) == 0:",
+                "        return []",
+                "    elif len(lines) == 1:",
+                "        # Single line - try to parse as JSON first, then as simple value",
+                "        line = lines[0]",
+                "        try:",
+                "            parsed = json.loads(line)",
+                "            return [parsed]",
+                "        except:",
+                "            # Try to parse as number or string",
+                "            def try_num(x):",
+                "                try:",
+                "                    return int(x)",
+                "                except:",
+                "                    try:",
+                "                        return float(x)",
+                "                    except:",
+                "                        return x",
+                "            return [try_num(line)]",
+                "    else:",
+                "        # Multiple lines - each line is a separate argument",
+                "        args = []",
+                "        for line in lines:",
+                "            try:",
+                "                # Try to parse each line as JSON (handles arrays, objects, etc.)",
+                "                parsed = json.loads(line)",
+                "                args.append(parsed)",
+                "            except:",
+                "                # If JSON parsing fails, try to parse as number or string",
+                "                def try_num(x):",
+                "                    try:",
+                "                        return int(x)",
+                "                    except:",
+                "                        try:",
+                "                            return float(x)",
+                "                        except:",
+                "                            return x",
+                "                args.append(try_num(line))",
+                "        return args",
+                "",
+                "if __name__ == \"__main__\":",
+                "    input_str = sys.stdin.read().strip()",
+                "    if input_str:",
+                "        args = parse_input(input_str)",
+                "        if not isinstance(args, list):",
+                "            args = [args]",
+                "    else:",
+                "        args = []",
+                "    ",
+                "    try:",
+                f"        # Check if the function exists",
+                f"        if '{function_name}' not in globals():",
+                f"            print(\"__EXCEPTION__Function '{function_name}' is not defined. Make sure you have a function named '{function_name}' in your code.\", file=sys.stderr)",
+                "            sys.exit(1)",
+                "        ",
+                f"        result = {function_name}(*args)",
+                "        ",
+                "        # Output the result directly",
+                "        if result is not None:",
+                "            if isinstance(result, (str, int, float, bool)):",
+                "                print(result)",
+                "            elif isinstance(result, (list, dict)):",
+                "                print(json.dumps(result))",
+                "            else:",
+                "                print(str(result))",
+                "        else:",
+                "            print(\"\")",
+                "        ",
+                "    except TypeError as error:",
+                "        if \"takes\" in str(error) and \"positional argument\" in str(error):",
+                "            print(\"__EXCEPTION__Function signature mismatch. Check that your solution function accepts the correct number of parameters for the given input.\", file=sys.stderr)",
+                "        else:",
+                "            print(\"__EXCEPTION__\" + str(error), file=sys.stderr)",
+                "        sys.exit(1)",
+                "    except Exception as error:",
+                "        print(\"__EXCEPTION__\" + str(error), file=sys.stderr)",
+                "        sys.exit(1)",
+            ])
+            wrapper_code = "\n".join(wrapper_lines)
             # Write the wrapper code to a temp file
             with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp_file:
                 tmp_file.write(wrapper_code)
