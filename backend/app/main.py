@@ -72,14 +72,55 @@ def xp_status():
             """))
             submissions_has_xp = bool(result.fetchone())
             
+            # Check actual user XP values
+            result = conn.execute(text("""
+                SELECT id, username, total_xp 
+                FROM users 
+                ORDER BY id 
+                LIMIT 5
+            """))
+            users_sample = [dict(row._mapping) for row in result.fetchall()]
+            
             return {
                 "xp_system_ready": users_has_xp and submissions_has_xp,
                 "users_table_has_xp": users_has_xp,
                 "submissions_table_has_xp": submissions_has_xp,
-                "status": "ready" if (users_has_xp and submissions_has_xp) else "migration_needed"
+                "status": "ready" if (users_has_xp and submissions_has_xp) else "migration_needed",
+                "sample_users": users_sample
             }
     except Exception as e:
         return {"error": str(e), "status": "error"}
+
+@app.post("/debug-award-xp/{user_id}/{xp_amount}")
+def debug_award_xp(user_id: int, xp_amount: int):
+    """Debug endpoint to manually award XP to a user."""
+    from .db.base import SessionLocal
+    from .db.models import User
+    
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return {"error": "User not found"}
+        
+        old_xp = user.total_xp or 0
+        user.total_xp = old_xp + xp_amount
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        
+        return {
+            "success": True,
+            "user_id": user_id,
+            "username": user.username,
+            "old_xp": old_xp,
+            "new_xp": user.total_xp,
+            "awarded": xp_amount
+        }
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        db.close()
 
 # Socket.io events
 usernames = {}
