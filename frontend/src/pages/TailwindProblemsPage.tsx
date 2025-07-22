@@ -27,6 +27,7 @@ const TailwindProblemsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All');
   const [sortBy, setSortBy] = useState<SortOption>('popularity');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -105,14 +106,37 @@ const TailwindProblemsPage: React.FC = () => {
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative max-w-2xl">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
+              {/* Floating Label */}
+              <label 
+                className={`absolute left-3 transition-all duration-200 pointer-events-none ${
+                  searchFocused || search 
+                    ? 'top-2 text-xs text-primary bg-card px-1 z-10' 
+                    : 'top-1/2 transform -translate-y-1/2 text-base text-muted-foreground'
+                }`}
+              >
+                Search problems
+              </label>
               <input
                 type="text"
-                placeholder="Search problems... (e.g. 'Linked List', 'Binary Tree')"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                className="w-full pl-3 pr-12 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               />
+              {/* Inline Action Button - Magnifier Icon */}
+              <button
+                onClick={() => {
+                  // Search functionality could be added here if needed
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-all duration-200 group"
+              >
+                <SearchIcon className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+              </button>
+              {/* Helper Text Below */}
+              <p className="text-xs text-white/50 mt-2">
+                Start typing to filter problems in real-time
+              </p>
             </div>
           </div>
 
@@ -163,15 +187,18 @@ const TailwindProblemsPage: React.FC = () => {
         {/* Problems Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProblems.map((problem) => (
-            <div key={problem.id} className="bg-card rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div key={problem.id} className="bg-card rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200 min-h-[200px] flex flex-col">
+              {/* Header Layout - Split into two columns */}
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-lg font-bold text-card-foreground flex-1 pr-3">
+                <h3 className="text-base font-bold text-card-foreground flex-1 pr-3">
                   {problem.title}
                 </h3>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
                   {problem.difficulty}
                 </span>
               </div>
+              {/* Spacer to push button to bottom */}
+              <div className="flex-1"></div>
               <Link
                 to={`/problems/${problem.id}`}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg transition-colors duration-200 inline-block text-center"
