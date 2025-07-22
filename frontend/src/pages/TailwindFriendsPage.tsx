@@ -8,7 +8,8 @@ import {
   XMarkIcon,
   TrophyIcon,
   StarIcon,
-  UserIcon
+  UserIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline';
 
 interface Friend {
@@ -203,8 +204,41 @@ const TailwindFriendsPage: React.FC = () => {
             Friends & Leaderboard
           </h1>
           <p className="text-muted-foreground">
-            Connect with friends and compete on the leaderboard!
+            Connect with friends, compete on the leaderboard, and track your coding progress together!
           </p>
+          
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <UsersIcon className="h-6 w-6 text-blue-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Friends</p>
+                  <p className="text-xl font-bold text-card-foreground">{friends.length}</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <TrophyIcon className="h-6 w-6 text-yellow-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Leaderboard Rank</p>
+                  <p className="text-xl font-bold text-card-foreground">
+                    {leaderboard.find(entry => entry.username === localStorage.getItem('username'))?.rank || '-'}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <UserPlusIcon className="h-6 w-6 text-green-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Pending Requests</p>
+                  <p className="text-xl font-bold text-card-foreground">{receivedRequests.length}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Notifications */}
@@ -235,8 +269,13 @@ const TailwindFriendsPage: React.FC = () => {
                 >
                   {tab}
                   {index === 2 && receivedRequests.length > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                    <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 animate-pulse">
                       {receivedRequests.length}
+                    </span>
+                  )}
+                  {index === 0 && leaderboard.length > 0 && (
+                    <span className="ml-2 bg-blue-500 text-white text-xs rounded-full px-2 py-1">
+                      {leaderboard.length}
                     </span>
                   )}
                 </button>
@@ -248,7 +287,18 @@ const TailwindFriendsPage: React.FC = () => {
             {/* Leaderboard Tab */}
             {activeTab === 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-4">Friends Leaderboard</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Friends Leaderboard</h3>
+                  <button
+                    onClick={fetchData}
+                    className="flex items-center space-x-2 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Refresh</span>
+                  </button>
+                </div>
                 {leaderboard.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <TrophyIcon className="h-16 w-16 mx-auto mb-4 opacity-50" />
@@ -257,15 +307,16 @@ const TailwindFriendsPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {leaderboard.map((entry) => (
+                    {leaderboard.map((entry, index) => (
                       <div
                         key={entry.id}
-                        className={`flex items-center justify-between p-4 rounded-lg border ${
-                          entry.rank === 1 ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800' :
-                          entry.rank === 2 ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800' :
-                          entry.rank === 3 ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' :
-                          'bg-muted/50 border-border'
+                        className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                          entry.rank === 1 ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 shadow-yellow-100' :
+                          entry.rank === 2 ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800 shadow-gray-100' :
+                          entry.rank === 3 ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 shadow-amber-100' :
+                          'bg-muted/50 border-border hover:bg-muted/70'
                         }`}
+                        style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center justify-center w-8">
@@ -486,8 +537,16 @@ const TailwindFriendsPage: React.FC = () => {
 
                 {searchQuery.length >= 2 && searchResults.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
-                    <UserIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No users found matching "{searchQuery}"</p>
+                    <MagnifyingGlassIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p className="text-lg mb-2">No users found matching "{searchQuery}"</p>
+                    <p className="text-sm">Try searching with a different username or check the spelling</p>
+                  </div>
+                )}
+
+                {searchQuery.length > 0 && searchQuery.length < 2 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MagnifyingGlassIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>Type at least 2 characters to search for users</p>
                   </div>
                 )}
               </div>
