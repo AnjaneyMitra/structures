@@ -255,7 +255,7 @@ function AppRoutes() {
       <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
       <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
       <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
-      <Route path="/rooms/:code" element={<CollaborativeRoomPage />} />
+      <Route path="/room/:code" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
       <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
     </Routes>
   );
