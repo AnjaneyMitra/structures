@@ -235,7 +235,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       />
       <main 
         className={`flex-grow min-h-screen bg-background relative page-transition ${
-          sidebarOpen ? 'ml-[280px]' : 'ml-0'
+          sidebarOpen ? 'ml-[280px]' : 'ml-[72px]'
         }`}
       >
         {/* Background Effects */}
