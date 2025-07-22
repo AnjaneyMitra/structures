@@ -43,7 +43,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
     } else {
       setSidebarOpen(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isProblemPage, isRoomPage]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
