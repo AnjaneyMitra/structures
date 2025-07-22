@@ -52,47 +52,38 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
       sidebarOpen ? 'w-[280px]' : 'w-[72px]'
     } h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 sidebar-transition transition-all duration-300 ease-in-out`}>
       
-      {/* Toggle button */}
-      <button
-        className={`absolute ${sidebarOpen ? 'top-4 right-4' : 'top-4 right-2'} z-20 p-2 bg-card border border-border rounded-lg hover:bg-primary/10 sidebar-button-hover sidebar-focus transition-all duration-200`}
-        onClick={handleToggle}
-        title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-      >
-        {sidebarOpen ? (
-          <ChevronLeftIcon className="h-5 w-5 text-primary" />
-        ) : (
-          <ChevronRightIcon className="h-5 w-5 text-primary" />
-        )}
-      </button>
-
-      {/* Background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/3 to-transparent pointer-events-none" />
-      
       {/* Header */}
       <div className={`relative z-10 ${sidebarOpen ? 'p-6' : 'p-4'} border-b border-card-foreground/10 transition-all duration-300`}>
         <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
           {sidebarOpen ? (
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300">
-              <CodeBracketIcon className="h-6 w-6 text-white transition-all duration-300" />
-            </div>
+            <>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300">
+                <CodeBracketIcon className="h-6 w-6 text-white transition-all duration-300" />
+              </div>
+              <div className="transition-opacity duration-300 opacity-100">
+                <h1 className="text-xl font-bold text-foreground">Structures</h1>
+                <p className="text-sm text-muted-foreground">Code & Collaborate</p>
+              </div>
+              <button
+                className="absolute top-4 right-4 z-20 p-2 bg-card border border-border rounded-lg hover:bg-primary/10 sidebar-button-hover sidebar-focus transition-all duration-200"
+                onClick={handleToggle}
+                title="Collapse sidebar"
+              >
+                <ChevronLeftIcon className="h-5 w-5 text-primary" />
+              </button>
+            </>
           ) : (
             <button
               onClick={handleToggle}
-              className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group relative overflow-hidden"
+              className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group relative overflow-hidden"
               title="Expand sidebar"
             >
               {/* Default icon - slides out on hover */}
-              <CodeBracketIcon className="h-5 w-5 text-white transition-all duration-300 transform group-hover:-translate-x-8 group-hover:opacity-0" />
+              <CodeBracketIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform group-hover:-translate-x-10 group-hover:opacity-0" />
               
               {/* Hover icon - slides in on hover */}
-              <ChevronRightIcon className="h-5 w-5 text-white absolute transition-all duration-300 transform translate-x-8 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+              <ChevronRightIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
             </button>
-          )}
-          {sidebarOpen && (
-            <div className="transition-opacity duration-300 opacity-100">
-              <h1 className="text-xl font-bold text-foreground">Structures</h1>
-              <p className="text-sm text-muted-foreground">Code & Collaborate</p>
-            </div>
           )}
         </div>
       </div>
