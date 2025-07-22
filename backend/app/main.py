@@ -18,8 +18,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -48,6 +49,11 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/api/friends/test")
+def friends_test():
+    """Test endpoint to verify friends API is working."""
+    return {"status": "friends_api_working", "message": "Friends API is accessible"}
 
 @app.get("/xp-status")
 def xp_status():
