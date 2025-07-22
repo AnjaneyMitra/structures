@@ -674,11 +674,11 @@ Good luck! 🚀`);
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#0a0a0a',
-        color: 'white'
+        bgcolor: 'var(--color-background)',
+        color: 'var(--color-foreground)'
       }}>
         <Stack alignItems="center" spacing={2}>
-          <CircularProgress size={60} sx={{ color: '#00d4aa' }} />
+          <CircularProgress size={60} sx={{ color: 'var(--color-primary)' }} />
           <Typography variant="h6">Loading collaborative room...</Typography>
         </Stack>
       </Box>
@@ -692,20 +692,20 @@ Good luck! 🚀`);
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#0a0a0a',
-        color: 'white',
+        bgcolor: 'var(--color-background)',
+        color: 'var(--color-foreground)',
         p: 4
       }}>
         <Stack alignItems="center" spacing={3}>
-          <Alert severity="error" sx={{ mb: 2, bgcolor: '#2d1b1b', color: '#ff6b6b' }}>
+          <Alert severity="error" sx={{ mb: 2, bgcolor: 'hsl(0 100% 50% / 0.1)', color: 'hsl(0 100% 50%)' }}>
             {roomError}
           </Alert>
           <Button
             variant="contained"
             onClick={() => window.location.href = '/rooms'}
             sx={{
-              bgcolor: '#00d4aa',
-              '&:hover': { bgcolor: '#00b894' },
+              bgcolor: 'var(--color-primary)',
+              '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
               px: 4,
               py: 1.5,
               borderRadius: 2
@@ -721,22 +721,22 @@ Good luck! 🚀`);
   return (
     <Box sx={{
       height: '100vh',
-      bgcolor: '#0a0a0a',
-      color: 'white',
+      bgcolor: 'var(--color-background)',
+      color: 'var(--color-foreground)',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
       {/* Header */}
       <Box sx={{
-        borderBottom: '1px solid #2d3748',
+        borderBottom: '1px solid var(--color-border)',
         px: 3,
         py: 2,
-        bgcolor: '#1a1a1a'
+        bgcolor: 'var(--color-card)'
       }}>
         <Stack direction="row" alignItems="center" spacing={2}>
-          <CodeIcon sx={{ color: '#00d4aa', fontSize: 28 }} />
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#00d4aa' }}>
+          <CodeIcon sx={{ color: 'var(--color-primary)', fontSize: 28 }} />
+          <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-primary)' }}>
             Room {roomCode}
           </Typography>
           <Chip
@@ -744,20 +744,20 @@ Good luck! 🚀`);
             color={connected ? 'success' : 'error'}
             size="small"
             sx={{
-              bgcolor: connected ? '#00d4aa' : '#ff6b6b',
+              bgcolor: connected ? 'var(--color-success)' : 'var(--color-destructive)',
               color: 'white',
               fontWeight: 600
             }}
           />
           <Badge badgeContent={Math.max(users.length, roomUsers.length)} color="primary">
-            <PeopleIcon sx={{ color: '#a0aec0' }} />
+            <PeopleIcon sx={{ color: 'var(--color-muted-foreground)' }} />
           </Badge>
           {problemData && (
             <Chip
               label={problemData.title}
               sx={{
-                bgcolor: '#2d3748',
-                color: 'white',
+                bgcolor: 'var(--color-card)',
+                color: 'var(--color-foreground)',
                 fontWeight: 600,
                 maxWidth: 200
               }}
@@ -770,12 +770,12 @@ Good luck! 🚀`);
             startIcon={<ArrowBackIcon />}
             onClick={() => setExitDialogOpen(true)}
             sx={{
-              borderColor: '#4a5568',
-              color: '#a0aec0',
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-muted-foreground)',
               '&:hover': {
-                borderColor: '#ff6b6b',
-                color: '#ff6b6b',
-                bgcolor: 'rgba(255, 107, 107, 0.1)'
+                borderColor: 'var(--color-destructive)',
+                color: 'var(--color-destructive)',
+                bgcolor: 'var(--color-destructive-bg)'
               }
             }}
           >
@@ -789,18 +789,18 @@ Good luck! 🚀`);
             sx={{
               minWidth: 120,
               '& .MuiOutlinedInput-root': {
-                bgcolor: '#2d3748',
-                color: 'white',
-                '& fieldset': { borderColor: '#4a5568' },
-                '&:hover fieldset': { borderColor: '#00d4aa' },
-                '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+                bgcolor: 'var(--color-card)',
+                color: 'var(--color-foreground)',
+                '& fieldset': { borderColor: 'var(--color-border)' },
+                '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' }
               },
-              '& .MuiInputLabel-root': { color: '#a0aec0' },
-              '& .MuiSelect-icon': { color: '#a0aec0' }
+              '& .MuiInputLabel-root': { color: 'var(--color-muted-foreground)' },
+              '& .MuiSelect-icon': { color: 'var(--color-muted-foreground)' }
             }}
           >
             {languageOptions.map(lang => (
-              <MenuItem key={lang.value} value={lang.value} sx={{ bgcolor: '#2d3748', color: 'white' }}>
+              <MenuItem key={lang.value} value={lang.value} sx={{ bgcolor: 'var(--color-card)', color: 'var(--color-foreground)' }}>
                 {lang.label}
               </MenuItem>
             ))}
@@ -814,8 +814,8 @@ Good luck! 🚀`);
         <Box sx={{
           width: sidebarOpen ? 400 : 0,
           transition: 'width 0.3s ease',
-          borderRight: '1px solid #2d3748',
-          bgcolor: '#1a1a1a',
+          borderRight: '1px solid var(--color-border)',
+          bgcolor: 'var(--color-card)',
           overflow: 'hidden'
         }}>
           {sidebarOpen && (
@@ -824,14 +824,14 @@ Good luck! 🚀`);
                 value={activeTab}
                 onChange={(_, newValue) => setActiveTab(newValue)}
                 sx={{
-                  borderBottom: '1px solid #2d3748',
+                  borderBottom: '1px solid var(--color-border)',
                   '& .MuiTab-root': {
-                    color: '#a0aec0',
+                    color: 'var(--color-muted-foreground)',
                     fontWeight: 600,
                     minHeight: 48
                   },
-                  '& .Mui-selected': { color: '#00d4aa' },
-                  '& .MuiTabs-indicator': { backgroundColor: '#00d4aa' }
+                  '& .Mui-selected': { color: 'var(--color-primary)' },
+                  '& .MuiTabs-indicator': { backgroundColor: 'var(--color-primary)' }
                 }}
               >
                 <Tab icon={<AssignmentIcon />} label="Problem" />
@@ -844,60 +844,60 @@ Good luck! 🚀`);
                 {activeTab === 0 && problemData && (
                   <Stack spacing={3}>
                     <Box>
-                      <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 1 }}>
+                      <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 1 }}>
                         {problemData.title}
                       </Typography>
                       <Chip
                         label={problemData.difficulty}
                         size="small"
                         sx={{
-                          bgcolor: problemData.difficulty === 'Easy' ? '#00d4aa' :
-                            problemData.difficulty === 'Medium' ? '#ffa726' : '#ff6b6b',
+                          bgcolor: problemData.difficulty === 'Easy' ? 'var(--color-primary)' :
+                            problemData.difficulty === 'Medium' ? 'hsl(30 100% 50%)' : 'hsl(0 100% 50%)',
                           color: 'white',
                           fontWeight: 600
                         }}
                       />
                     </Box>
 
-                    <Typography variant="body2" sx={{ color: '#e2e8f0', lineHeight: 1.6 }}>
+                    <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)', lineHeight: 1.6 }}>
                       {problemData.description}
                     </Typography>
 
                     {problemData.sample_input && problemData.sample_output && (
-                      <Card sx={{ bgcolor: '#2d3748', border: '1px solid #4a5568' }}>
+                      <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
                         <CardContent sx={{ p: 2 }}>
-                          <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                          <Typography variant="subtitle2" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
                             Example:
                           </Typography>
                           <Stack spacing={2}>
                             <Box>
-                              <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                              <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                                 Input:
                               </Typography>
                               <Paper sx={{
                                 p: 1.5,
                                 mt: 0.5,
-                                bgcolor: '#1a1a1a',
-                                border: '1px solid #4a5568',
+                                bgcolor: 'var(--color-background)',
+                                border: '1px solid var(--color-border)',
                                 fontFamily: 'JetBrains Mono, monospace',
                                 fontSize: 13,
-                                color: '#e2e8f0'
+                                color: 'var(--color-foreground)'
                               }}>
                                 {problemData.sample_input}
                               </Paper>
                             </Box>
                             <Box>
-                              <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                              <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                                 Output:
                               </Typography>
                               <Paper sx={{
                                 p: 1.5,
                                 mt: 0.5,
-                                bgcolor: '#1a1a1a',
-                                border: '1px solid #4a5568',
+                                bgcolor: 'var(--color-background)',
+                                border: '1px solid var(--color-border)',
                                 fontFamily: 'JetBrains Mono, monospace',
                                 fontSize: 13,
-                                color: '#e2e8f0'
+                                color: 'var(--color-foreground)'
                               }}>
                                 {problemData.sample_output}
                               </Paper>
@@ -912,16 +912,16 @@ Good luck! 🚀`);
                 {/* Users Tab */}
                 {activeTab === 1 && (
                   <Stack spacing={2}>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)' }}>
                       Room Participants ({Math.max(users.length, roomUsers.length)})
                     </Typography>
                     {roomUsers.map(u => (
                       <Card key={u.id} sx={{
-                        bgcolor: '#2d3748',
-                        border: '1px solid #4a5568',
+                        bgcolor: 'var(--color-card)',
+                        border: '1px solid var(--color-border)',
                         cursor: 'pointer',
                         transition: 'all 0.2s',
-                        '&:hover': { bgcolor: '#374151', borderColor: '#00d4aa' }
+                        '&:hover': { bgcolor: 'var(--color-muted)', borderColor: 'var(--color-primary)' }
                       }}>
                         <CardContent sx={{ p: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={2}>
@@ -935,18 +935,18 @@ Good luck! 🚀`);
                               {u.username.slice(0, 2).toUpperCase()}
                             </Avatar>
                             <Box sx={{ flex: 1 }}>
-                              <Typography variant="body2" fontWeight={600} sx={{ color: 'white' }}>
+                              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-foreground)' }}>
                                 {u.username === username ? `${u.username} (You)` : u.username}
                               </Typography>
                               <Stack direction="row" alignItems="center" spacing={1}>
                                 <FiberManualRecordIcon
                                   sx={{
                                     fontSize: 8,
-                                    color: users.includes(u.username) ? '#00d4aa' : '#6b7280'
+                                    color: users.includes(u.username) ? 'var(--color-primary)' : 'var(--color-muted-foreground)'
                                   }}
                                 />
                                 <Typography variant="caption" sx={{
-                                  color: users.includes(u.username) ? '#00d4aa' : '#6b7280'
+                                  color: users.includes(u.username) ? 'var(--color-primary)' : 'var(--color-muted-foreground)'
                                 }}>
                                   {users.includes(u.username) ? 'Online' : 'Offline'}
                                 </Typography>
@@ -957,7 +957,7 @@ Good luck! 🚀`);
                                 label="Coding"
                                 size="small"
                                 sx={{
-                                  bgcolor: '#00d4aa',
+                                  bgcolor: 'var(--color-primary)',
                                   color: 'white',
                                   fontSize: 11,
                                   height: 20
@@ -974,17 +974,17 @@ Good luck! 🚀`);
                 {/* Chat Tab */}
                 {activeTab === 2 && (
                   <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
                       Team Chat
                     </Typography>
                     <Box sx={{
                       flex: 1,
                       overflowY: 'auto',
                       mb: 2,
-                      bgcolor: '#2d3748',
+                      bgcolor: 'var(--color-card)',
                       borderRadius: 2,
                       p: 2,
-                      border: '1px solid #4a5568'
+                      border: '1px solid var(--color-border)'
                     }}>
                       {chatMessages.map((msg, idx) => (
                         <Box key={idx} sx={{ mb: 2 }}>
@@ -997,12 +997,12 @@ Good luck! 🚀`);
                             }}>
                               {(msg.username || msg.sid).slice(0, 2).toUpperCase()}
                             </Avatar>
-                            <Typography variant="caption" fontWeight={600} sx={{ color: '#00d4aa' }}>
+                            <Typography variant="caption" fontWeight={600} sx={{ color: 'var(--color-primary)' }}>
                               {msg.username || msg.sid}
                             </Typography>
                           </Stack>
                           <Typography variant="body2" sx={{
-                            color: '#e2e8f0',
+                            color: 'var(--color-foreground)',
                             ml: 3,
                             wordBreak: 'break-word'
                           }}>
@@ -1021,11 +1021,11 @@ Good luck! 🚀`);
                         onKeyDown={e => { if (e.key === 'Enter') handleSendMessage(); }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
-                            bgcolor: '#2d3748',
-                            color: 'white',
-                            '& fieldset': { borderColor: '#4a5568' },
-                            '&:hover fieldset': { borderColor: '#00d4aa' },
-                            '&.Mui-focused fieldset': { borderColor: '#00d4aa' }
+                            bgcolor: 'var(--color-background)',
+                            color: 'var(--color-foreground)',
+                            '& fieldset': { borderColor: 'var(--color-border)' },
+                            '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                            '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' }
                           }
                         }}
                       />
@@ -1033,10 +1033,10 @@ Good luck! 🚀`);
                         onClick={handleSendMessage}
                         disabled={!chatInput.trim()}
                         sx={{
-                          bgcolor: '#00d4aa',
+                          bgcolor: 'var(--color-primary)',
                           color: 'white',
-                          '&:hover': { bgcolor: '#00b894' },
-                          '&:disabled': { bgcolor: '#4a5568', color: '#6b7280' }
+                          '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
+                          '&:disabled': { bgcolor: 'var(--color-muted)', color: 'var(--color-muted-foreground)' }
                         }}
                       >
                         <SendIcon fontSize="small" />
@@ -1053,10 +1053,10 @@ Good luck! 🚀`);
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Code Editor Header */}
           <Box sx={{
-            borderBottom: '1px solid #2d3748',
+            borderBottom: '1px solid var(--color-border)',
             px: 3,
             py: 1.5,
-            bgcolor: '#1a1a1a',
+            bgcolor: 'var(--color-card)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between'
@@ -1066,14 +1066,14 @@ Good luck! 🚀`);
                 variant="text"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 sx={{
-                  color: '#a0aec0',
+                  color: 'var(--color-muted-foreground)',
                   minWidth: 'auto',
                   p: 1
                 }}
               >
                 {sidebarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </Button>
-              <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-muted-foreground)' }}>
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
             </Stack>
@@ -1091,8 +1091,8 @@ Good luck! 🚀`);
                 }}
                 size="small"
                 sx={{
-                  color: '#ffa726',
-                  '&:hover': { bgcolor: 'rgba(255, 167, 38, 0.1)' }
+                  color: 'hsl(30 100% 50%)',
+                  '&:hover': { bgcolor: 'hsl(30 100% 50% / 0.1)' }
                 }}
               >
                 Reset Template
@@ -1102,8 +1102,8 @@ Good luck! 🚀`);
                 disabled={undoStack.length === 0}
                 size="small"
                 sx={{
-                  color: '#a0aec0',
-                  '&:disabled': { color: '#4a5568' }
+                  color: 'var(--color-muted-foreground)',
+                  '&:disabled': { color: 'var(--color-muted)' }
                 }}
               >
                 Undo
@@ -1113,8 +1113,8 @@ Good luck! 🚀`);
                 disabled={redoStack.length === 0}
                 size="small"
                 sx={{
-                  color: '#a0aec0',
-                  '&:disabled': { color: '#4a5568' }
+                  color: 'var(--color-muted-foreground)',
+                  '&:disabled': { color: 'var(--color-muted)' }
                 }}
               >
                 Redo
@@ -1158,20 +1158,20 @@ Good luck! 🚀`);
           {/* Console/Output Area */}
           <Box sx={{
             height: 200,
-            borderTop: '1px solid #2d3748',
-            bgcolor: '#1a1a1a',
+            borderTop: '1px solid var(--color-border)',
+            bgcolor: 'var(--color-card)',
             display: 'flex',
             flexDirection: 'column'
           }}>
             <Box sx={{
               px: 3,
               py: 1.5,
-              borderBottom: '1px solid #2d3748',
+              borderBottom: '1px solid var(--color-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-              <Typography variant="body2" fontWeight={600} sx={{ color: '#a0aec0' }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-muted-foreground)' }}>
                 Console
               </Typography>
               <Stack direction="row" spacing={2}>
@@ -1182,12 +1182,12 @@ Good luck! 🚀`);
                   disabled={running}
                   size="small"
                   sx={{
-                    borderColor: '#4a5568',
-                    color: '#a0aec0',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-muted-foreground)',
                     '&:hover': {
-                      borderColor: '#ffa726',
-                      color: '#ffa726',
-                      bgcolor: 'rgba(255, 167, 38, 0.1)'
+                      borderColor: 'hsl(30 100% 50%)',
+                      color: 'hsl(30 100% 50%)',
+                      bgcolor: 'hsl(30 100% 50% / 0.1)'
                     }
                   }}
                 >
@@ -1200,12 +1200,12 @@ Good luck! 🚀`);
                   disabled={running}
                   size="small"
                   sx={{
-                    borderColor: '#4a5568',
-                    color: '#a0aec0',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-muted-foreground)',
                     '&:hover': {
-                      borderColor: '#00d4aa',
-                      color: '#00d4aa',
-                      bgcolor: 'rgba(0, 212, 170, 0.1)'
+                      borderColor: 'var(--color-primary)',
+                      color: 'var(--color-primary)',
+                      bgcolor: 'var(--color-primary) / 0.1'
                     }
                   }}
                 >
@@ -1218,8 +1218,8 @@ Good luck! 🚀`);
                   disabled={submitting}
                   size="small"
                   sx={{
-                    bgcolor: '#00d4aa',
-                    '&:hover': { bgcolor: '#00b894' },
+                    bgcolor: 'var(--color-primary)',
+                    '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
                     fontWeight: 600
                   }}
                 >
@@ -1233,17 +1233,17 @@ Good luck! 🚀`);
               {consoleOutput && (
                 <Card sx={{
                   mb: 2,
-                  bgcolor: '#2d3748',
-                  border: '1px solid #4a5568'
+                  bgcolor: 'var(--color-card)',
+                  border: '1px solid var(--color-border)'
                 }}>
                   <CardContent sx={{ p: 2 }}>
-                    <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 1 }}>
                       Console Output
                     </Typography>
                     <Typography variant="body2" sx={{
                       fontFamily: 'JetBrains Mono, monospace',
-                      color: '#e2e8f0',
-                      bgcolor: '#1a1a1a',
+                      color: 'var(--color-foreground)',
+                      bgcolor: 'var(--color-background)',
                       p: 1.5,
                       borderRadius: 1,
                       whiteSpace: 'pre-wrap',
@@ -1259,17 +1259,17 @@ Good luck! 🚀`);
               {runResult && (
                 <Card sx={{
                   mb: 2,
-                  bgcolor: runResult.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
-                  border: `1px solid ${runResult.passed ? '#00d4aa' : '#ff6b6b'}`
+                  bgcolor: runResult.passed ? 'var(--color-primary) / 0.1' : 'hsl(0 100% 50% / 0.1)',
+                  border: `1px solid ${runResult.passed ? 'var(--color-primary)' : 'hsl(0 100% 50%)'}`
                 }}>
                   <CardContent sx={{ p: 2 }}>
                     <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
                       {runResult.passed ?
-                        <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 20 }} /> :
-                        <CancelIcon sx={{ color: '#ff6b6b', fontSize: 20 }} />
+                        <CheckCircleIcon sx={{ color: 'var(--color-primary)', fontSize: 20 }} /> :
+                        <CancelIcon sx={{ color: 'hsl(0 100% 50%)', fontSize: 20 }} />
                       }
                       <Typography variant="subtitle2" fontWeight={700} sx={{
-                        color: runResult.passed ? '#00d4aa' : '#ff6b6b'
+                        color: runResult.passed ? 'var(--color-primary)' : 'hsl(0 100% 50%)'
                       }}>
                         {runResult.passed ? 'Test Passed' : 'Test Failed'}
                       </Typography>
@@ -1277,21 +1277,21 @@ Good luck! 🚀`);
                         label={`${runResult.execution_time?.toFixed(3) || '0.000'}s`}
                         size="small"
                         sx={{
-                          bgcolor: '#2d3748',
-                          color: '#a0aec0',
+                          bgcolor: 'var(--color-muted)',
+                          color: 'var(--color-muted-foreground)',
                           fontSize: 11
                         }}
                       />
                     </Stack>
                     <Stack spacing={1}>
                       <Box>
-                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                        <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                           Input:
                         </Typography>
                         <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
-                          color: '#e2e8f0',
-                          bgcolor: '#2d3748',
+                          color: 'var(--color-foreground)',
+                          bgcolor: 'var(--color-card)',
                           p: 1,
                           borderRadius: 1,
                           mt: 0.5
@@ -1300,13 +1300,13 @@ Good luck! 🚀`);
                         </Typography>
                       </Box>
                       <Box>
-                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                        <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                           Expected:
                         </Typography>
                         <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
-                          color: '#e2e8f0',
-                          bgcolor: '#2d3748',
+                          color: 'var(--color-foreground)',
+                          bgcolor: 'var(--color-card)',
                           p: 1,
                           borderRadius: 1,
                           mt: 0.5
@@ -1315,13 +1315,13 @@ Good luck! 🚀`);
                         </Typography>
                       </Box>
                       <Box>
-                        <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
+                        <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                           Actual Output:
                         </Typography>
                         <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
-                          color: runResult.passed ? '#00d4aa' : '#ff6b6b',
-                          bgcolor: '#2d3748',
+                          color: runResult.passed ? 'var(--color-primary)' : 'hsl(0 100% 50%)',
+                          bgcolor: 'var(--color-card)',
                           p: 1,
                           borderRadius: 1,
                           mt: 0.5
@@ -1331,13 +1331,13 @@ Good luck! 🚀`);
                       </Box>
                       {runResult.error && (
                         <Box>
-                          <Typography variant="caption" sx={{ color: '#ff6b6b', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ color: 'hsl(0 100% 50%)', fontWeight: 600 }}>
                             Error:
                           </Typography>
                           <Typography variant="body2" sx={{
                             fontFamily: 'JetBrains Mono, monospace',
-                            color: '#ff6b6b',
-                            bgcolor: '#2d3748',
+                            color: 'hsl(0 100% 50%)',
+                            bgcolor: 'var(--color-card)',
                             p: 1,
                             borderRadius: 1,
                             mt: 0.5
@@ -1354,23 +1354,23 @@ Good luck! 🚀`);
               {/* Submission Results */}
               {results && results.length > 0 && (
                 <Box>
-                  <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
+                  <Typography variant="subtitle2" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
                     Submission Results
                   </Typography>
                   <Stack spacing={2}>
                     {results.map((r, i) => (
                       <Card key={i} sx={{
-                        bgcolor: r.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
-                        border: `1px solid ${r.passed ? '#00d4aa' : '#ff6b6b'}`
+                        bgcolor: r.passed ? 'var(--color-primary) / 0.1' : 'hsl(0 100% 50% / 0.1)',
+                        border: `1px solid ${r.passed ? 'var(--color-primary)' : 'hsl(0 100% 50%)'}`
                       }}>
                         <CardContent sx={{ p: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
                             {r.passed ?
-                              <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 18 }} /> :
-                              <CancelIcon sx={{ color: '#ff6b6b', fontSize: 18 }} />
+                              <CheckCircleIcon sx={{ color: 'var(--color-primary)', fontSize: 18 }} /> :
+                              <CancelIcon sx={{ color: 'hsl(0 100% 50%)', fontSize: 18 }} />
                             }
                             <Typography variant="body2" fontWeight={600} sx={{
-                              color: r.passed ? '#00d4aa' : '#ff6b6b'
+                              color: r.passed ? 'var(--color-primary)' : 'hsl(0 100% 50%)'
                             }}>
                               Test Case {i + 1}
                             </Typography>
@@ -1378,8 +1378,8 @@ Good luck! 🚀`);
                               label={r.runtime}
                               size="small"
                               sx={{
-                                bgcolor: '#2d3748',
-                                color: '#a0aec0',
+                                bgcolor: 'var(--color-muted)',
+                                color: 'var(--color-muted-foreground)',
                                 fontSize: 10,
                                 height: 20
                               }}
@@ -1388,20 +1388,20 @@ Good luck! 🚀`);
                           {!r.passed && (
                             <Stack spacing={1} sx={{ mt: 1 }}>
                               <Typography variant="caption" sx={{
-                                color: '#e2e8f0',
+                                color: 'var(--color-foreground)',
                                 fontFamily: 'JetBrains Mono, monospace',
                                 display: 'block',
-                                bgcolor: '#2d3748',
+                                bgcolor: 'var(--color-card)',
                                 p: 1,
                                 borderRadius: 1
                               }}>
                                 Expected: {r.expected}
                               </Typography>
                               <Typography variant="caption" sx={{
-                                color: '#ff6b6b',
+                                color: 'hsl(0 100% 50%)',
                                 fontFamily: 'JetBrains Mono, monospace',
                                 display: 'block',
-                                bgcolor: '#2d3748',
+                                bgcolor: 'var(--color-card)',
                                 p: 1,
                                 borderRadius: 1
                               }}>
@@ -1409,10 +1409,10 @@ Good luck! 🚀`);
                               </Typography>
                               {r.error && (
                                 <Typography variant="caption" sx={{
-                                  color: '#ff6b6b',
+                                  color: 'hsl(0 100% 50%)',
                                   fontFamily: 'JetBrains Mono, monospace',
                                   display: 'block',
-                                  bgcolor: '#2d3748',
+                                  bgcolor: 'var(--color-card)',
                                   p: 1,
                                   borderRadius: 1
                                 }}>
@@ -1433,10 +1433,10 @@ Good luck! 🚀`);
                 <Alert
                   severity="error"
                   sx={{
-                    bgcolor: 'rgba(255, 107, 107, 0.1)',
-                    border: '1px solid #ff6b6b',
-                    color: '#ff6b6b',
-                    '& .MuiAlert-icon': { color: '#ff6b6b' }
+                    bgcolor: 'hsl(0 100% 50% / 0.1)',
+                    border: '1px solid hsl(0 100% 50%)',
+                    color: 'hsl(0 100% 50%)',
+                    '& .MuiAlert-icon': { color: 'hsl(0 100% 50%)' }
                   }}
                 >
                   {submitError}
@@ -1460,7 +1460,7 @@ Good luck! 🚀`);
           onClose={() => setOpenNotif(false)}
           severity="info"
           sx={{
-            bgcolor: '#00d4aa',
+            bgcolor: 'var(--color-primary)',
             color: 'white'
           }}
         >
@@ -1474,29 +1474,29 @@ Good luck! 🚀`);
         onClose={() => setExitDialogOpen(false)}
         PaperProps={{
           sx: {
-            bgcolor: '#1a1a1a',
-            border: '1px solid #2d3748',
+            bgcolor: 'var(--color-card)',
+            border: '1px solid var(--color-border)',
             borderRadius: 3
           }
         }}
       >
-        <DialogTitle sx={{ color: 'white', borderBottom: '1px solid #2d3748' }}>
+        <DialogTitle sx={{ color: 'var(--color-foreground)', borderBottom: '1px solid var(--color-border)' }}>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <ExitToAppIcon sx={{ color: '#ff6b6b' }} />
+            <ExitToAppIcon sx={{ color: 'hsl(0 100% 50%)' }} />
             <Typography variant="h6" fontWeight={700}>
               Exit Room
             </Typography>
           </Stack>
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
-          <Typography sx={{ color: '#e2e8f0' }}>
+          <Typography sx={{ color: 'var(--color-muted-foreground)' }}>
             Are you sure you want to leave this collaborative room? Your progress will be saved, but you'll need the room code to rejoin.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ borderTop: '1px solid #2d3748', pt: 2, px: 3, pb: 3 }}>
+        <DialogActions sx={{ borderTop: '1px solid var(--color-border)', pt: 2, px: 3, pb: 3 }}>
           <Button
             onClick={() => setExitDialogOpen(false)}
-            sx={{ color: '#a0aec0', '&:hover': { bgcolor: '#2d3748' } }}
+            sx={{ color: 'var(--color-muted-foreground)', '&:hover': { bgcolor: 'var(--color-muted)' } }}
           >
             Cancel
           </Button>
@@ -1508,8 +1508,8 @@ Good luck! 🚀`);
             variant="contained"
             startIcon={<ExitToAppIcon />}
             sx={{
-              bgcolor: '#ff6b6b',
-              '&:hover': { bgcolor: '#e53e3e' },
+              bgcolor: 'hsl(0 100% 50%)',
+              '&:hover': { bgcolor: 'hsl(0 100% 45%)' },
               fontWeight: 600
             }}
           >
