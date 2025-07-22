@@ -344,7 +344,7 @@ const RoomsPage: React.FC = () => {
                   <Button
                     variant="contained"
                     fullWidth
-                    onClick={() => navigate(`/rooms/${room.code}`)}
+                    onClick={() => navigate(`/rooms/${room.code}/${room.problem_id}`)}
                     startIcon={<PlayArrowIcon />}
                     sx={{
                       bgcolor: '#00d4aa',
