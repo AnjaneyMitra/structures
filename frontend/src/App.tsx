@@ -7,6 +7,7 @@ import TailwindDashboardPage from './pages/TailwindDashboardPage';
 import TailwindProblemsPage from './pages/TailwindProblemsPage';
 import TailwindRoomsPage from './pages/TailwindRoomsPage';
 import TailwindProfilePage from './pages/TailwindProfilePage';
+import TailwindFriendsPage from './pages/TailwindFriendsPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
@@ -280,6 +281,7 @@ function AppRoutes() {
       <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
       <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
       <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
+      <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
     </Routes>
   );
 }

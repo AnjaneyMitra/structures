@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Table, Boolean, JSON, Float
+import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from .base import Base
 import datetime
@@ -71,4 +72,22 @@ class TestCase(Base):
     input = Column(Text, nullable=False)
     output = Column(Text, nullable=False)
     problem_id = Column(Integer, ForeignKey("problems.id"))
-    problem = relationship("Problem", back_populates="test_cases") 
+    problem = relationship("Problem", back_populates="test_cases")
+
+class Friendship(Base):
+    __tablename__ = "friendships"
+    id = Column(Integer, primary_key=True, index=True)
+    requester_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    addressee_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    status = Column(String, nullable=False, default="pending")  # pending, accepted, blocked
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    # Relationships
+    requester = relationship("User", foreign_keys=[requester_id], backref="sent_friend_requests")
+    addressee = relationship("User", foreign_keys=[addressee_id], backref="received_friend_requests")
+    
+    # Ensure unique friendship pairs
+    __table_args__ = (
+        sa.UniqueConstraint('requester_id', 'addressee_id', name='unique_friendship'),
+    ) 

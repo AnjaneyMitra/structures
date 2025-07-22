@@ -5,6 +5,7 @@ import {
   CodeBracketIcon, 
   UserGroupIcon, 
   UserIcon, 
+  UsersIcon,
   Cog6ToothIcon, 
   ChevronLeftIcon,
   ChevronRightIcon
@@ -15,6 +16,7 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
+  { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
 ];
 

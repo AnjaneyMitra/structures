@@ -63,4 +63,35 @@ class RoomOut(RoomBase):
 
 class Token(BaseModel):
     access_token: str
-    token_type: str 
+    token_type: str
+
+# Friend System Schemas
+class FriendRequestCreate(BaseModel):
+    username: str  # Username of the person to send request to
+
+class FriendshipOut(BaseModel):
+    id: int
+    requester_id: int
+    addressee_id: int
+    status: str
+    created_at: datetime.datetime
+    requester_username: str
+    addressee_username: str
+    class Config:
+        orm_mode = True
+
+class FriendOut(BaseModel):
+    id: int
+    username: str
+    total_xp: int
+    class Config:
+        orm_mode = True
+
+class LeaderboardEntry(BaseModel):
+    rank: int
+    id: int
+    username: str
+    total_xp: int
+    problems_solved: int
+    class Config:
+        orm_mode = True 
