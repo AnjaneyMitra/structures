@@ -41,14 +41,14 @@ const TailwindProfilePage: React.FC = () => {
         const token = localStorage.getItem('token');
         
         // Fetch user profile
-        const userRes = await axios.get('https://structures-production.up.railway.app/api/auth/profile', {
+        const userRes = await axios.get('https://structures-production.up.railway.app/api/profile/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
         setNewUsername(userRes.data.username);
 
         // Fetch submissions
-        const submissionsRes = await axios.get('https://structures-production.up.railway.app/api/submissions/user', {
+        const submissionsRes = await axios.get('https://structures-production.up.railway.app/api/profile/submissions/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSubmissions(submissionsRes.data);
@@ -78,7 +78,7 @@ const TailwindProfilePage: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        'https://structures-production.up.railway.app/api/auth/profile',
+        'https://structures-production.up.railway.app/api/profile/username',
         { username: newUsername },
         { headers: { Authorization: `Bearer ${token}` } }
       );
