@@ -153,7 +153,7 @@ const TailwindFriendsPage: React.FC = () => {
   };
 
   const removeFriend = async (friendId: number, username: string) => {
-    if (!confirm(`Remove ${username} from your friends?`)) return;
+    if (!window.confirm(`Remove ${username} from your friends?`)) return;
 
     try {
       const token = localStorage.getItem('token');
