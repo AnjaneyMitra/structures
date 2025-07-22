@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
   HomeIcon, 
   CodeBracketIcon, 
   UserGroupIcon, 
   UserIcon, 
-  Cog6ToothIcon 
+  Cog6ToothIcon, 
+  Bars3Icon, 
+  ChevronLeftIcon 
 } from '@heroicons/react/24/outline';
 import { TailwindThemeToggle } from './TailwindThemeToggle';
 
@@ -25,17 +27,55 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
   const location = useLocation();
   const user = { name: localStorage.getItem('username') || 'User', avatar: '' };
 
+  // Determine if we are on a problem or room page
+  const isProblemPage = /^\/problems\/[\w-]+$/.test(location.pathname);
+  const isRoomPage = /^\/rooms\/[\w-]+\/[\w-]+$/.test(location.pathname);
+
+  // Sidebar open state: autocollapse on problem/room pages, else open
+  const [sidebarOpen, setSidebarOpen] = useState(
+    !(isProblemPage || isRoomPage)
+  );
+
+  // Update sidebar open state on route change
+  useEffect(() => {
+    if (isProblemPage || isRoomPage) {
+      setSidebarOpen(false);
+    } else {
+      setSidebarOpen(true);
+    }
+  }, [location.pathname]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     window.location.href = '/login';
   };
 
+  // If sidebar is collapsed, show a floating expand button
+  if (!sidebarOpen) {
+    return (
+      <button
+        className="fixed top-4 left-4 z-[100] p-2 bg-card border border-border rounded-lg shadow-lg hover:bg-primary/10 transition-colors"
+        onClick={() => setSidebarOpen(true)}
+        title="Expand sidebar"
+      >
+        <Bars3Icon className="h-6 w-6 text-primary" />
+      </button>
+    );
+  }
+
   return (
-    <div className="w-[280px] h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50">
+    <div className="w-[280px] h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300">
+      {/* Collapse button */}
+      <button
+        className="absolute top-4 right-4 z-20 p-2 bg-card border border-border rounded-lg hover:bg-primary/10 transition-colors"
+        onClick={() => setSidebarOpen(false)}
+        title="Collapse sidebar"
+      >
+        <ChevronLeftIcon className="h-5 w-5 text-primary" />
+      </button>
       {/* Background overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/3 to-transparent pointer-events-none" />
-      
       {/* Header */}
       <div className="relative z-10 p-6 border-b border-card-foreground/10">
         <div className="flex items-center space-x-3">
@@ -48,14 +88,12 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
           </div>
         </div>
       </div>
-
       {/* Navigation */}
       <nav className="relative z-10 flex-1 p-4">
         <ul className="space-y-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const IconComponent = item.icon;
-            
             return (
               <li key={item.path}>
                 <Link
@@ -76,7 +114,6 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
           })}
         </ul>
       </nav>
-
       {/* User Section */}
       <div className="relative z-10 p-4 border-t border-card-foreground/10">
         {/* User Profile */}
@@ -91,7 +128,6 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
             <p className="text-xs text-muted-foreground">Online</p>
           </div>
         </div>
-
         {/* Actions */}
         <div className="flex items-center justify-between">
           <TailwindThemeToggle />
@@ -103,7 +139,6 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
             <Cog6ToothIcon className="h-5 w-5" />
           </button>
         </div>
-
         {/* Footer */}
         <div className="mt-4 pt-4 border-t border-card-foreground/10">
           <p className="text-xs text-muted-foreground text-center">
