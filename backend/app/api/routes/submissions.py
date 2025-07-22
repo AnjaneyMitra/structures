@@ -88,9 +88,13 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
             xp_awarded = 0
             if execution_results['overall_status'] == 'pass' and should_award_xp(user.id, problem.id, db):
                 xp_awarded = calculate_xp_for_problem(problem.difficulty)
+                old_xp = user.total_xp or 0
                 # Update user's total XP
-                user.total_xp = (user.total_xp or 0) + xp_awarded
+                user.total_xp = old_xp + xp_awarded
                 db.add(user)
+                print(f"🎉 XP AWARDED: User {user.id} earned {xp_awarded} XP for {problem.difficulty} problem. Total XP: {old_xp} -> {user.total_xp}")
+            else:
+                print(f"❌ NO XP: User {user.id}, Status: {execution_results['overall_status']}, Should award: {should_award_xp(user.id, problem.id, db) if execution_results['overall_status'] == 'pass' else 'N/A (not passed)'}")
             
             # Create new submission in database
             new_submission = models.Submission(
@@ -110,6 +114,8 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
             db.add(new_submission)
             db.commit()
             db.refresh(new_submission)
+            if xp_awarded > 0:
+                db.refresh(user)  # Refresh user to get updated total_xp
             return schemas.SubmissionOut(
                 id=new_submission.id,
                 user_id=new_submission.user_id,

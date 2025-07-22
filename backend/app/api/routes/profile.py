@@ -7,7 +7,9 @@ from ...core import auth
 router = APIRouter()
 
 @router.get("/", response_model=schemas.UserOut)
-def get_profile(user=Depends(deps.get_current_user)):
+def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
+    # Refresh user from database to get latest XP
+    db.refresh(user)
     return user
 
 @router.get("/submissions/")
