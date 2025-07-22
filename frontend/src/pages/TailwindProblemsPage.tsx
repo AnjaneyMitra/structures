@@ -15,9 +15,9 @@ type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
 type SortOption = 'popularity' | 'newest' | 'difficulty';
 
 const difficultyStyles = {
-  Easy: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200',
-  Medium: 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200',
-  Hard: 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200',
+  Easy: 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-900/30',
+  Medium: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-200 dark:hover:bg-yellow-900/30',
+  Hard: 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-200 dark:hover:bg-red-900/30',
 };
 
 const TailwindProblemsPage: React.FC = () => {
@@ -111,7 +111,7 @@ const TailwindProblemsPage: React.FC = () => {
                 placeholder="Search problems... (e.g. 'Linked List', 'Binary Tree')"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ const TailwindProblemsPage: React.FC = () => {
                     className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
                       difficultyFilter === difficulty
                         ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-card text-card-foreground border-gray-200 hover:border-primary'
+                        : 'bg-card text-card-foreground border-border hover:border-primary'
                     }`}
                   >
                     {difficulty}
@@ -144,7 +144,7 @@ const TailwindProblemsPage: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="px-4 py-2 bg-card border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                className="px-4 py-2 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               >
                 <option value="popularity">Popularity</option>
                 <option value="newest">Newest</option>
@@ -163,12 +163,12 @@ const TailwindProblemsPage: React.FC = () => {
         {/* Problems Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProblems.map((problem) => (
-            <div key={problem.id} className="bg-card rounded-lg border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div key={problem.id} className="bg-card rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-card-foreground flex-1 pr-3">
                   {problem.title}
                 </h3>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
                   {problem.difficulty}
                 </span>
               </div>

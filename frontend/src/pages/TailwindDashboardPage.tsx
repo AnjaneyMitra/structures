@@ -19,9 +19,9 @@ interface Problem {
 }
 
 const difficultyStyles = {
-  Easy: 'bg-green-100 text-green-800 border-green-200',
-  Medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  Hard: 'bg-red-100 text-red-800 border-red-200',
+  Easy: 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800',
+  Medium: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
+  Hard: 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800',
 };
 
 const TailwindDashboardPage: React.FC = () => {
@@ -137,7 +137,7 @@ const TailwindDashboardPage: React.FC = () => {
               value={quickSearch}
               onChange={(e) => setQuickSearch(e.target.value)}
               onKeyDown={handleQuickSearch}
-              className="w-full pl-10 pr-4 py-3 bg-card border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
             />
           </div>
         </div>
@@ -148,12 +148,12 @@ const TailwindDashboardPage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {problems.map((problem) => (
-              <div key={problem.id} className="bg-card rounded-lg border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div key={problem.id} className="bg-card rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-lg font-bold text-card-foreground flex-1 pr-3">
                     {problem.title}
                   </h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
                     {problem.difficulty}
                   </span>
                 </div>
