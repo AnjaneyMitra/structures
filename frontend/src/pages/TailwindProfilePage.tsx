@@ -57,7 +57,7 @@ const TailwindProfilePage: React.FC = () => {
         const totalSubmissions = submissionsRes.data.length;
         const problemsSolved = new Set(
           submissionsRes.data
-            .filter((sub: Submission) => sub.result === 'Passed')
+            .filter((sub: Submission) => typeof sub.result === 'string' && sub.result.toLowerCase() === 'pass')
             .map((sub: Submission) => sub.problem_id)
         ).size;
         
