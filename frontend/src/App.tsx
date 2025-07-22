@@ -3,10 +3,9 @@ import { Box, Container, Paper, Typography, Stack, Button, Grid } from '@mui/mat
 import { Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import { Sidebar } from './components/Sidebar';
-
-import ProblemsPage from './pages/ProblemsPage';
+import TailwindDashboardPage from './pages/TailwindDashboardPage';
+import TailwindProblemsPage from './pages/TailwindProblemsPage';
+import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import RoomsPage from './pages/RoomsPage';
 import ProfilePage from './pages/ProfilePage';
@@ -213,63 +212,34 @@ function Landing() {
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar />
-      <Box 
-        component="main" 
-        sx={{ 
-          flexGrow: 1, 
-          ml: '280px', 
-          minHeight: '100vh',
-          bgcolor: 'background.default',
-          position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: (theme) => theme.palette.mode === 'dark'
-              ? `
-                radial-gradient(circle at 25% 25%, rgba(129, 140, 248, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.05) 0%, transparent 50%)
-              `
-              : `
-                radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%)
-              `,
-            pointerEvents: 'none',
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: (theme) => theme.palette.mode === 'dark'
-              ? `
-                linear-gradient(45deg, transparent 49%, rgba(129, 140, 248, 0.02) 50%, transparent 51%),
-                linear-gradient(-45deg, transparent 49%, rgba(244, 114, 182, 0.02) 50%, transparent 51%)
-              `
-              : `
+    <div className="flex">
+      <TailwindSidebar />
+      <main className="flex-grow ml-[280px] min-h-screen bg-background relative">
+        {/* Background Effects */}
+        <div className="absolute inset-0 opacity-30 pointer-events-none">
+          <div className="absolute inset-0" style={{
+            background: `
+              radial-gradient(circle at 25% 25%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%)
+            `
+          }} />
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: `
                 linear-gradient(45deg, transparent 49%, rgba(79, 70, 229, 0.01) 50%, transparent 51%),
                 linear-gradient(-45deg, transparent 49%, rgba(236, 72, 153, 0.01) 50%, transparent 51%)
               `,
-            backgroundSize: '60px 60px',
-            pointerEvents: 'none',
-            opacity: 0.3,
-          },
-        }}
-      >
-        <Box sx={{ position: 'relative', zIndex: 1 }}>
+              backgroundSize: '60px 60px'
+            }}
+          />
+        </div>
+        <div className="relative z-10">
           {children}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </main>
+    </div>
   );
 }
 
@@ -281,8 +251,8 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
-      <Route path="/problems" element={<AppLayout><ProblemsPage /></AppLayout>} />
+      <Route path="/dashboard" element={<AppLayout><TailwindDashboardPage /></AppLayout>} />
+      <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
       <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
       <Route path="/rooms" element={<AppLayout><RoomsPage /></AppLayout>} />
       <Route path="/rooms/:code" element={<CollaborativeRoomPage />} />
