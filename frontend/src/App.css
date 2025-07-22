@@ -1,5 +1,8 @@
+/* Development-Centric Theme - Global Styles */
 .App {
   text-align: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 }
 
 .App-logo {
