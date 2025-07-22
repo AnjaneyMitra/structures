@@ -124,6 +124,38 @@ def run_code(submission: schemas.SubmissionCreate = Body(...), db: Session = Dep
     submission.sample_only = True
     return submit_code(submission, db, user)
 
+@router.post("/test")
+def test_run_code(data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+    """
+    Execute code directly for testing purposes (simple execution without test cases).
+    """
+    code = data.get("code", "")
+    language = data.get("language", "python")
+    simple_run = data.get("simple_run", False)
+    
+    if not simple_run:
+        raise HTTPException(status_code=400, detail="This endpoint only supports simple_run mode")
+    
+    try:
+        from ...code_runner.executor import CodeExecutor
+        executor = CodeExecutor(timeout=5, memory_limit_mb=128)
+        
+        # Simple run mode - just execute the code to see print output
+        input_data = ""  # No input for simple test runs
+        execution_result = executor.execute_python_code(code, input_data)
+        
+        result = {
+            "simple_execution": True,
+            "success": execution_result["success"],
+            "output": execution_result["output"],
+            "error": execution_result["error"],
+            "execution_time": execution_result["execution_time"]
+        }
+        
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
+
 @router.get("/problem/{problem_id}", response_model=list[schemas.SubmissionOut])
 def get_submissions(problem_id: int, db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
     """

@@ -72,9 +72,142 @@ const difficultyConfig: Record<string, any> = {
 };
 
 const languageOptions = [
-  { label: 'Python', value: 'python', monaco: 'python', defaultCode: '# Write your solution here\n\ndef solution():\n    # Your code here\n    pass\n\n# Read input and call solution\nif __name__ == "__main__":\n    result = solution()\n    print(result)\n' },
-  { label: 'JavaScript', value: 'javascript', monaco: 'javascript', defaultCode: '// Write your solution here\n\nfunction solution() {\n    // Your code here\n}\n\n// Read input and call solution\nconst result = solution();\nconsole.log(result);\n' },
+  { 
+    label: 'Python', 
+    value: 'python', 
+    monaco: 'python', 
+    defaultCode: `def solution():
+    # Write your solution here
+    # Make sure to return the result
+    pass
+` 
+  },
+  { 
+    label: 'JavaScript', 
+    value: 'javascript', 
+    monaco: 'javascript', 
+    defaultCode: `function solution() {
+    // Write your solution here
+    // Make sure to return the result
+}
+` 
+  },
 ];
+
+function stringToColor(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += ('00' + value.toString(16)).slice(-2);
+  }
+  return color;
+}
+
+function generateProblemTemplate(problemData: any, language: string): string {
+  if (!problemData) {
+    return languageOptions.find(l => l.value === language)?.defaultCode || '';
+  }
+
+  // Analyze problem title and description for better parameter naming
+  const title = problemData.title?.toLowerCase() || '';
+  const description = problemData.description?.toLowerCase() || '';
+  
+  let paramName = 'nums';
+  if (title.includes('array') || title.includes('list') || description.includes('array') || description.includes('list')) {
+    paramName = 'nums';
+  } else if (title.includes('string') || description.includes('string')) {
+    paramName = 's';
+  } else if (title.includes('tree') || description.includes('tree')) {
+    paramName = 'root';
+  } else if (title.includes('graph') || description.includes('node')) {
+    paramName = 'graph';
+  } else if (title.includes('matrix') || description.includes('matrix')) {
+    paramName = 'matrix';
+  }
+
+  if (language === 'python') {
+    let template = `def solution(${paramName}):\n`;
+    template += `    """\n`;
+    template += `    ${problemData.title || 'Problem'}\n`;
+    template += `    \n`;
+    template += `    Args:\n`;
+    template += `        ${paramName}: ${getParameterDescription(problemData, paramName)}\n`;
+    template += `    \n`;
+    template += `    Returns:\n`;
+    template += `        ${getReturnDescription(problemData)}\n`;
+    template += `    \n`;
+    template += `    Example:\n`;
+    if (problemData.sample_input && problemData.sample_output) {
+      template += `        Input: ${problemData.sample_input.replace(/\n/g, ', ')}\n`;
+      template += `        Output: ${problemData.sample_output}\n`;
+    }
+    template += `    """\n`;
+    template += `    # Write your solution here\n`;
+    template += `    \n`;
+    template += `    # TODO: Implement your solution\n`;
+    template += `    pass\n`;
+    
+    return template;
+  } else if (language === 'javascript') {
+    let template = `/**\n`;
+    template += ` * ${problemData.title || 'Problem'}\n`;
+    template += ` * \n`;
+    template += ` * @param {${getJSParameterType(problemData)}} ${paramName} - ${getParameterDescription(problemData, paramName)}\n`;
+    template += ` * @returns {${getJSReturnType(problemData)}} ${getReturnDescription(problemData)}\n`;
+    template += ` * \n`;
+    if (problemData.sample_input && problemData.sample_output) {
+      template += ` * Example:\n`;
+      template += ` * Input: ${problemData.sample_input.replace(/\n/g, ', ')}\n`;
+      template += ` * Output: ${problemData.sample_output}\n`;
+    }
+    template += ` */\n`;
+    template += `function solution(${paramName}) {\n`;
+    template += `    // Write your solution here\n`;
+    template += `    \n`;
+    template += `    // TODO: Implement your solution\n`;
+    template += `}\n`;
+    
+    return template;
+  }
+  
+  return languageOptions.find(l => l.value === language)?.defaultCode || '';
+}
+
+function getParameterDescription(problemData: any, paramName: string): string {
+  if (paramName === 'nums') return 'Array of numbers';
+  if (paramName === 's') return 'Input string';
+  if (paramName === 'root') return 'Root of the binary tree';
+  if (paramName === 'graph') return 'Graph representation';
+  if (paramName === 'matrix') return '2D matrix/array';
+  return 'Input parameter';
+}
+
+function getReturnDescription(problemData: any): string {
+  const output = problemData.sample_output?.toLowerCase() || '';
+  if (output.includes('[') || output.includes('array')) return 'Array result';
+  if (output === 'true' || output === 'false') return 'Boolean result';
+  if (!isNaN(Number(output))) return 'Numeric result';
+  return 'Result';
+}
+
+function getJSParameterType(problemData: any): string {
+  const input = problemData.sample_input?.toLowerCase() || '';
+  if (input.includes('[') || input.includes(',')) return 'number[]';
+  if (input.includes('"') || input.includes("'")) return 'string';
+  return 'any';
+}
+
+function getJSReturnType(problemData: any): string {
+  const output = problemData.sample_output?.toLowerCase() || '';
+  if (output.includes('[')) return 'number[]';
+  if (output === 'true' || output === 'false') return 'boolean';
+  if (!isNaN(Number(output))) return 'number';
+  return 'any';
+}
 
 const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,6 +223,7 @@ const ProblemDetailPage: React.FC = () => {
   const [running, setRunning] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [consoleOutput, setConsoleOutput] = useState<string>('');
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -98,6 +232,21 @@ const ProblemDetailPage: React.FC = () => {
       try {
         const res = await axios.get(`https://structures-production.up.railway.app/api/problems/${id}`);
         setProblem(res.data);
+        
+        // Initialize code with problem-specific template
+        const template = generateProblemTemplate(res.data, language);
+        setCode(template);
+        
+        // Show helpful message in console
+        setConsoleOutput(`Welcome to the problem editor! 
+
+📝 Your code editor has been initialized with a solution template.
+🔧 Modify the solution function to solve the problem.
+🏃 Use "Test Run" to see print output from your code.
+🎯 Use "Run Sample" to test against the sample input/output.
+✅ Use "Submit" to test against all test cases.
+
+Good luck! 🚀`);
       } catch (err) {
         setError('Failed to load problem.');
       } finally {
@@ -108,15 +257,21 @@ const ProblemDetailPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    // Reset code when language changes
-    const lang = languageOptions.find(l => l.value === language);
-    if (lang) setCode(lang.defaultCode);
-  }, [language]);
+    // Reset code when language changes with problem-specific template
+    if (problem) {
+      const template = generateProblemTemplate(problem, language);
+      setCode(template);
+    } else {
+      const lang = languageOptions.find(l => l.value === language);
+      if (lang) setCode(lang.defaultCode);
+    }
+  }, [language, problem]);
 
   const handleSubmit = async () => {
     setSubmitting(true);
     setSubmitError('');
     setResults(null);
+    setConsoleOutput('');
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
@@ -131,10 +286,69 @@ const ProblemDetailPage: React.FC = () => {
         }
       );
       setResults(res.data);
+      
+      // Show submission summary in console
+      const testResults = res.data.test_case_results || [];
+      const passedCount = testResults.filter((r: any) => r.passed).length;
+      const totalCount = testResults.length;
+      const overallStatus = res.data.overall_status || 'unknown';
+      
+      let summaryMessage = `Submission Complete!\n`;
+      summaryMessage += `Status: ${overallStatus.toUpperCase()}\n`;
+      summaryMessage += `Passed: ${passedCount}/${totalCount} test cases\n`;
+      summaryMessage += `Execution Time: ${res.data.execution_time?.toFixed(3) || '0.000'}s`;
+      
+      if (overallStatus === 'pass') {
+        summaryMessage += `\n🎉 All tests passed! Great job!`;
+      } else if (passedCount > 0) {
+        summaryMessage += `\n⚠️ Some tests failed. Check the results below.`;
+      } else {
+        summaryMessage += `\n❌ All tests failed. Review your solution.`;
+      }
+      
+      setConsoleOutput(summaryMessage);
     } catch (err: any) {
-      setSubmitError(err.response?.data?.detail || 'Submission failed');
+      const errorMsg = err.response?.data?.detail || 'Submission failed';
+      setSubmitError(errorMsg);
+      setConsoleOutput(`Submission Error: ${errorMsg}`);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleTestRun = async () => {
+    setRunning(true);
+    setRunResult(null);
+    setSubmitError('');
+    setConsoleOutput('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        `https://structures-production.up.railway.app/api/submissions/test`,
+        {
+          code,
+          language,
+          simple_run: true, // This will execute code directly to show print statements
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      // Handle simple execution result
+      if (res.data.simple_execution) {
+        if (res.data.success) {
+          setConsoleOutput(res.data.output || 'Code executed successfully (no output)');
+        } else {
+          setConsoleOutput(`Error: ${res.data.error || 'Execution failed'}`);
+        }
+      }
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.detail || 'Test run failed';
+      setSubmitError(errorMsg);
+      setConsoleOutput(`Error: ${errorMsg}`);
+    } finally {
+      setRunning(false);
     }
   };
 
@@ -142,6 +356,7 @@ const ProblemDetailPage: React.FC = () => {
     setRunning(true);
     setRunResult(null);
     setSubmitError('');
+    setConsoleOutput('');
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
@@ -158,9 +373,21 @@ const ProblemDetailPage: React.FC = () => {
       // Get the first test case result
       if (res.data.test_case_results && res.data.test_case_results.length > 0) {
         setRunResult(res.data.test_case_results[0]);
+        
+        // Set console output from the execution result
+        const result = res.data.test_case_results[0];
+        if (result) {
+          if (result.output) {
+            setConsoleOutput(result.output);
+          } else if (result.error) {
+            setConsoleOutput(`Error: ${result.error}`);
+          }
+        }
       }
     } catch (err: any) {
-      setSubmitError(err.response?.data?.detail || 'Run failed');
+      const errorMsg = err.response?.data?.detail || 'Run failed';
+      setSubmitError(errorMsg);
+      setConsoleOutput(`Error: ${errorMsg}`);
     } finally {
       setRunning(false);
     }
@@ -412,6 +639,22 @@ const ProblemDetailPage: React.FC = () => {
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
             </Stack>
+            
+            <Button
+              onClick={() => {
+                if (problem) {
+                  const template = generateProblemTemplate(problem, language);
+                  setCode(template);
+                }
+              }}
+              size="small"
+              sx={{
+                color: '#ffa726',
+                '&:hover': { bgcolor: 'rgba(255, 167, 38, 0.1)' }
+              }}
+            >
+              Reset Template
+            </Button>
           </Box>
 
           {/* Monaco Editor */}
@@ -465,6 +708,24 @@ const ProblemDetailPage: React.FC = () => {
                 <Button
                   variant="outlined"
                   startIcon={<PlayArrowIcon />}
+                  onClick={handleTestRun}
+                  disabled={running}
+                  size="small"
+                  sx={{
+                    borderColor: '#4a5568',
+                    color: '#a0aec0',
+                    '&:hover': {
+                      borderColor: '#ffa726',
+                      color: '#ffa726',
+                      bgcolor: 'rgba(255, 167, 38, 0.1)'
+                    }
+                  }}
+                >
+                  {running ? 'Testing...' : 'Test Run'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<PlayArrowIcon />}
                   onClick={handleRun}
                   disabled={running}
                   size="small"
@@ -478,7 +739,7 @@ const ProblemDetailPage: React.FC = () => {
                     }
                   }}
                 >
-                  {running ? 'Running...' : 'Run'}
+                  {running ? 'Running...' : 'Run Sample'}
                 </Button>
                 <Button
                   variant="contained"
@@ -498,6 +759,32 @@ const ProblemDetailPage: React.FC = () => {
             </Box>
             
             <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+              {/* Console Output */}
+              {consoleOutput && (
+                <Card sx={{
+                  mb: 2,
+                  bgcolor: '#2d3748',
+                  border: '1px solid #4a5568'
+                }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 1 }}>
+                      Console Output
+                    </Typography>
+                    <Typography variant="body2" sx={{
+                      fontFamily: 'JetBrains Mono, monospace',
+                      color: '#e2e8f0',
+                      bgcolor: '#1a1a1a',
+                      p: 1.5,
+                      borderRadius: 1,
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word'
+                    }}>
+                      {consoleOutput}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
+            
               {/* Run Result */}
               {runResult && (
                 <Card sx={{ 
