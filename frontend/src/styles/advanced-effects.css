@@ -1,18 +1,26 @@
 /* Advanced Visual Effects & Animations */
 
-/* CSS Custom Properties for Design System */
+/* CSS Custom Properties for Development-Centric Design System */
 :root {
-  /* Color System - Light Mode */
-  --color-primary: #4F46E5;
-  --color-primary-light: #818CF8;
-  --color-primary-dark: #3730A3;
-  --color-secondary: #EC4899;
-  --color-secondary-light: #F472B6;
-  --color-secondary-dark: #DB2777;
-  --color-background: #FAFBFC;
-  --color-surface: #FFFFFF;
-  --color-text: #1E293B;
-  --color-text-secondary: #64748B;
+  /* Development-Centric Color System */
+  --color-background: #f8f9fa;
+  --color-foreground: #0c0c1d;
+  --color-primary: #ff00c8;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f0f0ff;
+  --color-secondary-foreground: #0c0c1d;
+  --color-accent: #00ffcc;
+  --color-accent-foreground: #0c0c1d;
+  --color-card: #ffffff;
+  --color-card-foreground: #0c0c1d;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0c0c1d;
+  --color-muted: #f0f0ff;
+  --color-muted-foreground: #0c0c1d;
+  
+  /* Gradient definitions */
+  --gradient-primary: linear-gradient(135deg, #ff00c8 0%, #ff3366 100%);
+  --gradient-accent: linear-gradient(135deg, #00ffcc 0%, #00cc99 100%);
   
   /* Spacing Scale (8-point grid) */
   --space-xs: 0.5rem;

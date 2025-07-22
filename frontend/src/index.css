@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import './styles/animations.css';
 @import './styles/advanced-effects.css';
 
@@ -12,7 +16,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #FAFBFC;
+  background: #f8f9fa; /* Development-centric light background */
+  color: #0c0c1d; /* Dark foreground */
   line-height: 1.6;
 }
 
