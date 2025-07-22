@@ -13,9 +13,10 @@ class CodeExecutor:
         self.timeout = timeout
         self.memory_limit_mb = memory_limit_mb
     
-    def execute_python_code(self, code: str, input_data: str) -> Dict[str, Any]:
+    def execute_python_code(self, code: str, input_data: str = "") -> Dict[str, Any]:
         """
         Execute Python code with given input and return results.
+        This method executes code directly without function wrapping.
         
         Args:
             code: Python code to execute
@@ -25,6 +26,7 @@ class CodeExecutor:
             Dict containing execution results
         """
         start_time = time.time()
+        tmp_file_path = None
         
         try:
             # Create temporary file for the code
@@ -62,14 +64,14 @@ class CodeExecutor:
                     return {
                         'success': True,
                         'output': stdout.strip(),
-                        'error': None,
+                        'error': stderr.strip() if stderr.strip() else None,
                         'execution_time': execution_time,
                         'memory_usage': self._estimate_memory_usage(process.pid)
                     }
                 else:
                     return {
                         'success': False,
-                        'output': None,
+                        'output': stdout.strip() if stdout.strip() else None,
                         'error': stderr.strip() or 'Runtime error occurred',
                         'execution_time': execution_time,
                         'memory_usage': self._estimate_memory_usage(process.pid)
@@ -116,18 +118,25 @@ class CodeExecutor:
         start_time = time.time()
         tmp_file_path = None
         try:
-            # Prepare the wrapper code
+            # Prepare the wrapper code that captures both function output and print statements
             wrapper_code = f"""
 import sys
 import json
+
 {user_code}
 
 def parse_input(input_str):
-    # Try to parse as JSON, else split by lines/commas
+    # Try to parse as JSON first (handles lists, objects, etc.)
     try:
-        return json.loads(input_str)
+        parsed = json.loads(input_str)
+        # If it's a list, return it as a single argument (the list itself)
+        if isinstance(parsed, list):
+            return [parsed]
+        else:
+            return [parsed]
     except:
-        parts = [x.strip() for x in input_str.strip().replace('\r', '').replace('\n', ',').split(',') if x.strip()]
+        # If JSON parsing fails, try to parse as simple values
+        parts = [x.strip() for x in input_str.strip().replace('\\r', '').replace('\\n', ',').split(',') if x.strip()]
         # Try to convert to int/float if possible
         def try_num(x):
             try:
@@ -140,15 +149,30 @@ def parse_input(input_str):
         return [try_num(x) for x in parts]
 
 if __name__ == "__main__":
-    input_str = sys.stdin.read()
-    args = parse_input(input_str)
-    if not isinstance(args, list):
-        args = [args]
+    input_str = sys.stdin.read().strip()
+    if input_str:
+        args = parse_input(input_str)
+        if not isinstance(args, list):
+            args = [args]
+    else:
+        args = []
+    
     try:
         result = {function_name}(*args)
-        print(json.dumps(result))
-    except Exception as e:
-        print(f"__EXCEPTION__{{str(e)}}", file=sys.stderr)
+        
+        # Output the result directly
+        if result is not None:
+            if isinstance(result, (str, int, float, bool)):
+                print(result)
+            elif isinstance(result, (list, dict)):
+                print(json.dumps(result))
+            else:
+                print(str(result))
+        else:
+            print("")
+            
+    except Exception as error:
+        print("__EXCEPTION__" + str(error), file=sys.stderr)
         sys.exit(1)
 """
             # Write the wrapper code to a temp file
@@ -205,11 +229,11 @@ if __name__ == "__main__":
                     'execution_time': self.timeout,
                     'memory_usage': 0
                 }
-        except Exception as e:
+        except Exception as ex:
             return {
                 'success': False,
                 'output': None,
-                'error': f'Execution error: {str(e)}',
+                'error': f'Execution error: {str(ex)}',
                 'execution_time': time.time() - start_time,
                 'memory_usage': 0
             }
@@ -245,6 +269,34 @@ if __name__ == "__main__":
         if actual == expected:
             return True
         
+        # Handle multi-line outputs by comparing line by line
+        actual_lines = [line.strip() for line in actual.split('\n') if line.strip()]
+        expected_lines = [line.strip() for line in expected.split('\n') if line.strip()]
+        
+        # If both have same number of lines, compare each line
+        if len(actual_lines) == len(expected_lines):
+            all_match = True
+            for a_line, e_line in zip(actual_lines, expected_lines):
+                if not self._compare_single_output(a_line, e_line):
+                    all_match = False
+                    break
+            if all_match:
+                return True
+        
+        # Try comparing the last line (function return value) if there are print statements
+        if actual_lines and expected_lines:
+            if self._compare_single_output(actual_lines[-1], expected_lines[-1]):
+                return True
+        
+        # Fallback to single output comparison
+        return self._compare_single_output(actual, expected)
+    
+    def _compare_single_output(self, actual: str, expected: str) -> bool:
+        """Compare single line outputs with various type handling"""
+        # Direct comparison
+        if actual == expected:
+            return True
+        
         # Try to parse as JSON for array/list comparisons
         try:
             actual_json = json.loads(actual)
@@ -269,6 +321,16 @@ if __name__ == "__main__":
         }
         if actual in bool_map and expected in bool_map:
             return bool_map[actual] == bool_map[expected]
+        
+        # Handle list/array string representations
+        try:
+            # Remove brackets and spaces, then compare as comma-separated values
+            actual_clean = actual.replace('[', '').replace(']', '').replace(' ', '')
+            expected_clean = expected.replace('[', '').replace(']', '').replace(' ', '')
+            if actual_clean == expected_clean:
+                return True
+        except:
+            pass
         
         return False
     

@@ -163,6 +163,41 @@ const CollaborativeRoomPage: React.FC = () => {
         setOpenNotif(true);
       }
     });
+    socket.on('room_state_updated', (data: any) => {
+      if (data.room) {
+        setRoomData(data.room);
+        setRoomUsers(data.room.participants || []);
+      }
+      if (data.problem) {
+        setProblemData(data.problem);
+      }
+    });
+    socket.on('user_joined_room', (data: any) => {
+      if (data.room_code === roomCode && data.user) {
+        setRoomUsers(prev => {
+          const exists = prev.find(u => u.id === data.user.id);
+          if (!exists) {
+            return [...prev, data.user];
+          }
+          return prev;
+        });
+      }
+    });
+    // Listen for room state updates
+    socket.on('room_state_updated', (data: any) => {
+      if (data.room) {
+        setRoomData(data.room);
+        setRoomUsers(data.room.participants);
+        setUsers(data.room.participants.map((u: any) => u.username));
+      }
+    });
+    // Listen for user list updates
+    socket.on('user_list', (data: any) => {
+      if (data.users) {
+        setRoomUsers(data.users);
+        setUsers(data.users.map((u: any) => u.username));
+      }
+    });
     return () => {
       socket.emit('leave_room', { room: roomCode });
       socket.disconnect();
@@ -304,11 +339,48 @@ const CollaborativeRoomPage: React.FC = () => {
     }
   };
 
+  const handleTestRun = async () => {
+    setRunning(true);
+    setRunResult(null);
+    setSubmitError('');
+    setConsoleOutput('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        `https://structures-production.up.railway.app/api/rooms/${roomCode}/execute`,
+        {
+          code,
+          language,
+          simple_run: true, // This will execute code directly to show print statements
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      // Handle simple execution result
+      if (res.data.simple_execution) {
+        if (res.data.success) {
+          setConsoleOutput(res.data.output || 'Code executed successfully (no output)');
+        } else {
+          setConsoleOutput(`Error: ${res.data.error || 'Execution failed'}`);
+        }
+      }
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.detail || 'Test run failed';
+      setSubmitError(errorMsg);
+      setConsoleOutput(`Error: ${errorMsg}`);
+    } finally {
+      setRunning(false);
+    }
+  };
+
   const handleRun = async (share: boolean = false) => {
     if (share) setSharingRun(true);
     else setRunning(true);
     setRunResult(null);
     setSubmitError('');
+    setConsoleOutput('');
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
@@ -325,6 +397,15 @@ const CollaborativeRoomPage: React.FC = () => {
       );
       const result = res.data.test_case_results ? res.data.test_case_results[0] : null;
       setRunResult(result);
+      
+      // Set console output from the execution result
+      if (result) {
+        if (result.output) {
+          setConsoleOutput(result.output);
+        } else if (result.error) {
+          setConsoleOutput(`Error: ${result.error}`);
+        }
+      }
 
       // Emit socket event for real-time updates
       if (socketRef.current) {
@@ -332,11 +413,14 @@ const CollaborativeRoomPage: React.FC = () => {
           room: roomCode,
           result: res.data,
           sample_only: true,
-          shared: share
+          shared: share,
+          username: username
         });
       }
     } catch (err: any) {
-      setSubmitError(err.response?.data?.detail || 'Run failed');
+      const errorMsg = err.response?.data?.detail || 'Run failed';
+      setSubmitError(errorMsg);
+      setConsoleOutput(`Error: ${errorMsg}`);
     } finally {
       if (share) setSharingRun(false);
       else setRunning(false);
@@ -347,6 +431,7 @@ const CollaborativeRoomPage: React.FC = () => {
     setSubmitting(true);
     setSubmitError('');
     setResults(null);
+    setConsoleOutput('');
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
@@ -359,18 +444,43 @@ const CollaborativeRoomPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setResults(res.data.test_case_results || []);
+      
+      const testResults = res.data.test_case_results || [];
+      setResults(testResults);
+      
+      // Show submission summary in console
+      const passedCount = testResults.filter((r: any) => r.passed).length;
+      const totalCount = testResults.length;
+      const overallStatus = res.data.overall_status || 'unknown';
+      
+      let summaryMessage = `Submission Complete!\n`;
+      summaryMessage += `Status: ${overallStatus.toUpperCase()}\n`;
+      summaryMessage += `Passed: ${passedCount}/${totalCount} test cases\n`;
+      summaryMessage += `Execution Time: ${res.data.total_execution_time?.toFixed(3) || '0.000'}s`;
+      
+      if (overallStatus === 'pass') {
+        summaryMessage += `\n🎉 All tests passed! Great job!`;
+      } else if (passedCount > 0) {
+        summaryMessage += `\n⚠️ Some tests failed. Check the results below.`;
+      } else {
+        summaryMessage += `\n❌ All tests failed. Review your solution.`;
+      }
+      
+      setConsoleOutput(summaryMessage);
 
       // Emit socket event for real-time updates
       if (socketRef.current) {
         socketRef.current.emit('code_submitted', {
           room: roomCode,
           result: res.data,
-          passed: res.data.overall_status === 'pass'
+          passed: overallStatus === 'pass',
+          username: username
         });
       }
     } catch (err: any) {
-      setSubmitError(err.response?.data?.detail || 'Submission failed');
+      const errorMsg = err.response?.data?.detail || 'Submission failed';
+      setSubmitError(errorMsg);
+      setConsoleOutput(`Submission Error: ${errorMsg}`);
     } finally {
       setSubmitting(false);
     }
@@ -911,6 +1021,24 @@ const CollaborativeRoomPage: React.FC = () => {
                 <Button
                   variant="outlined"
                   startIcon={<PlayArrowIcon />}
+                  onClick={() => handleTestRun()}
+                  disabled={running}
+                  size="small"
+                  sx={{
+                    borderColor: '#4a5568',
+                    color: '#a0aec0',
+                    '&:hover': {
+                      borderColor: '#ffa726',
+                      color: '#ffa726',
+                      bgcolor: 'rgba(255, 167, 38, 0.1)'
+                    }
+                  }}
+                >
+                  {running ? 'Testing...' : 'Test Run'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<PlayArrowIcon />}
                   onClick={() => handleRun()}
                   disabled={running}
                   size="small"
@@ -924,7 +1052,7 @@ const CollaborativeRoomPage: React.FC = () => {
                     }
                   }}
                 >
-                  {running ? 'Running...' : 'Run'}
+                  {running ? 'Running...' : 'Run Sample'}
                 </Button>
                 <Button
                   variant="contained"
@@ -944,6 +1072,32 @@ const CollaborativeRoomPage: React.FC = () => {
             </Box>
 
             <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+              {/* Console Output */}
+              {consoleOutput && (
+                <Card sx={{
+                  mb: 2,
+                  bgcolor: '#2d3748',
+                  border: '1px solid #4a5568'
+                }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#00d4aa', mb: 1 }}>
+                      Console Output
+                    </Typography>
+                    <Typography variant="body2" sx={{
+                      fontFamily: 'JetBrains Mono, monospace',
+                      color: '#e2e8f0',
+                      bgcolor: '#1a1a1a',
+                      p: 1.5,
+                      borderRadius: 1,
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word'
+                    }}>
+                      {consoleOutput}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Run Result */}
               {runResult && (
                 <Card sx={{
@@ -963,7 +1117,7 @@ const CollaborativeRoomPage: React.FC = () => {
                         {runResult.passed ? 'Test Passed' : 'Test Failed'}
                       </Typography>
                       <Chip
-                        label={runResult.runtime}
+                        label={`${runResult.execution_time?.toFixed(3) || '0.000'}s`}
                         size="small"
                         sx={{
                           bgcolor: '#2d3748',
@@ -1005,7 +1159,7 @@ const CollaborativeRoomPage: React.FC = () => {
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
-                          Output:
+                          Actual Output:
                         </Typography>
                         <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
@@ -1015,9 +1169,26 @@ const CollaborativeRoomPage: React.FC = () => {
                           borderRadius: 1,
                           mt: 0.5
                         }}>
-                          {runResult.output}
+                          {runResult.output || 'No output'}
                         </Typography>
                       </Box>
+                      {runResult.error && (
+                        <Box>
+                          <Typography variant="caption" sx={{ color: '#ff6b6b', fontWeight: 600 }}>
+                            Error:
+                          </Typography>
+                          <Typography variant="body2" sx={{
+                            fontFamily: 'JetBrains Mono, monospace',
+                            color: '#ff6b6b',
+                            bgcolor: '#2d3748',
+                            p: 1,
+                            borderRadius: 1,
+                            mt: 0.5
+                          }}>
+                            {runResult.error}
+                          </Typography>
+                        </Box>
+                      )}
                     </Stack>
                   </CardContent>
                 </Card>
@@ -1058,16 +1229,40 @@ const CollaborativeRoomPage: React.FC = () => {
                             />
                           </Stack>
                           {!r.passed && (
-                            <Typography variant="caption" sx={{
-                              color: '#e2e8f0',
-                              fontFamily: 'JetBrains Mono, monospace',
-                              display: 'block',
-                              bgcolor: '#2d3748',
-                              p: 1,
-                              borderRadius: 1
-                            }}>
-                              Expected: {r.expected} | Got: {r.output}
-                            </Typography>
+                            <Stack spacing={1} sx={{ mt: 1 }}>
+                              <Typography variant="caption" sx={{
+                                color: '#e2e8f0',
+                                fontFamily: 'JetBrains Mono, monospace',
+                                display: 'block',
+                                bgcolor: '#2d3748',
+                                p: 1,
+                                borderRadius: 1
+                              }}>
+                                Expected: {r.expected}
+                              </Typography>
+                              <Typography variant="caption" sx={{
+                                color: '#ff6b6b',
+                                fontFamily: 'JetBrains Mono, monospace',
+                                display: 'block',
+                                bgcolor: '#2d3748',
+                                p: 1,
+                                borderRadius: 1
+                              }}>
+                                Got: {r.output || 'No output'}
+                              </Typography>
+                              {r.error && (
+                                <Typography variant="caption" sx={{
+                                  color: '#ff6b6b',
+                                  fontFamily: 'JetBrains Mono, monospace',
+                                  display: 'block',
+                                  bgcolor: '#2d3748',
+                                  p: 1,
+                                  borderRadius: 1
+                                }}>
+                                  Error: {r.error}
+                                </Typography>
+                              )}
+                            </Stack>
                           )}
                         </CardContent>
                       </Card>

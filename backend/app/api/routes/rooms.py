@@ -12,7 +12,7 @@ def generate_room_code(length=6):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 @router.post("/", response_model=schemas.RoomOut)
-def create_room(room: schemas.RoomCreate, db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+async def create_room(room: schemas.RoomCreate, db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
     code = generate_room_code()
     while db.query(models.Room).filter(models.Room.code == code).first():
         code = generate_room_code()
@@ -21,19 +21,40 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(deps.get_db), us
     db.add(new_room)
     db.commit()
     db.refresh(new_room)
+    
+    # Emit room creation event
+    await sio.emit("room_created", {
+        "room": {
+            "id": new_room.id,
+            "code": new_room.code,
+            "problem_id": new_room.problem_id,
+            "created_at": new_room.created_at.isoformat() if new_room.created_at else None,
+            "participants": [{"id": user.id, "username": user.username}]
+        }
+    })
+    
     return new_room
 
 @router.post("/join/", response_model=schemas.RoomOut)
-def join_room(data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+async def join_room(data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
     code = data.get("code")
     if not code:
         raise HTTPException(status_code=422, detail="Room code is required")
     room = db.query(models.Room).options(joinedload(models.Room.participants)).filter(models.Room.code == code).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
-    if user not in room.participants:
+    
+    user_was_new = user not in room.participants
+    if user_was_new:
         room.participants.append(user)
         db.commit()
+        
+        # Emit user joined event to room
+        await sio.emit("user_joined_room", {
+            "room_code": code,
+            "user": {"id": user.id, "username": user.username}
+        }, room=code)
+    
     db.refresh(room)
     return room
 
@@ -79,38 +100,57 @@ async def execute_code_in_room(room_code: str, data: dict = Body(...), db: Sessi
     problem = db.query(Problem).filter(Problem.id == room.problem_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
+    
     code = data.get("code", "")
     language = data.get("language", "python")
     sample_only = data.get("sample_only", True)
     share_run_output = data.get("share_run_output", False)
+    simple_run = data.get("simple_run", False)  # New parameter for simple execution
+    
     try:
         executor = CodeExecutor(timeout=5, memory_limit_mb=128)
-        if sample_only and problem.sample_input and problem.sample_output:
-            test_case_data = [{
-                'input': problem.sample_input,
-                'output': problem.sample_output
-            }]
-            execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
-            execution_result = execution_results
+        
+        # Simple run mode - just execute the code to see print output
+        if simple_run:
+            input_data = problem.sample_input if problem.sample_input else ""
+            execution_result = executor.execute_python_code(code, input_data)
+            result = {
+                "simple_execution": True,
+                "success": execution_result["success"],
+                "output": execution_result["output"],
+                "error": execution_result["error"],
+                "execution_time": execution_result["execution_time"]
+            }
         else:
-            test_cases = problem.test_cases
-            test_case_data = []
-            for tc in test_cases:
-                test_case_data.append({
-                    'input': tc.input,
-                    'output': tc.output
-                })
-            execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
-            execution_result = execution_results
+            # Test case execution mode
+            if sample_only and problem.sample_input and problem.sample_output:
+                test_case_data = [{
+                    'input': problem.sample_input,
+                    'output': problem.sample_output
+                }]
+                execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
+                result = execution_results
+            else:
+                test_cases = problem.test_cases
+                test_case_data = []
+                for tc in test_cases:
+                    test_case_data.append({
+                        'input': tc.input,
+                        'output': tc.output
+                    })
+                execution_results = executor.run_all_test_cases(code, test_case_data, function_name='solution')
+                result = execution_results
+        
         # Emit run output to all users if share_run_output is true
         if share_run_output:
             await sio.emit("run_output_shared", {
                 "room": room_code,
                 "user_id": user.id,
                 "username": user.username,
-                "result": execution_result
+                "result": result
             }, room=room_code)
-        return execution_result
+        
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
 

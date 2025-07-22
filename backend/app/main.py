@@ -72,8 +72,9 @@ async def join_room(sid, data):
         usernames[sid] = username
     await sio.enter_room(sid, room)
     await sio.emit("user_joined", {"sid": sid, "username": username}, room=room)
-    # Emit updated user list
+    # Emit updated user list and room state
     await emit_user_list(room)
+    await emit_room_state(room)
 
 @sio.event
 async def leave_room(sid, data):
@@ -97,6 +98,51 @@ async def emit_user_list(room_code):
         db.close()
     await sio.emit("user_list", {"users": users}, room=room_code)
 
+async def emit_room_state(room_code):
+    # Query DB for complete room state
+    db = SessionLocal()
+    try:
+        from app.db.models import Room, Problem
+        room = db.query(Room).filter(Room.code == room_code).first()
+        if room:
+            problem = db.query(Problem).filter(Problem.id == room.problem_id).first()
+            room_state = {
+                "room": {
+                    "id": room.id,
+                    "code": room.code,
+                    "problem_id": room.problem_id,
+                    "created_at": room.created_at.isoformat() if room.created_at else None,
+                    "participants": [{"id": u.id, "username": u.username} for u in room.participants]
+                },
+                "problem": {
+                    "id": problem.id,
+                    "title": problem.title,
+                    "description": problem.description,
+                    "difficulty": problem.difficulty,
+                    "sample_input": problem.sample_input,
+                    "sample_output": problem.sample_output
+                } if problem else None
+            }
+            await sio.emit("room_state_updated", room_state, room=room_code)
+    finally:
+        db.close()
+
+async def emit_room_state(room_code):
+    # Query DB for current room state
+    db = SessionLocal()
+    try:
+        room = db.query(Room).filter(Room.code == room_code).first()
+        if room:
+            room_data = {
+                "id": room.id,
+                "code": room.code,
+                "problem_id": room.problem_id,
+                "participants": [{"id": u.id, "username": u.username} for u in room.participants]
+            }
+            await sio.emit("room_state_updated", {"room": room_data}, room=room_code)
+    finally:
+        db.close()
+
 @sio.event
 async def get_user_list(sid, data):
     room = data.get("room")
@@ -106,7 +152,8 @@ async def get_user_list(sid, data):
 async def code_update(sid, data):
     room = data.get("room")
     code = data.get("code")
-    await sio.emit("code_update", {"sid": sid, "code": code}, room=room, skip_sid=sid)
+    username = data.get("username") or usernames.get(sid)
+    await sio.emit("code_update", {"sid": sid, "code": code, "username": username}, room=room, skip_sid=sid)
 
 @sio.event
 async def chat_message(sid, data):

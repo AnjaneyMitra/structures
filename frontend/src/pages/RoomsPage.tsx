@@ -68,10 +68,17 @@ const RoomsPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://structures-production.up.railway.app/api/rooms/join/', { code: joinCode }, {
+      const response = await axios.post('https://structures-production.up.railway.app/api/rooms/join/', { code: joinCode }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      window.location.reload();
+      // Refresh rooms list
+      const roomsRes = await axios.get('https://structures-production.up.railway.app/api/rooms/', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRooms(roomsRes.data);
+      setJoinCode('');
+      // Navigate to the joined room
+      navigate(`/rooms/${response.data.code}`);
     } catch (err) {
       setError('Failed to join room.');
     } finally {
@@ -87,6 +94,11 @@ const RoomsPage: React.FC = () => {
       const res = await axios.post('https://structures-production.up.railway.app/api/rooms/', { problem_id: selectedProblem }, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Refresh rooms list
+      const roomsRes = await axios.get('https://structures-production.up.railway.app/api/rooms/', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRooms(roomsRes.data);
       setCreating(false);
       setCreateOpen(false);
       setSelectedProblem('');
