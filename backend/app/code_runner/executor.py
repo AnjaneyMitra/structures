@@ -136,17 +136,43 @@ def parse_input(input_str):
             return [parsed]
     except:
         # If JSON parsing fails, try to parse as simple values
-        parts = [x.strip() for x in input_str.strip().replace('\\r', '').replace('\\n', ',').split(',') if x.strip()]
-        # Try to convert to int/float if possible
-        def try_num(x):
-            try:
-                return int(x)
-            except:
+        lines = [line.strip() for line in input_str.strip().split('\\n') if line.strip()]
+        if len(lines) == 1:
+            # Single line input - could be space-separated or single value
+            parts = [x.strip() for x in lines[0].split() if x.strip()]
+            if len(parts) == 1:
+                # Single value
+                def try_num(x):
+                    try:
+                        return int(x)
+                    except:
+                        try:
+                            return float(x)
+                        except:
+                            return x
+                return [try_num(parts[0])]
+            else:
+                # Multiple space-separated values - return as list
+                def try_num(x):
+                    try:
+                        return int(x)
+                    except:
+                        try:
+                            return float(x)
+                        except:
+                            return x
+                return [[try_num(x) for x in parts]]
+        else:
+            # Multiple lines - each line is a separate argument
+            def try_num(x):
                 try:
-                    return float(x)
+                    return int(x)
                 except:
-                    return x
-        return [try_num(x) for x in parts]
+                    try:
+                        return float(x)
+                    except:
+                        return x
+            return [try_num(line) for line in lines]
 
 if __name__ == "__main__":
     input_str = sys.stdin.read().strip()
@@ -158,6 +184,11 @@ if __name__ == "__main__":
         args = []
     
     try:
+        # Check if the function exists
+        if '{function_name}' not in globals():
+            print("__EXCEPTION__Function '{function_name}' is not defined. Make sure you have a function named '{function_name}' in your code.", file=sys.stderr)
+            sys.exit(1)
+            
         result = {function_name}(*args)
         
         # Output the result directly
@@ -171,6 +202,12 @@ if __name__ == "__main__":
         else:
             print("")
             
+    except TypeError as error:
+        if "takes" in str(error) and "positional argument" in str(error):
+            print("__EXCEPTION__Function signature mismatch. Check that your solution function accepts the correct number of parameters for the given input.", file=sys.stderr)
+        else:
+            print("__EXCEPTION__" + str(error), file=sys.stderr)
+        sys.exit(1)
     except Exception as error:
         print("__EXCEPTION__" + str(error), file=sys.stderr)
         sys.exit(1)

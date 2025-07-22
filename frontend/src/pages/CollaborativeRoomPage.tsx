@@ -29,8 +29,26 @@ import MuiAlert from '@mui/material/Alert';
 const SOCKET_URL = 'https://structures-production.up.railway.app';
 
 const languageOptions = [
-  { label: 'Python', value: 'python', monaco: 'python', defaultCode: '# Write your solution here\n' },
-  { label: 'JavaScript', value: 'javascript', monaco: 'javascript', defaultCode: '// Write your solution here\n' },
+  { 
+    label: 'Python', 
+    value: 'python', 
+    monaco: 'python', 
+    defaultCode: `def solution():
+    # Write your solution here
+    # Make sure to return the result
+    pass
+` 
+  },
+  { 
+    label: 'JavaScript', 
+    value: 'javascript', 
+    monaco: 'javascript', 
+    defaultCode: `function solution() {
+    // Write your solution here
+    // Make sure to return the result
+}
+` 
+  },
 ];
 
 // Define chat message type
@@ -53,10 +71,112 @@ function stringToColor(str: string) {
   return color;
 }
 
+function generateProblemTemplate(problemData: any, language: string): string {
+  if (!problemData) {
+    return languageOptions.find(l => l.value === language)?.defaultCode || '';
+  }
+
+  // Analyze problem title and description for better parameter naming
+  const title = problemData.title?.toLowerCase() || '';
+  const description = problemData.description?.toLowerCase() || '';
+  
+  let paramName = 'nums';
+  if (title.includes('array') || title.includes('list') || description.includes('array') || description.includes('list')) {
+    paramName = 'nums';
+  } else if (title.includes('string') || description.includes('string')) {
+    paramName = 's';
+  } else if (title.includes('tree') || description.includes('tree')) {
+    paramName = 'root';
+  } else if (title.includes('graph') || description.includes('node')) {
+    paramName = 'graph';
+  } else if (title.includes('matrix') || description.includes('matrix')) {
+    paramName = 'matrix';
+  }
+
+  if (language === 'python') {
+    let template = `def solution(${paramName}):\n`;
+    template += `    """\n`;
+    template += `    ${problemData.title || 'Problem'}\n`;
+    template += `    \n`;
+    template += `    Args:\n`;
+    template += `        ${paramName}: ${getParameterDescription(problemData, paramName)}\n`;
+    template += `    \n`;
+    template += `    Returns:\n`;
+    template += `        ${getReturnDescription(problemData)}\n`;
+    template += `    \n`;
+    template += `    Example:\n`;
+    if (problemData.sample_input && problemData.sample_output) {
+      template += `        Input: ${problemData.sample_input.replace(/\n/g, ', ')}\n`;
+      template += `        Output: ${problemData.sample_output}\n`;
+    }
+    template += `    """\n`;
+    template += `    # Write your solution here\n`;
+    template += `    \n`;
+    template += `    # TODO: Implement your solution\n`;
+    template += `    pass\n`;
+    
+    return template;
+  } else if (language === 'javascript') {
+    let template = `/**\n`;
+    template += ` * ${problemData.title || 'Problem'}\n`;
+    template += ` * \n`;
+    template += ` * @param {${getJSParameterType(problemData)}} ${paramName} - ${getParameterDescription(problemData, paramName)}\n`;
+    template += ` * @returns {${getJSReturnType(problemData)}} ${getReturnDescription(problemData)}\n`;
+    template += ` * \n`;
+    if (problemData.sample_input && problemData.sample_output) {
+      template += ` * Example:\n`;
+      template += ` * Input: ${problemData.sample_input.replace(/\n/g, ', ')}\n`;
+      template += ` * Output: ${problemData.sample_output}\n`;
+    }
+    template += ` */\n`;
+    template += `function solution(${paramName}) {\n`;
+    template += `    // Write your solution here\n`;
+    template += `    \n`;
+    template += `    // TODO: Implement your solution\n`;
+    template += `}\n`;
+    
+    return template;
+  }
+  
+  return languageOptions.find(l => l.value === language)?.defaultCode || '';
+}
+
+function getParameterDescription(problemData: any, paramName: string): string {
+  if (paramName === 'nums') return 'Array of numbers';
+  if (paramName === 's') return 'Input string';
+  if (paramName === 'root') return 'Root of the binary tree';
+  if (paramName === 'graph') return 'Graph representation';
+  if (paramName === 'matrix') return '2D matrix/array';
+  return 'Input parameter';
+}
+
+function getReturnDescription(problemData: any): string {
+  const output = problemData.sample_output?.toLowerCase() || '';
+  if (output.includes('[') || output.includes('array')) return 'Array result';
+  if (output === 'true' || output === 'false') return 'Boolean result';
+  if (!isNaN(Number(output))) return 'Numeric result';
+  return 'Result';
+}
+
+function getJSParameterType(problemData: any): string {
+  const input = problemData.sample_input?.toLowerCase() || '';
+  if (input.includes('[') || input.includes(',')) return 'number[]';
+  if (input.includes('"') || input.includes("'")) return 'string';
+  return 'any';
+}
+
+function getJSReturnType(problemData: any): string {
+  const output = problemData.sample_output?.toLowerCase() || '';
+  if (output.includes('[')) return 'number[]';
+  if (output === 'true' || output === 'false') return 'boolean';
+  if (!isNaN(Number(output))) return 'number';
+  return 'any';
+}
+
 const CollaborativeRoomPage: React.FC = () => {
   const { code: roomCode, id: problemId } = useParams<{ code: string; id?: string }>();
   const navigate = useNavigate();
-  const [code, setCode] = useState(languageOptions[0].defaultCode);
+  const [code, setCode] = useState('');
   const [language, setLanguage] = useState(languageOptions[0].value);
   const [connected, setConnected] = useState(false);
   const [users, setUsers] = useState<string[]>([]);
@@ -241,6 +361,23 @@ const CollaborativeRoomPage: React.FC = () => {
               headers: { Authorization: `Bearer ${token}` },
             });
             setProblemData(problemRes.data);
+            
+            // Initialize code with problem-specific template if code is empty
+            if (!code.trim()) {
+              const template = generateProblemTemplate(problemRes.data, language);
+              setCode(template);
+              
+              // Show helpful message in console
+              setConsoleOutput(`Welcome to the collaborative room! 
+
+📝 Your code editor has been initialized with a solution template.
+🔧 Modify the solution function to solve the problem.
+🏃 Use "Test Run" to see print output from your code.
+🎯 Use "Run Sample" to test against the sample input/output.
+✅ Use "Submit" to test against all test cases.
+
+Good luck! 🚀`);
+            }
           } catch (err) {
             console.error('Failed to fetch problem data:', err);
           }
@@ -334,6 +471,18 @@ const CollaborativeRoomPage: React.FC = () => {
 
   const handleLanguageChange = (val: string) => {
     setLanguage(val);
+    
+    // Generate new template for the selected language
+    if (problemData) {
+      const newTemplate = generateProblemTemplate(problemData, val);
+      setCode(newTemplate);
+      
+      // Emit the new code to other users
+      if (socketRef.current) {
+        socketRef.current.emit('code_update', { room: roomCode, code: newTemplate, username });
+      }
+    }
+    
     if (socketRef.current) {
       socketRef.current.emit('language_update', { room: roomCode, language: val });
     }
@@ -940,6 +1089,24 @@ const CollaborativeRoomPage: React.FC = () => {
             </Stack>
 
             <Stack direction="row" spacing={2}>
+              <Button
+                onClick={() => {
+                  if (problemData) {
+                    const template = generateProblemTemplate(problemData, language);
+                    setCode(template);
+                    if (socketRef.current) {
+                      socketRef.current.emit('code_update', { room: roomCode, code: template, username });
+                    }
+                  }
+                }}
+                size="small"
+                sx={{
+                  color: '#ffa726',
+                  '&:hover': { bgcolor: 'rgba(255, 167, 38, 0.1)' }
+                }}
+              >
+                Reset Template
+              </Button>
               <Button
                 onClick={handleUndo}
                 disabled={undoStack.length === 0}

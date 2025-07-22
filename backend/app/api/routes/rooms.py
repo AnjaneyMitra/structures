@@ -155,7 +155,7 @@ async def execute_code_in_room(room_code: str, data: dict = Body(...), db: Sessi
         raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
 
 @router.post("/{room_code}/submit")
-def submit_code_in_room(room_code: str, data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+async def submit_code_in_room(room_code: str, data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
     room = db.query(models.Room).options(joinedload(models.Room.participants)).filter(models.Room.code == room_code).first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -204,11 +204,10 @@ def submit_code_in_room(room_code: str, data: dict = Body(...), db: Session = De
             "execution_time": submission.execution_time
         }
         # Broadcast new submission to all users in the room
-        import asyncio
-        asyncio.create_task(sio.emit("room_submission", {
+        await sio.emit("room_submission", {
             "room": room_code,
             "submission": submission_result
-        }, room=room_code))
+        }, room=room_code)
         return submission_result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Submission failed: {str(e)}")
