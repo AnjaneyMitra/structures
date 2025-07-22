@@ -470,16 +470,16 @@ const CollaborativeRoomPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ 
-      height: '100vh', 
-      bgcolor: '#0a0a0a', 
+    <Box sx={{
+      height: '100vh',
+      bgcolor: '#0a0a0a',
       color: 'white',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
       {/* Header */}
-      <Box sx={{ 
+      <Box sx={{
         borderBottom: '1px solid #2d3748',
         px: 3,
         py: 2,
@@ -490,11 +490,11 @@ const CollaborativeRoomPage: React.FC = () => {
           <Typography variant="h5" fontWeight={700} sx={{ color: '#00d4aa' }}>
             Room {roomCode}
           </Typography>
-          <Chip 
-            label={connected ? 'Connected' : 'Disconnected'} 
+          <Chip
+            label={connected ? 'Connected' : 'Disconnected'}
             color={connected ? 'success' : 'error'}
             size="small"
-            sx={{ 
+            sx={{
               bgcolor: connected ? '#00d4aa' : '#ff6b6b',
               color: 'white',
               fontWeight: 600
@@ -504,10 +504,10 @@ const CollaborativeRoomPage: React.FC = () => {
             <PeopleIcon sx={{ color: '#a0aec0' }} />
           </Badge>
           {problemData && (
-            <Chip 
+            <Chip
               label={problemData.title}
-              sx={{ 
-                bgcolor: '#2d3748', 
+              sx={{
+                bgcolor: '#2d3748',
                 color: 'white',
                 fontWeight: 600,
                 maxWidth: 200
@@ -515,7 +515,7 @@ const CollaborativeRoomPage: React.FC = () => {
             />
           )}
           <Box sx={{ flexGrow: 1 }} />
-          
+
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
@@ -537,7 +537,7 @@ const CollaborativeRoomPage: React.FC = () => {
             size="small"
             value={language}
             onChange={e => handleLanguageChange(e.target.value)}
-            sx={{ 
+            sx={{
               minWidth: 120,
               '& .MuiOutlinedInput-root': {
                 bgcolor: '#2d3748',
@@ -562,7 +562,7 @@ const CollaborativeRoomPage: React.FC = () => {
       {/* Main Content */}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left Panel - Problem & Description */}
-        <Box sx={{ 
+        <Box sx={{
           width: sidebarOpen ? 400 : 0,
           transition: 'width 0.3s ease',
           borderRight: '1px solid #2d3748',
@@ -571,12 +571,12 @@ const CollaborativeRoomPage: React.FC = () => {
         }}>
           {sidebarOpen && (
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Tabs 
-                value={activeTab} 
+              <Tabs
+                value={activeTab}
                 onChange={(_, newValue) => setActiveTab(newValue)}
-                sx={{ 
+                sx={{
                   borderBottom: '1px solid #2d3748',
-                  '& .MuiTab-root': { 
+                  '& .MuiTab-root': {
                     color: '#a0aec0',
                     fontWeight: 600,
                     minHeight: 48
@@ -589,7 +589,7 @@ const CollaborativeRoomPage: React.FC = () => {
                 <Tab icon={<PeopleIcon />} label="Users" />
                 <Tab icon={<ChatIcon />} label="Chat" />
               </Tabs>
-              
+
               <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
                 {/* Problem Tab */}
                 {activeTab === 0 && problemData && (
@@ -598,22 +598,22 @@ const CollaborativeRoomPage: React.FC = () => {
                       <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 1 }}>
                         {problemData.title}
                       </Typography>
-                      <Chip 
+                      <Chip
                         label={problemData.difficulty}
                         size="small"
                         sx={{
-                          bgcolor: problemData.difficulty === 'Easy' ? '#00d4aa' : 
-                                  problemData.difficulty === 'Medium' ? '#ffa726' : '#ff6b6b',
+                          bgcolor: problemData.difficulty === 'Easy' ? '#00d4aa' :
+                            problemData.difficulty === 'Medium' ? '#ffa726' : '#ff6b6b',
                           color: 'white',
                           fontWeight: 600
                         }}
                       />
                     </Box>
-                    
+
                     <Typography variant="body2" sx={{ color: '#e2e8f0', lineHeight: 1.6 }}>
                       {problemData.description}
                     </Typography>
-                    
+
                     {problemData.sample_input && problemData.sample_output && (
                       <Card sx={{ bgcolor: '#2d3748', border: '1px solid #4a5568' }}>
                         <CardContent sx={{ p: 2 }}>
@@ -625,10 +625,10 @@ const CollaborativeRoomPage: React.FC = () => {
                               <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
                                 Input:
                               </Typography>
-                              <Paper sx={{ 
-                                p: 1.5, 
+                              <Paper sx={{
+                                p: 1.5,
                                 mt: 0.5,
-                                bgcolor: '#1a1a1a', 
+                                bgcolor: '#1a1a1a',
                                 border: '1px solid #4a5568',
                                 fontFamily: 'JetBrains Mono, monospace',
                                 fontSize: 13,
@@ -641,10 +641,10 @@ const CollaborativeRoomPage: React.FC = () => {
                               <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
                                 Output:
                               </Typography>
-                              <Paper sx={{ 
-                                p: 1.5, 
+                              <Paper sx={{
+                                p: 1.5,
                                 mt: 0.5,
-                                bgcolor: '#1a1a1a', 
+                                bgcolor: '#1a1a1a',
                                 border: '1px solid #4a5568',
                                 fontFamily: 'JetBrains Mono, monospace',
                                 fontSize: 13,
@@ -659,7 +659,7 @@ const CollaborativeRoomPage: React.FC = () => {
                     )}
                   </Stack>
                 )}
-                
+
                 {/* Users Tab */}
                 {activeTab === 1 && (
                   <Stack spacing={2}>
@@ -667,8 +667,8 @@ const CollaborativeRoomPage: React.FC = () => {
                       Room Participants ({Math.max(users.length, roomUsers.length)})
                     </Typography>
                     {roomUsers.map(u => (
-                      <Card key={u.id} sx={{ 
-                        bgcolor: '#2d3748', 
+                      <Card key={u.id} sx={{
+                        bgcolor: '#2d3748',
                         border: '1px solid #4a5568',
                         cursor: 'pointer',
                         transition: 'all 0.2s',
@@ -676,9 +676,9 @@ const CollaborativeRoomPage: React.FC = () => {
                       }}>
                         <CardContent sx={{ p: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar sx={{ 
-                              bgcolor: stringToColor(u.username), 
-                              width: 32, 
+                            <Avatar sx={{
+                              bgcolor: stringToColor(u.username),
+                              width: 32,
                               height: 32,
                               fontSize: 14,
                               fontWeight: 700
@@ -690,29 +690,29 @@ const CollaborativeRoomPage: React.FC = () => {
                                 {u.username === username ? `${u.username} (You)` : u.username}
                               </Typography>
                               <Stack direction="row" alignItems="center" spacing={1}>
-                                <FiberManualRecordIcon 
-                                  sx={{ 
-                                    fontSize: 8, 
-                                    color: users.includes(u.username) ? '#00d4aa' : '#6b7280' 
-                                  }} 
+                                <FiberManualRecordIcon
+                                  sx={{
+                                    fontSize: 8,
+                                    color: users.includes(u.username) ? '#00d4aa' : '#6b7280'
+                                  }}
                                 />
-                                <Typography variant="caption" sx={{ 
-                                  color: users.includes(u.username) ? '#00d4aa' : '#6b7280' 
+                                <Typography variant="caption" sx={{
+                                  color: users.includes(u.username) ? '#00d4aa' : '#6b7280'
                                 }}>
                                   {users.includes(u.username) ? 'Online' : 'Offline'}
                                 </Typography>
                               </Stack>
                             </Box>
                             {activeUser === u.username && (
-                              <Chip 
-                                label="Coding" 
-                                size="small" 
-                                sx={{ 
-                                  bgcolor: '#00d4aa', 
+                              <Chip
+                                label="Coding"
+                                size="small"
+                                sx={{
+                                  bgcolor: '#00d4aa',
                                   color: 'white',
                                   fontSize: 11,
                                   height: 20
-                                }} 
+                                }}
                               />
                             )}
                           </Stack>
@@ -721,16 +721,16 @@ const CollaborativeRoomPage: React.FC = () => {
                     ))}
                   </Stack>
                 )}
-                
+
                 {/* Chat Tab */}
                 {activeTab === 2 && (
                   <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="h6" fontWeight={700} sx={{ color: '#00d4aa', mb: 2 }}>
                       Team Chat
                     </Typography>
-                    <Box sx={{ 
-                      flex: 1, 
-                      overflowY: 'auto', 
+                    <Box sx={{
+                      flex: 1,
+                      overflowY: 'auto',
                       mb: 2,
                       bgcolor: '#2d3748',
                       borderRadius: 2,
@@ -740,9 +740,9 @@ const CollaborativeRoomPage: React.FC = () => {
                       {chatMessages.map((msg, idx) => (
                         <Box key={idx} sx={{ mb: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-                            <Avatar sx={{ 
-                              width: 20, 
-                              height: 20, 
+                            <Avatar sx={{
+                              width: 20,
+                              height: 20,
                               bgcolor: stringToColor(msg.username || msg.sid),
                               fontSize: 10
                             }}>
@@ -752,8 +752,8 @@ const CollaborativeRoomPage: React.FC = () => {
                               {msg.username || msg.sid}
                             </Typography>
                           </Stack>
-                          <Typography variant="body2" sx={{ 
-                            color: '#e2e8f0', 
+                          <Typography variant="body2" sx={{
+                            color: '#e2e8f0',
                             ml: 3,
                             wordBreak: 'break-word'
                           }}>
@@ -780,10 +780,10 @@ const CollaborativeRoomPage: React.FC = () => {
                           }
                         }}
                       />
-                      <IconButton 
-                        onClick={handleSendMessage} 
+                      <IconButton
+                        onClick={handleSendMessage}
                         disabled={!chatInput.trim()}
-                        sx={{ 
+                        sx={{
                           bgcolor: '#00d4aa',
                           color: 'white',
                           '&:hover': { bgcolor: '#00b894' },
@@ -803,7 +803,7 @@ const CollaborativeRoomPage: React.FC = () => {
         {/* Main Coding Area */}
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Code Editor Header */}
-          <Box sx={{ 
+          <Box sx={{
             borderBottom: '1px solid #2d3748',
             px: 3,
             py: 1.5,
@@ -816,7 +816,7 @@ const CollaborativeRoomPage: React.FC = () => {
               <Button
                 variant="text"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                sx={{ 
+                sx={{
                   color: '#a0aec0',
                   minWidth: 'auto',
                   p: 1
@@ -828,13 +828,13 @@ const CollaborativeRoomPage: React.FC = () => {
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
             </Stack>
-            
+
             <Stack direction="row" spacing={2}>
               <Button
                 onClick={handleUndo}
                 disabled={undoStack.length === 0}
                 size="small"
-                sx={{ 
+                sx={{
                   color: '#a0aec0',
                   '&:disabled': { color: '#4a5568' }
                 }}
@@ -845,7 +845,7 @@ const CollaborativeRoomPage: React.FC = () => {
                 onClick={handleRedo}
                 disabled={redoStack.length === 0}
                 size="small"
-                sx={{ 
+                sx={{
                   color: '#a0aec0',
                   '&:disabled': { color: '#4a5568' }
                 }}
@@ -889,14 +889,14 @@ const CollaborativeRoomPage: React.FC = () => {
           </Box>
 
           {/* Console/Output Area */}
-          <Box sx={{ 
+          <Box sx={{
             height: 200,
             borderTop: '1px solid #2d3748',
             bgcolor: '#1a1a1a',
             display: 'flex',
             flexDirection: 'column'
           }}>
-            <Box sx={{ 
+            <Box sx={{
               px: 3,
               py: 1.5,
               borderBottom: '1px solid #2d3748',
@@ -942,34 +942,34 @@ const CollaborativeRoomPage: React.FC = () => {
                 </Button>
               </Stack>
             </Box>
-            
+
             <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
               {/* Run Result */}
               {runResult && (
-                <Card sx={{ 
+                <Card sx={{
                   mb: 2,
                   bgcolor: runResult.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
                   border: `1px solid ${runResult.passed ? '#00d4aa' : '#ff6b6b'}`
                 }}>
                   <CardContent sx={{ p: 2 }}>
                     <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                      {runResult.passed ? 
-                        <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 20 }} /> : 
+                      {runResult.passed ?
+                        <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 20 }} /> :
                         <CancelIcon sx={{ color: '#ff6b6b', fontSize: 20 }} />
                       }
-                      <Typography variant="subtitle2" fontWeight={700} sx={{ 
-                        color: runResult.passed ? '#00d4aa' : '#ff6b6b' 
+                      <Typography variant="subtitle2" fontWeight={700} sx={{
+                        color: runResult.passed ? '#00d4aa' : '#ff6b6b'
                       }}>
                         {runResult.passed ? 'Test Passed' : 'Test Failed'}
                       </Typography>
-                      <Chip 
-                        label={runResult.runtime} 
-                        size="small" 
-                        sx={{ 
-                          bgcolor: '#2d3748', 
+                      <Chip
+                        label={runResult.runtime}
+                        size="small"
+                        sx={{
+                          bgcolor: '#2d3748',
                           color: '#a0aec0',
                           fontSize: 11
-                        }} 
+                        }}
                       />
                     </Stack>
                     <Stack spacing={1}>
@@ -977,7 +977,7 @@ const CollaborativeRoomPage: React.FC = () => {
                         <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
                           Input:
                         </Typography>
-                        <Typography variant="body2" sx={{ 
+                        <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
                           color: '#e2e8f0',
                           bgcolor: '#2d3748',
@@ -992,7 +992,7 @@ const CollaborativeRoomPage: React.FC = () => {
                         <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
                           Expected:
                         </Typography>
-                        <Typography variant="body2" sx={{ 
+                        <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
                           color: '#e2e8f0',
                           bgcolor: '#2d3748',
@@ -1007,7 +1007,7 @@ const CollaborativeRoomPage: React.FC = () => {
                         <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 600 }}>
                           Output:
                         </Typography>
-                        <Typography variant="body2" sx={{ 
+                        <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
                           color: runResult.passed ? '#00d4aa' : '#ff6b6b',
                           bgcolor: '#2d3748',
@@ -1031,34 +1031,34 @@ const CollaborativeRoomPage: React.FC = () => {
                   </Typography>
                   <Stack spacing={2}>
                     {results.map((r, i) => (
-                      <Card key={i} sx={{ 
+                      <Card key={i} sx={{
                         bgcolor: r.passed ? 'rgba(0, 212, 170, 0.1)' : 'rgba(255, 107, 107, 0.1)',
                         border: `1px solid ${r.passed ? '#00d4aa' : '#ff6b6b'}`
                       }}>
                         <CardContent sx={{ p: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                            {r.passed ? 
-                              <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 18 }} /> : 
+                            {r.passed ?
+                              <CheckCircleIcon sx={{ color: '#00d4aa', fontSize: 18 }} /> :
                               <CancelIcon sx={{ color: '#ff6b6b', fontSize: 18 }} />
                             }
-                            <Typography variant="body2" fontWeight={600} sx={{ 
-                              color: r.passed ? '#00d4aa' : '#ff6b6b' 
+                            <Typography variant="body2" fontWeight={600} sx={{
+                              color: r.passed ? '#00d4aa' : '#ff6b6b'
                             }}>
                               Test Case {i + 1}
                             </Typography>
-                            <Chip 
-                              label={r.runtime} 
-                              size="small" 
-                              sx={{ 
-                                bgcolor: '#2d3748', 
+                            <Chip
+                              label={r.runtime}
+                              size="small"
+                              sx={{
+                                bgcolor: '#2d3748',
                                 color: '#a0aec0',
                                 fontSize: 10,
                                 height: 20
-                              }} 
+                              }}
                             />
                           </Stack>
                           {!r.passed && (
-                            <Typography variant="caption" sx={{ 
+                            <Typography variant="caption" sx={{
                               color: '#e2e8f0',
                               fontFamily: 'JetBrains Mono, monospace',
                               display: 'block',
@@ -1078,9 +1078,9 @@ const CollaborativeRoomPage: React.FC = () => {
 
               {/* Error Messages */}
               {submitError && (
-                <Alert 
-                  severity="error" 
-                  sx={{ 
+                <Alert
+                  severity="error"
+                  sx={{
                     bgcolor: 'rgba(255, 107, 107, 0.1)',
                     border: '1px solid #ff6b6b',
                     color: '#ff6b6b',
@@ -1096,18 +1096,18 @@ const CollaborativeRoomPage: React.FC = () => {
       </Box>
 
       {/* Notifications */}
-      <Snackbar 
-        open={openNotif} 
-        autoHideDuration={3000} 
-        onClose={() => setOpenNotif(false)} 
+      <Snackbar
+        open={openNotif}
+        autoHideDuration={3000}
+        onClose={() => setOpenNotif(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MuiAlert 
-          elevation={6} 
-          variant="filled" 
-          onClose={() => setOpenNotif(false)} 
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={() => setOpenNotif(false)}
           severity="info"
-          sx={{ 
+          sx={{
             bgcolor: '#00d4aa',
             color: 'white'
           }}
@@ -1117,8 +1117,8 @@ const CollaborativeRoomPage: React.FC = () => {
       </Snackbar>
 
       {/* Exit Room Confirmation Dialog */}
-      <Dialog 
-        open={exitDialogOpen} 
+      <Dialog
+        open={exitDialogOpen}
         onClose={() => setExitDialogOpen(false)}
         PaperProps={{
           sx: {
@@ -1142,13 +1142,13 @@ const CollaborativeRoomPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions sx={{ borderTop: '1px solid #2d3748', pt: 2, px: 3, pb: 3 }}>
-          <Button 
+          <Button
             onClick={() => setExitDialogOpen(false)}
             sx={{ color: '#a0aec0', '&:hover': { bgcolor: '#2d3748' } }}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={() => {
               setExitDialogOpen(false);
               handleExitRoom();

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Box, Button, TextField, Typography, Stack, Alert, InputAdornment, 
-  Card, CardContent, Divider, CircularProgress
+  Card, CardContent, Divider, CircularProgress, ThemeProvider
 } from '@mui/material';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { authTheme } from '../theme';
 
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -65,10 +66,10 @@ const LoginPage: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <ThemeProvider theme={authTheme}>
       <Box sx={{ 
         minHeight: '100vh',
-        bgcolor: '#0a0a0a',
+        bgcolor: 'background.default',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -282,7 +283,7 @@ const LoginPage: React.FC = () => {
           © 2024 CodeLab. Built for developers, by developers.
         </Typography>
       </Box>
-    </>
+    </ThemeProvider>
   );
 };
 

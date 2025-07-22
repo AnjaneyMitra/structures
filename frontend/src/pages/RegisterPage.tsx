@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Box, Button, TextField, Typography, Stack, Alert, InputAdornment, 
-  Card, CardContent, Divider, CircularProgress
+  Card, CardContent, Divider, CircularProgress, ThemeProvider
 } from '@mui/material';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { authTheme } from '../theme';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -61,9 +62,10 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh',
-      bgcolor: '#0a0a0a',
+    <ThemeProvider theme={authTheme}>
+      <Box sx={{ 
+        minHeight: '100vh',
+        bgcolor: 'background.default',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -309,6 +311,7 @@ const RegisterPage: React.FC = () => {
         </Box>
       </Box>
     </Box>
+    </ThemeProvider>
   );
 };
 

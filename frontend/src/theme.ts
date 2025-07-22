@@ -1,6 +1,6 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 
-// Advanced Design System Theme following the comprehensive design guide
+// Modern Coding Platform Theme - HackerRank/LeetCode inspired
 const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
   const isLight = mode === 'light';
 
@@ -8,41 +8,41 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
     palette: {
       mode,
       primary: {
-        main: '#4F46E5', // Modern indigo for trust and professionalism
-        light: '#818CF8',
-        dark: '#3730A3',
+        main: '#00D4AA', // Teal green - modern coding platform color
+        light: '#26E5C7',
+        dark: '#00B894',
         contrastText: '#FFFFFF',
       },
       secondary: {
-        main: '#EC4899', // Vibrant pink for energy and creativity
-        light: '#F472B6',
-        dark: '#DB2777',
+        main: '#6366F1', // Modern indigo for secondary actions
+        light: '#818CF8',
+        dark: '#4F46E5',
         contrastText: '#FFFFFF',
       },
       background: {
-        default: isLight ? '#FAFBFC' : '#0A0A0F',
-        paper: isLight ? '#FFFFFF' : '#1A1A2E',
+        default: isLight ? '#FFFFFF' : '#0A0A0A',
+        paper: isLight ? '#FAFBFC' : '#1A1A1A',
       },
       text: {
-        primary: isLight ? '#1E293B' : '#F1F5F9',
-        secondary: isLight ? '#64748B' : '#94A3B8',
+        primary: isLight ? '#1E293B' : '#FFFFFF',
+        secondary: isLight ? '#64748B' : '#A0AEC0',
       },
       success: {
-        main: '#10B981',
-        light: '#34D399',
-        dark: '#059669',
+        main: '#00D4AA',
+        light: '#26E5C7',
+        dark: '#00B894',
         contrastText: '#FFFFFF',
       },
       error: {
-        main: '#EF4444',
-        light: '#F87171',
-        dark: '#DC2626',
+        main: '#FF6B6B',
+        light: '#FF8E8E',
+        dark: '#E53E3E',
         contrastText: '#FFFFFF',
       },
       warning: {
-        main: '#F59E0B',
-        light: '#FBBF24',
-        dark: '#D97706',
+        main: '#FFA726',
+        light: '#FFB74D',
+        dark: '#F57C00',
         contrastText: '#FFFFFF',
       },
       info: {
@@ -63,7 +63,39 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
         800: '#1E293B',
         900: '#0F172A',
       },
-      divider: isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(51, 65, 85, 0.8)',
+      divider: isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(45, 55, 72, 0.8)',
+      // Custom colors for coding platform
+      ...(isLight ? {
+        // Light mode colors
+        surface: {
+          main: '#FFFFFF',
+          secondary: '#F8F9FA',
+          tertiary: '#E2E8F0',
+        },
+        border: {
+          main: '#E2E8F0',
+          secondary: '#CBD5E1',
+        },
+        code: {
+          background: '#F8F9FA',
+          border: '#E2E8F0',
+        }
+      } : {
+        // Dark mode colors
+        surface: {
+          main: '#1A1A1A',
+          secondary: '#2D3748',
+          tertiary: '#4A5568',
+        },
+        border: {
+          main: '#2D3748',
+          secondary: '#4A5568',
+        },
+        code: {
+          background: '#1A1A1A',
+          border: '#2D3748',
+        }
+      }),
     },
     typography: {
       fontFamily: [
@@ -184,29 +216,29 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
           },
           contained: {
             background: isLight 
-              ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)'
-              : 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+              ? 'linear-gradient(135deg, #00D4AA 0%, #26E5C7 100%)'
+              : 'linear-gradient(135deg, #00D4AA 0%, #26E5C7 100%)',
             color: '#FFFFFF',
-            boxShadow: '0 4px 14px rgba(79, 70, 229, 0.25)',
+            boxShadow: '0 4px 14px rgba(0, 212, 170, 0.25)',
             '&:hover': {
               background: isLight 
-                ? 'linear-gradient(135deg, #3730A3 0%, #6D28D9 100%)'
-                : 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
-              boxShadow: '0 8px 25px rgba(79, 70, 229, 0.35)',
+                ? 'linear-gradient(135deg, #00B894 0%, #00D4AA 100%)'
+                : 'linear-gradient(135deg, #00B894 0%, #00D4AA 100%)',
+              boxShadow: '0 8px 25px rgba(0, 212, 170, 0.35)',
             },
             '&:active': {
               transform: 'translateY(0px)',
-              boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
+              boxShadow: '0 2px 8px rgba(0, 212, 170, 0.3)',
             },
           },
           outlined: {
-            borderColor: isLight ? 'rgba(79, 70, 229, 0.3)' : 'rgba(99, 102, 241, 0.4)',
-            color: isLight ? '#4F46E5' : '#818CF8',
+            borderColor: isLight ? 'rgba(0, 212, 170, 0.3)' : 'rgba(0, 212, 170, 0.4)',
+            color: isLight ? '#00B894' : '#00D4AA',
             borderWidth: '2px',
-            background: isLight ? 'rgba(79, 70, 229, 0.02)' : 'rgba(99, 102, 241, 0.05)',
+            background: isLight ? 'rgba(0, 212, 170, 0.02)' : 'rgba(0, 212, 170, 0.05)',
             '&:hover': {
-              borderColor: isLight ? '#4F46E5' : '#818CF8',
-              backgroundColor: isLight ? 'rgba(79, 70, 229, 0.08)' : 'rgba(99, 102, 241, 0.12)',
+              borderColor: isLight ? '#00D4AA' : '#26E5C7',
+              backgroundColor: isLight ? 'rgba(0, 212, 170, 0.08)' : 'rgba(0, 212, 170, 0.12)',
               borderWidth: '2px',
             },
           },
@@ -426,6 +458,142 @@ const createAdvancedTheme = (mode: 'light' | 'dark' = 'light') => {
   return createTheme(baseTheme);
 };
 
+// Create auth theme that's always dark
+export const createAuthTheme = () => {
+  return createTheme({
+    palette: {
+      mode: 'dark',
+      primary: {
+        main: '#00D4AA',
+        light: '#26E5C7',
+        dark: '#00B894',
+        contrastText: '#FFFFFF',
+      },
+      secondary: {
+        main: '#6366F1',
+        light: '#818CF8',
+        dark: '#4F46E5',
+        contrastText: '#FFFFFF',
+      },
+      background: {
+        default: '#0A0A0A',
+        paper: '#1A1A1A',
+      },
+      text: {
+        primary: '#FFFFFF',
+        secondary: '#A0AEC0',
+      },
+      success: {
+        main: '#00D4AA',
+        light: '#26E5C7',
+        dark: '#00B894',
+      },
+      error: {
+        main: '#FF6B6B',
+        light: '#FF8E8E',
+        dark: '#E53E3E',
+      },
+      warning: {
+        main: '#FFA726',
+        light: '#FFB74D',
+        dark: '#F57C00',
+      },
+      surface: {
+        main: '#1A1A1A',
+        secondary: '#2D3748',
+        tertiary: '#4A5568',
+      },
+      border: {
+        main: '#2D3748',
+        secondary: '#4A5568',
+      },
+    },
+    typography: {
+      fontFamily: [
+        'Inter',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        'Segoe UI',
+        'Roboto',
+        'sans-serif',
+      ].join(','),
+    },
+    shape: {
+      borderRadius: 12,
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+            textTransform: 'none',
+            fontWeight: 600,
+            transition: 'all 0.3s ease',
+          },
+          contained: {
+            background: 'linear-gradient(135deg, #00D4AA 0%, #26E5C7 100%)',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 14px rgba(0, 212, 170, 0.25)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #00B894 0%, #00D4AA 100%)',
+              boxShadow: '0 8px 25px rgba(0, 212, 170, 0.35)',
+              transform: 'translateY(-2px)',
+            },
+          },
+          outlined: {
+            borderColor: 'rgba(0, 212, 170, 0.4)',
+            color: '#00D4AA',
+            background: 'rgba(0, 212, 170, 0.05)',
+            '&:hover': {
+              borderColor: '#26E5C7',
+              backgroundColor: 'rgba(0, 212, 170, 0.12)',
+              transform: 'translateY(-1px)',
+            },
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: '#2D3748',
+              borderRadius: 12,
+              color: '#FFFFFF',
+              '& fieldset': {
+                borderColor: '#4A5568',
+              },
+              '&:hover fieldset': {
+                borderColor: '#00D4AA',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#00D4AA',
+                boxShadow: '0 0 0 3px rgba(0, 212, 170, 0.2)',
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: '#A0AEC0',
+              '&.Mui-focused': {
+                color: '#00D4AA',
+              },
+            },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#1A1A1A',
+            border: '1px solid #2D3748',
+            borderRadius: 16,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          },
+        },
+      },
+    },
+  });
+};
+
 const theme = createAdvancedTheme('light');
 export const darkTheme = createAdvancedTheme('dark');
+export const authTheme = createAuthTheme();
 export default theme;

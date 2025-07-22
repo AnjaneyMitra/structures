@@ -11,3 +11,4 @@ node_modules/
 .env.*.local
 .vscode/
 .idea/ 
+UI_REDESIGN_SUMMARY.md
