@@ -21,18 +21,23 @@
   --accent-hover: 0 0% 92.9412% / 0.1;
   --destructive: 9.8901 81.9820% 43.5294%;
   --destructive-foreground: 0 100% 99.4118%;
+  --destructive-bg: 9.8901 81.9820% 43.5294% / 0.1;
   --success: 151.3274 66.8639% 66.8627%;
   --success-foreground: 153.3333 13.0435% 13.5294%;
   --success-bg: 151.3274 66.8639% 66.8627% / 0.1;
-  --destructive-bg: 9.8901 81.9820% 43.5294% / 0.1;
   --border: 0 0% 87.4510%;
   --input: 0 0% 96.4706%;
   --ring: 151.3274 66.8639% 66.8627%;
+  --radius: 0.5rem;
+  
+  /* Chart colors */
   --chart-1: 151.3274 66.8639% 66.8627%;
   --chart-2: 217.2193 91.2195% 59.8039%;
   --chart-3: 258.3117 89.5349% 66.2745%;
   --chart-4: 37.6923 92.1260% 50.1961%;
   --chart-5: 160.1183 84.0796% 39.4118%;
+  
+  /* Sidebar colors */
   --sidebar: 0 0% 98.8235%;
   --sidebar-foreground: 0 0% 43.9216%;
   --sidebar-primary: 151.3274 66.8639% 66.8627%;
@@ -41,20 +46,6 @@
   --sidebar-accent-foreground: 0 0% 12.5490%;
   --sidebar-border: 0 0% 87.4510%;
   --sidebar-ring: 151.3274 66.8639% 66.8627%;
-  --font-sans: Outfit, sans-serif;
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: monospace;
-  --radius: 0.5rem;
-  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.09);
-  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.09);
-  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 1px 2px -1px hsl(0 0% 0% / 0.17);
-  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 1px 2px -1px hsl(0 0% 0% / 0.17);
-  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 2px 4px -1px hsl(0 0% 0% / 0.17);
-  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 4px 6px -1px hsl(0 0% 0% / 0.17);
-  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 8px 10px -1px hsl(0 0% 0% / 0.17);
-  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.43);
-  --tracking-normal: 0.025em;
-  --spacing: 0.25rem;
   
   /* Legacy variable mappings for compatibility */
   --color-background: hsl(var(--background));
@@ -65,6 +56,7 @@
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-hover: hsl(var(--accent-hover));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
@@ -73,54 +65,18 @@
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success-bg));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-bg: hsl(var(--destructive-bg));
   
-  /* Gradient definitions - Updated to use green theme */
-  --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--chart-5)) 100%);
-  --gradient-accent: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--chart-1)) 100%);
+  /* Typography */
+  --font-sans: Outfit, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: monospace;
   
-  /* Spacing Scale (8-point grid) */
-  --space-xs: 0.5rem;
-  --space-sm: 1rem;
-  --space-md: 1.5rem;
-  --space-lg: 2rem;
-  --space-xl: 3rem;
-  --space-2xl: 4rem;
-  
-  /* Typography Scale (Major Third - 1.25x) */
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.56rem;
-  --font-size-3xl: 1.95rem;
-  --font-size-4xl: 2.44rem;
-  --font-size-5xl: 3.05rem;
-  
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  
-  /* Shadows (Elevation System) */
-  --shadow-sm: 0 1px 2px rgba(30, 41, 59, 0.05);
-  --shadow-md: 0 4px 6px rgba(30, 41, 59, 0.1);
-  --shadow-lg: 0 10px 15px rgba(30, 41, 59, 0.1);
-  --shadow-xl: 0 20px 25px rgba(30, 41, 59, 0.15);
-  --shadow-2xl: 0 25px 50px rgba(30, 41, 59, 0.25);
-  
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-/* Body Styling */
-body {
-  letter-spacing: var(--tracking-normal);
+  /* Tracking */
+  --tracking-normal: 0.025em;
 }
 
 /* Dark Mode Variables */
@@ -145,18 +101,22 @@ body {
   --accent-hover: 0 0% 19.2157% / 0.1;
   --destructive: 6.6667 60.0000% 20.5882%;
   --destructive-foreground: 12.0000 12.1951% 91.9608%;
+  --destructive-bg: 6.6667 60.0000% 20.5882% / 0.1;
   --success: 154.8980 100.0000% 19.2157%;
   --success-foreground: 152.7273 19.2982% 88.8235%;
   --success-bg: 154.8980 100.0000% 19.2157% / 0.1;
-  --destructive-bg: 6.6667 60.0000% 20.5882% / 0.1;
   --border: 0 0% 16.0784%;
   --input: 0 0% 14.1176%;
   --ring: 141.8919 69.1589% 58.0392%;
+  
+  /* Chart colors for dark mode */
   --chart-1: 141.8919 69.1589% 58.0392%;
   --chart-2: 213.1169 93.9024% 67.8431%;
   --chart-3: 255.1351 91.7355% 76.2745%;
   --chart-4: 43.2558 96.4126% 56.2745%;
   --chart-5: 172.4551 66.0079% 50.3922%;
+  
+  /* Sidebar colors for dark mode */
   --sidebar: 0 0% 7.0588%;
   --sidebar-foreground: 0 0% 53.7255%;
   --sidebar-primary: 154.8980 100.0000% 19.2157%;
@@ -165,20 +125,8 @@ body {
   --sidebar-accent-foreground: 0 0% 98.0392%;
   --sidebar-border: 0 0% 16.0784%;
   --sidebar-ring: 141.8919 69.1589% 58.0392%;
-  --font-sans: Outfit, sans-serif;
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: monospace;
-  --radius: 0.5rem;
-  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.09);
-  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.09);
-  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 1px 2px -1px hsl(0 0% 0% / 0.17);
-  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 1px 2px -1px hsl(0 0% 0% / 0.17);
-  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 2px 4px -1px hsl(0 0% 0% / 0.17);
-  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 4px 6px -1px hsl(0 0% 0% / 0.17);
-  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 8px 10px -1px hsl(0 0% 0% / 0.17);
-  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.43);
   
-  /* Legacy variable mappings for compatibility */
+  /* Legacy variable mappings for compatibility - Updated values */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-primary: hsl(var(--primary));
@@ -187,6 +135,7 @@ body {
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-hover: hsl(var(--accent-hover));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
@@ -195,13 +144,18 @@ body {
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
-  
-  /* Adjust shadows for dark mode */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
-  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success-bg));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-bg: hsl(var(--destructive-bg));
+}
+
+/* Body Styling */
+body {
+  letter-spacing: var(--tracking-normal);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Advanced Keyframe Animations */
