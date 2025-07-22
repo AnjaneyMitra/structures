@@ -71,9 +71,20 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
       {/* Header */}
       <div className={`relative z-10 ${sidebarOpen ? 'p-6' : 'p-4'} border-b border-card-foreground/10 transition-all duration-300`}>
         <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'justify-center'}`}>
-          <div className={`${sidebarOpen ? 'w-10 h-10' : 'w-8 h-8'} bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300`}>
-            <CodeBracketIcon className={`${sidebarOpen ? 'h-6 w-6' : 'h-5 w-5'} text-white transition-all duration-300`} />
-          </div>
+          {sidebarOpen ? (
+            <div className={`w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300`}>
+              <CodeBracketIcon className="h-6 w-6 text-white transition-all duration-300" />
+            </div>
+          ) : (
+            <button
+              onClick={handleToggle}
+              className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group"
+              title="Expand sidebar"
+            >
+              <CodeBracketIcon className="h-5 w-5 text-white transition-all duration-300 group-hover:opacity-0 group-hover:scale-75" />
+              <ChevronRightIcon className="h-5 w-5 text-white absolute transition-all duration-300 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100" />
+            </button>
+          )}
           {sidebarOpen && (
             <div className="transition-opacity duration-300 opacity-100">
               <h1 className="text-xl font-bold text-foreground">Structures</h1>
