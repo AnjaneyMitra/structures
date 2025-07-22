@@ -17,6 +17,8 @@
   --color-popover-foreground: #0c0c1d;
   --color-muted: #f0f0ff;
   --color-muted-foreground: #0c0c1d;
+  --color-border: #e5e7eb;
+  --color-input: #f3f4f6;
   
   /* Gradient definitions */
   --gradient-primary: linear-gradient(135deg, #ff00c8 0%, #ff3366 100%);
@@ -66,19 +68,21 @@
 [data-theme="dark"] {
   /* Development-Centric Dark Mode Color System */
   --color-background: #0c0c1d;
-  --color-foreground: #f8f9fa;
+  --color-foreground: #eceff4;
   --color-primary: #ff00c8;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #1a1a2e;
-  --color-secondary-foreground: #f8f9fa;
+  --color-secondary: #2e2e5e;
+  --color-secondary-foreground: #eceff4;
   --color-accent: #00ffcc;
   --color-accent-foreground: #0c0c1d;
-  --color-card: #1a1a2e;
-  --color-card-foreground: #f8f9fa;
-  --color-popover: #1a1a2e;
-  --color-popover-foreground: #f8f9fa;
-  --color-muted: #2a2a3e;
+  --color-card: #2e2e5e;
+  --color-card-foreground: #eceff4;
+  --color-popover: #2e2e5e;
+  --color-popover-foreground: #eceff4;
+  --color-muted: #2e2e5e;
   --color-muted-foreground: #94a3b8;
+  --color-border: #2e2e5e;
+  --color-input: #2e2e5e;
   
   /* Adjust shadows for dark mode */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);

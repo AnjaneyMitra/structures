@@ -39,14 +39,14 @@ module.exports = {
           DEFAULT: '#ef4444',
           foreground: '#ffffff',
         },
-        border: '#e5e7eb',
-        input: '#f3f4f6',
+        border: 'var(--color-border)',
+        input: 'var(--color-input)',
         ring: 'var(--color-primary)',
       },
       borderRadius: {
         lg: '0.5rem',
-        md: '0.375rem',
-        sm: '0.25rem',
+        md: '0.5rem', 
+        sm: '0.5rem',
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
