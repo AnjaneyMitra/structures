@@ -100,9 +100,9 @@ const TailwindDashboardPage: React.FC = () => {
           {/* Welcome Header - Full Width */}
           <section className="col-span-12 mb-8">
             <div className="bg-card/30 backdrop-blur-sm rounded-xl p-8 border border-border/50">
-              <h1 className="text-4xl font-bold text-foreground mb-3">
+              <h2 className="text-2xl font-bold text-foreground mb-3">
                 Good morning, {user?.username ? formatUsername(user.username) : ''}
-              </h1>
+              </h2>
               <p className="text-muted-foreground text-lg">
                 Ready to solve some problems today?
               </p>
@@ -206,7 +206,12 @@ const TailwindDashboardPage: React.FC = () => {
             <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
-                <div className="h-px flex-1 bg-gradient-to-r from-border/50 to-transparent ml-6"></div>
+                <Link 
+                  to="/problems"
+                  className="inline-flex items-center px-6 py-2.5 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary transition-all duration-200 font-medium text-sm"
+                >
+                  View All Problems
+                </Link>
               </div>
               
               {/* 12-column grid for problem cards with consistent 24px gutters */}
@@ -223,22 +228,12 @@ const TailwindDashboardPage: React.FC = () => {
                     </div>
                     <Link
                       to={`/problems/${problem.id}`}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-4 rounded-xl transition-all duration-200 inline-block text-center hover:shadow-md"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 px-4 rounded-xl transition-all duration-200 inline-block text-center hover:shadow-lg shadow-md"
                     >
                       Solve Problem
                     </Link>
                   </div>
                 ))}
-              </div>
-              
-              {/* View All Problems Button - Centered */}
-              <div className="flex justify-center pt-4 border-t border-border/30">
-                <Link 
-                  to="/problems"
-                  className="inline-flex items-center px-8 py-4 border-2 border-primary text-primary bg-transparent rounded-xl hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-semibold hover:shadow-lg"
-                >
-                  View All Problems
-                </Link>
               </div>
             </div>
           </section>
