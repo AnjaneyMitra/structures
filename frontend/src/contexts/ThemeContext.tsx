@@ -29,8 +29,16 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+    
     // Update data-theme attribute for CSS variables
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    
+    // Also update the class for Tailwind dark mode
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [isDarkMode]);
 
   const toggleTheme = () => {

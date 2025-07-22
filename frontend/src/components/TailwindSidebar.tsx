@@ -32,12 +32,12 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
   };
 
   return (
-    <div className="w-[280px] h-screen bg-gradient-to-b from-slate-50/95 to-slate-100/95 backdrop-blur-2xl border-r border-slate-200/50 flex flex-col fixed left-0 top-0 z-50">
+    <div className="w-[280px] h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50">
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/3 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/3 to-transparent pointer-events-none" />
       
       {/* Header */}
-      <div className="relative z-10 p-6 border-b border-slate-200/50">
+      <div className="relative z-10 p-6 border-b border-card-foreground/10">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
             <CodeBracketIcon className="h-6 w-6 text-white" />
@@ -78,11 +78,11 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
       </nav>
 
       {/* User Section */}
-      <div className="relative z-10 p-4 border-t border-slate-200/50">
+      <div className="relative z-10 p-4 border-t border-card-foreground/10">
         {/* User Profile */}
-        <div className="flex items-center space-x-3 p-3 rounded-xl bg-card mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-slate-400 to-slate-600 rounded-full flex items-center justify-center">
-            <UserIcon className="h-5 w-5 text-white" />
+        <div className="flex items-center space-x-3 p-3 rounded-xl bg-card/50 border border-card-foreground/10 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted-foreground/20 rounded-full flex items-center justify-center">
+            <UserIcon className="h-5 w-5 text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-card-foreground truncate">
@@ -105,7 +105,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({ open = true, onClose }
         </div>
 
         {/* Footer */}
-        <div className="mt-4 pt-4 border-t border-slate-200/50">
+        <div className="mt-4 pt-4 border-t border-card-foreground/10">
           <p className="text-xs text-muted-foreground text-center">
             Structures v1.0
           </p>
