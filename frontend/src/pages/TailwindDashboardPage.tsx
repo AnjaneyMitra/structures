@@ -88,13 +88,13 @@ const TailwindDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen bg-background overflow-hidden">
+    <div className="lg:h-screen bg-background lg:overflow-hidden">
       {/* Main Container with 12-column grid system */}
-      <div className="max-w-7xl mx-auto px-6 py-8 h-full flex flex-col">
-        <div className="grid grid-cols-12 gap-6 h-full">
+      <div className="max-w-7xl mx-auto px-6 py-8 lg:h-full lg:flex lg:flex-col">
+        <div className="grid grid-cols-12 gap-6 lg:h-full">
           
           {/* Welcome Header - Full Width */}
-          <section className="col-span-12 flex-shrink-0">
+          <section className="col-span-12 lg:flex-shrink-0">
             <div className="bg-card/30 backdrop-blur-sm rounded-xl p-8 border border-border/50">
               <h2 className="text-2xl font-bold text-foreground mb-3">
                 Good morning, {user?.username ? formatUsername(user.username) : ''}
@@ -106,12 +106,12 @@ const TailwindDashboardPage: React.FC = () => {
           </section>
 
           {/* Main Content Section - Split Layout */}
-          <div className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+          <div className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0">
             
             {/* Featured Problems Section - Left Side with Scroll */}
-            <section className="lg:col-span-1 flex flex-col">
-              <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 h-full flex flex-col">
-                <div className="flex items-center justify-between p-8 pb-4 flex-shrink-0">
+            <section className="lg:col-span-1 lg:flex lg:flex-col">
+              <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 lg:h-full lg:flex lg:flex-col">
+                <div className="flex items-center justify-between p-8 pb-4 lg:flex-shrink-0">
                   <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
                   <Link 
                     to="/problems"
@@ -121,8 +121,8 @@ const TailwindDashboardPage: React.FC = () => {
                   </Link>
                 </div>
                 
-                {/* Scrollable Problem cards */}
-                <div className="flex-1 overflow-y-auto px-8 pb-8">
+                {/* Scrollable Problem cards - responsive overflow */}
+                <div className="px-8 pb-8 lg:flex-1 lg:overflow-y-auto">
                   <div className="grid grid-cols-1 gap-4">
                     {problems.map((problem) => (
                       <div 
@@ -147,10 +147,10 @@ const TailwindDashboardPage: React.FC = () => {
 
             {/* Stats Cards Section - Right Side Fixed */}
             {stats && (
-              <section className="lg:col-span-1 flex flex-col">
-                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 h-full flex flex-col">
-                  <h2 className="text-xl font-semibold text-foreground mb-6 flex-shrink-0">Your Progress</h2>
-                  <div className="grid grid-cols-2 gap-3 h-fit flex-shrink-0">
+              <section className="lg:col-span-1 lg:flex lg:flex-col">
+                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 lg:h-full lg:flex lg:flex-col">
+                  <h2 className="text-xl font-semibold text-foreground mb-6 lg:flex-shrink-0">Your Progress</h2>
+                  <div className="grid grid-cols-2 gap-3 h-fit lg:flex-shrink-0">
                     <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
                         <div className="p-2.5 bg-primary/10 rounded-lg mb-2.5">
