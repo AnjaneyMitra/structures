@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
 from .api.routes import auth, problems, submissions, profile, rooms, friends
@@ -45,7 +45,14 @@ try:
             result = conn.execute(text("SELECT COUNT(*) FROM friendships"))
             count = result.scalar()
             print(f"✓ Friendship table verified with {count} records")
-        e
+        except Exception as e:
+            print(f"⚠ Friendship table verification failed: {e}")
+            
+except Exception as e:
+    print(f"⚠ Database table creation failed: {e}")
+
+# Import deps after app is created
+from .api import deps
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
