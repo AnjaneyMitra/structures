@@ -7,6 +7,20 @@ from ...api import deps
 
 router = APIRouter()
 
+# Add explicit OPTIONS handler for CORS preflight
+@router.options("/")
+@router.options("/requests/received")
+@router.options("/requests/sent")
+@router.options("/leaderboard")
+@router.options("/search/{username}")
+@router.options("/request")
+@router.options("/requests/{request_id}/accept")
+@router.options("/requests/{request_id}/reject")
+@router.options("/{friend_id}")
+def handle_options():
+    """Handle CORS preflight requests."""
+    return {"status": "ok"}
+
 @router.post("/request")
 def send_friend_request(
     request: dict = Body(...),
@@ -65,28 +79,39 @@ def get_received_friend_requests(
 ):
     """Get all pending friend requests received by the current user."""
     try:
+        print(f"Getting received requests for user: {user.username} (ID: {user.id})")
         requests = db.query(models.Friendship).filter(
             models.Friendship.addressee_id == user.id,
             models.Friendship.status == "pending"
         ).all()
+        print(f"Found {len(requests)} received requests")
     except Exception as e:
         print(f"Received requests query error: {e}")
+        import traceback
+        traceback.print_exc()
         return []
     
     result = []
-    for req in requests:
-        requester = db.query(models.User).filter(models.User.id == req.requester_id).first()
-        result.append({
-            "id": req.id,
-            "requester_id": req.requester_id,
-            "addressee_id": req.addressee_id,
-            "status": req.status,
-            "created_at": req.created_at,
-            "requester_username": requester.username,
-            "addressee_username": user.username
-        })
-    
-    return result
+    try:
+        for req in requests:
+            requester = db.query(models.User).filter(models.User.id == req.requester_id).first()
+            if requester:
+                result.append({
+                    "id": req.id,
+                    "requester_id": req.requester_id,
+                    "addressee_id": req.addressee_id,
+                    "status": req.status,
+                    "created_at": req.created_at,
+                    "requester_username": requester.username,
+                    "addressee_username": user.username
+                })
+        
+        return result
+    except Exception as e:
+        print(f"Error processing received requests: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
 
 @router.get("/requests/sent")
 def get_sent_friend_requests(
@@ -95,28 +120,39 @@ def get_sent_friend_requests(
 ):
     """Get all friend requests sent by the current user."""
     try:
+        print(f"Getting sent requests for user: {user.username} (ID: {user.id})")
         requests = db.query(models.Friendship).filter(
             models.Friendship.requester_id == user.id,
             models.Friendship.status == "pending"
         ).all()
+        print(f"Found {len(requests)} sent requests")
     except Exception as e:
         print(f"Sent requests query error: {e}")
+        import traceback
+        traceback.print_exc()
         return []
     
     result = []
-    for req in requests:
-        addressee = db.query(models.User).filter(models.User.id == req.addressee_id).first()
-        result.append({
-            "id": req.id,
-            "requester_id": req.requester_id,
-            "addressee_id": req.addressee_id,
-            "status": req.status,
-            "created_at": req.created_at,
-            "requester_username": user.username,
-            "addressee_username": addressee.username
-        })
-    
-    return result
+    try:
+        for req in requests:
+            addressee = db.query(models.User).filter(models.User.id == req.addressee_id).first()
+            if addressee:
+                result.append({
+                    "id": req.id,
+                    "requester_id": req.requester_id,
+                    "addressee_id": req.addressee_id,
+                    "status": req.status,
+                    "created_at": req.created_at,
+                    "requester_username": user.username,
+                    "addressee_username": addressee.username
+                })
+        
+        return result
+    except Exception as e:
+        print(f"Error processing sent requests: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
 
 @router.post("/requests/{request_id}/accept")
 def accept_friend_request(
@@ -167,6 +203,17 @@ def get_friends(
 ):
     """Get all friends of the current user."""
     try:
+        print(f"Getting friends for user: {user.username} (ID: {user.id})")
+        
+        # First check if friendship table exists
+        from sqlalchemy import text
+        try:
+            db.execute(text("SELECT 1 FROM friendships LIMIT 1"))
+            print("Friendship table exists")
+        except Exception as table_error:
+            print(f"Friendship table doesn't exist or is inaccessible: {table_error}")
+            return []
+        
         # Get accepted friendships where user is either requester or addressee
         friendships = db.query(models.Friendship).filter(
             or_(
@@ -175,27 +222,40 @@ def get_friends(
             ),
             models.Friendship.status == "accepted"
         ).all()
+        
+        print(f"Found {len(friendships)} friendships for user {user.username}")
+        
     except Exception as e:
         # If friendship table doesn't exist, return empty list
         print(f"Friends query error: {e}")
+        import traceback
+        traceback.print_exc()
         return []
     
     friends = []
-    for friendship in friendships:
-        # Get the friend (the other person in the friendship)
-        friend_id = friendship.addressee_id if friendship.requester_id == user.id else friendship.requester_id
-        friend = db.query(models.User).filter(models.User.id == friend_id).first()
+    try:
+        for friendship in friendships:
+            # Get the friend (the other person in the friendship)
+            friend_id = friendship.addressee_id if friendship.requester_id == user.id else friendship.requester_id
+            friend = db.query(models.User).filter(models.User.id == friend_id).first()
+            
+            if friend:
+                friends.append({
+                    "id": friend.id,
+                    "username": friend.username,
+                    "total_xp": friend.total_xp or 0
+                })
         
-        if friend:
-            friends.append({
-                "id": friend.id,
-                "username": friend.username,
-                "total_xp": friend.total_xp or 0
-            })
-    
-    # Sort by XP descending
-    friends.sort(key=lambda x: x.total_xp, reverse=True)
-    return friends
+        # Sort by XP descending
+        friends.sort(key=lambda x: x.total_xp, reverse=True)
+        print(f"Returning {len(friends)} friends for user {user.username}")
+        return friends
+        
+    except Exception as e:
+        print(f"Error processing friends data: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
 
 @router.delete("/{friend_id}")
 def remove_friend(
@@ -227,6 +287,7 @@ def get_friends_leaderboard(
 ):
     """Get leaderboard of friends sorted by XP."""
     try:
+        print(f"Getting leaderboard for user: {user.username} (ID: {user.id})")
         # Get all friends
         friendships = db.query(models.Friendship).filter(
             or_(
@@ -235,50 +296,68 @@ def get_friends_leaderboard(
             ),
             models.Friendship.status == "accepted"
         ).all()
+        print(f"Found {len(friendships)} friendships for leaderboard")
     except Exception as e:
         print(f"Leaderboard query error: {e}")
+        import traceback
+        traceback.print_exc()
         # Return just the current user if friendship table doesn't exist
         friendships = []
     
-    # Collect friend IDs and include current user
-    friend_ids = [user.id]  # Include current user in leaderboard
-    for friendship in friendships:
-        friend_id = friendship.addressee_id if friendship.requester_id == user.id else friendship.requester_id
-        friend_ids.append(friend_id)
-    
-    # Get users with their stats
-    leaderboard = []
-    for friend_id in friend_ids:
-        friend = db.query(models.User).filter(models.User.id == friend_id).first()
-        if friend:
-            # Count problems solved
-            problems_solved = db.query(models.Submission.problem_id).filter(
-                models.Submission.user_id == friend.id,
-                models.Submission.overall_status == "pass"
-            ).distinct().count()
-            
-            leaderboard.append({
-                "id": friend.id,
-                "username": friend.username,
-                "total_xp": friend.total_xp or 0,
-                "problems_solved": problems_solved
+    try:
+        # Collect friend IDs and include current user
+        friend_ids = [user.id]  # Include current user in leaderboard
+        for friendship in friendships:
+            friend_id = friendship.addressee_id if friendship.requester_id == user.id else friendship.requester_id
+            friend_ids.append(friend_id)
+        
+        # Get users with their stats
+        leaderboard = []
+        for friend_id in friend_ids:
+            friend = db.query(models.User).filter(models.User.id == friend_id).first()
+            if friend:
+                # Count problems solved
+                problems_solved = db.query(models.Submission.problem_id).filter(
+                    models.Submission.user_id == friend.id,
+                    models.Submission.overall_status == "pass"
+                ).distinct().count()
+                
+                leaderboard.append({
+                    "id": friend.id,
+                    "username": friend.username,
+                    "total_xp": friend.total_xp or 0,
+                    "problems_solved": problems_solved
+                })
+        
+        # Sort by XP descending
+        leaderboard.sort(key=lambda x: x["total_xp"], reverse=True)
+        
+        # Add ranks
+        result = []
+        for i, entry in enumerate(leaderboard):
+            result.append({
+                "rank": i + 1,
+                "id": entry["id"],
+                "username": entry["username"],
+                "total_xp": entry["total_xp"],
+                "problems_solved": entry["problems_solved"]
             })
-    
-    # Sort by XP descending
-    leaderboard.sort(key=lambda x: x["total_xp"], reverse=True)
-    
-    # Add ranks
-    result = []
-    for i, entry in enumerate(leaderboard):
-        result.append({
-            "rank": i + 1,
-            "id": entry["id"],
-            "username": entry["username"],
-            "total_xp": entry["total_xp"],
-            "problems_solved": entry["problems_solved"]
-        })
-    
-    return result
+        
+        print(f"Returning leaderboard with {len(result)} entries")
+        return result
+        
+    except Exception as e:
+        print(f"Error processing leaderboard data: {e}")
+        import traceback
+        traceback.print_exc()
+        # Return just current user as fallback
+        return [{
+            "rank": 1,
+            "id": user.id,
+            "username": user.username,
+            "total_xp": user.total_xp or 0,
+            "problems_solved": 0
+        }]
 
 @router.get("/search/{username}")
 def search_users(

@@ -55,24 +55,100 @@ const TailwindFriendsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const validateToken = (token: string) => {
+    try {
+      // Basic JWT structure validation
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        return false;
+      }
+      
+      // Try to decode the payload
+      const payload = JSON.parse(atob(parts[1]));
+      
+      // Check if token is expired
+      if (payload.exp && payload.exp < Date.now() / 1000) {
+        console.log('Token is expired');
+        return false;
+      }
+      
+      return true;
+    } catch (e) {
+      console.error('Token validation failed:', e);
+      return false;
+    }
+  };
+
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please log in to view friends');
+        setLoading(false);
+        return;
+      }
+
+      // Validate token format and expiration
+      if (!validateToken(token)) {
+        setError('Session expired. Please log in again.');
+        localStorage.removeItem('token');
+        setLoading(false);
+        return;
+      }
+
       const headers = { Authorization: `Bearer ${token}` };
 
+      console.log('Fetching friends data with token validation passed...');
+      
       const [friendsRes, receivedRes, sentRes, leaderboardRes] = await Promise.all([
-        axios.get('https://structures-production.up.railway.app/api/friends/', { headers }),
-        axios.get('https://structures-production.up.railway.app/api/friends/requests/received', { headers }),
-        axios.get('https://structures-production.up.railway.app/api/friends/requests/sent', { headers }),
-        axios.get('https://structures-production.up.railway.app/api/friends/leaderboard', { headers })
+        axios.get('https://structures-production.up.railway.app/api/friends/', { headers }).catch(err => {
+          console.error('Friends API error:', err.response?.status, err.response?.data);
+          if (err.response?.status === 401) {
+            throw new Error('Authentication failed');
+          }
+          return { data: [] };
+        }),
+        axios.get('https://structures-production.up.railway.app/api/friends/requests/received', { headers }).catch(err => {
+          console.error('Received requests API error:', err.response?.status, err.response?.data);
+          if (err.response?.status === 401) {
+            throw new Error('Authentication failed');
+          }
+          return { data: [] };
+        }),
+        axios.get('https://structures-production.up.railway.app/api/friends/requests/sent', { headers }).catch(err => {
+          console.error('Sent requests API error:', err.response?.status, err.response?.data);
+          if (err.response?.status === 401) {
+            throw new Error('Authentication failed');
+          }
+          return { data: [] };
+        }),
+        axios.get('https://structures-production.up.railway.app/api/friends/leaderboard', { headers }).catch(err => {
+          console.error('Leaderboard API error:', err.response?.status, err.response?.data);
+          if (err.response?.status === 401) {
+            throw new Error('Authentication failed');
+          }
+          return { data: [] };
+        })
       ]);
 
-      setFriends(friendsRes.data);
-      setReceivedRequests(receivedRes.data);
-      setSentRequests(sentRes.data);
-      setLeaderboard(leaderboardRes.data);
-    } catch (err) {
-      setError('Failed to load friends data');
+      setFriends(friendsRes.data || []);
+      setReceivedRequests(receivedRes.data || []);
+      setSentRequests(sentRes.data || []);
+      setLeaderboard(leaderboardRes.data || []);
+      
+      console.log('Friends data loaded successfully');
+    } catch (err: any) {
+      console.error('Failed to load friends data:', err);
+      
+      if (err.response?.status === 401) {
+        setError('Session expired. Please log in again.');
+        // Optionally redirect to login
+        localStorage.removeItem('token');
+      } else if (err.response?.status === 500) {
+        setError('Server error. The friends system may be temporarily unavailable.');
+      } else {
+        setError('Failed to load friends data. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

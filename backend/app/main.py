@@ -21,6 +21,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,
 )
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -32,7 +33,19 @@ app.add_middleware(
 )
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+try:
+    print("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    print("✓ Database tables created successfully")
+    
+    # Verify friendship table exists
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        try:
+            result = conn.execute(text("SELECT COUNT(*) FROM friendships"))
+            count = result.scalar()
+            print(f"✓ Friendship table verified with {count} records")
+        e
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
@@ -54,6 +67,94 @@ def health_check():
 def friends_test():
     """Test endpoint to verify friends API is working."""
     return {"status": "friends_api_working", "message": "Friends API is accessible"}
+
+@app.get("/api/auth/debug")
+def auth_debug(user=Depends(deps.get_current_user)):
+    """Debug endpoint to check current user authentication."""
+    return {
+        "authenticated": True,
+        "user_id": user.id,
+        "username": user.username,
+        "total_xp": user.total_xp or 0,
+        "message": "Authentication successful"
+    }
+
+@app.get("/api/friends/health")
+def friends_health():
+    """Health check for friends API with database connectivity."""
+    from .db.base import SessionLocal
+    from .db.models import Friendship, User
+    from sqlalchemy import text
+    
+    try:
+        db = SessionLocal()
+        
+        # Test basic database connectivity
+        db.execute(text("SELECT 1"))
+        
+        # Test users table
+        user_count = db.query(User).count()
+        
+        # Test friendship table
+        try:
+            friendship_count = db.query(Friendship).count()
+            friendship_table_exists = True
+        except Exception as e:
+            friendship_count = 0
+            friendship_table_exists = False
+        
+        db.close()
+        
+        return {
+            "status": "healthy" if friendship_table_exists else "partial",
+            "database": "connected",
+            "user_count": user_count,
+            "friendship_count": friendship_count,
+            "friendship_table_exists": friendship_table_exists,
+            "message": "Friends API health check complete"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "database": "error",
+            "error": str(e),
+            "message": "Database connection failed"
+        }
+
+@app.post("/api/admin/init-friendship-table")
+def init_friendship_table():
+    """Initialize the friendship table if it doesn't exist. Admin only."""
+    from .db.base import Base
+    from .db.models import Friendship
+    from sqlalchemy import text
+    
+    try:
+        # Check if table exists
+        with engine.connect() as conn:
+            try:
+                conn.execute(text("SELECT 1 FROM friendships LIMIT 1"))
+                return {"status": "exists", "message": "Friendship table already exists"}
+            except:
+                pass
+        
+        # Create the table
+        Base.metadata.create_all(bind=engine, tables=[Friendship.__table__])
+        
+        # Verify creation
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1 FROM friendships LIMIT 1"))
+        
+        return {
+            "status": "created",
+            "message": "Friendship table created successfully"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "message": "Failed to create friendship table"
+        }
 
 @app.get("/xp-status")
 def xp_status():
