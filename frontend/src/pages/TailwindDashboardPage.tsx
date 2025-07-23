@@ -31,7 +31,6 @@ const TailwindDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
-  const [loadingProblem, setLoadingProblem] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,11 +59,7 @@ const TailwindDashboardPage: React.FC = () => {
   }, []);
 
   const handleProblemClick = (problemId: number) => {
-    setLoadingProblem(problemId);
-    // Simulate a brief loading state before navigation
-    setTimeout(() => {
-      navigate(`/problems/${problemId}`);
-    }, 150);
+    navigate(`/problems/${problemId}`);
   };
 
   const formatUsername = (username: string) => {
@@ -126,11 +121,15 @@ const TailwindDashboardPage: React.FC = () => {
                   </Link>
                 </div>
                 
-                {/* Problem cards with reduced grid */}
+                {/* Problem cards without solve buttons */}
                 <div className="grid grid-cols-1 gap-4">
-                  {problems.slice(0, 3).map((problem) => (
-                    <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-4 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group">
-                      <div className="flex items-start justify-between mb-4">
+                  {problems.map((problem) => (
+                    <div 
+                      key={problem.id} 
+                      className="bg-card rounded-xl border border-border/50 p-4 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group cursor-pointer"
+                      onClick={() => handleProblemClick(problem.id)}
+                    >
+                      <div className="flex items-start justify-between">
                         <h3 className="text-base font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
                           {problem.title}
                         </h3>
@@ -138,20 +137,6 @@ const TailwindDashboardPage: React.FC = () => {
                           {problem.difficulty}
                         </span>
                       </div>
-                      <button
-                        onClick={() => handleProblemClick(problem.id)}
-                        disabled={loadingProblem === problem.id}
-                        className="w-full bg-primary hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] text-primary-foreground font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {loadingProblem === problem.id ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-                            <span>Loading...</span>
-                          </>
-                        ) : (
-                          'Solve Problem'
-                        )}
-                      </button>
                     </div>
                   ))}
                 </div>
@@ -163,44 +148,44 @@ const TailwindDashboardPage: React.FC = () => {
               <section className="lg:col-span-1">
                 <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 h-full">
                   <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
-                  <div className="grid grid-cols-2 gap-4 h-fit">
-                    <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="grid grid-cols-2 gap-3 h-fit">
+                    <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-3 bg-primary/10 rounded-lg mb-3">
-                          <CheckCircleIcon className="h-8 w-8 text-primary" />
+                        <div className="p-2.5 bg-primary/10 rounded-lg mb-2.5">
+                          <CheckCircleIcon className="h-7 w-7 text-primary" />
                         </div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Problems Solved</p>
-                        <p className="text-2xl font-bold text-primary">{stats.problems_solved}</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Problems Solved</p>
+                        <p className="text-xl font-bold text-primary">{stats.problems_solved}</p>
                       </div>
                     </div>
                     
-                    <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-3 bg-accent/10 rounded-lg mb-3">
-                          <BoltIcon className="h-8 w-8 text-accent" />
+                        <div className="p-2.5 bg-accent/10 rounded-lg mb-2.5">
+                          <BoltIcon className="h-7 w-7 text-accent" />
                         </div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Total Submissions</p>
-                        <p className="text-2xl font-bold text-accent">{stats.total_submissions}</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Total Submissions</p>
+                        <p className="text-xl font-bold text-accent">{stats.total_submissions}</p>
                       </div>
                     </div>
 
-                    <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-3 bg-yellow-500/10 rounded-lg mb-3">
-                          <StarIcon className="h-8 w-8 text-yellow-500" />
+                        <div className="p-2.5 bg-yellow-500/10 rounded-lg mb-2.5">
+                          <StarIcon className="h-7 w-7 text-yellow-500" />
                         </div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Total XP</p>
-                        <p className="text-2xl font-bold text-yellow-600">{stats.total_xp || 0}</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Total XP</p>
+                        <p className="text-xl font-bold text-yellow-600">{stats.total_xp || 0}</p>
                       </div>
                     </div>
 
-                    <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
+                    <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-5 opacity-60">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-3 bg-muted/10 rounded-lg mb-3">
-                          <div className="h-8 w-8 bg-muted/20 rounded"></div>
+                        <div className="p-2.5 bg-muted/10 rounded-lg mb-2.5">
+                          <div className="h-7 w-7 bg-muted/20 rounded"></div>
                         </div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Streak</p>
-                        <p className="text-2xl font-bold text-muted-foreground">--</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Streak</p>
+                        <p className="text-xl font-bold text-muted-foreground">--</p>
                       </div>
                     </div>
                   </div>
@@ -208,51 +193,6 @@ const TailwindDashboardPage: React.FC = () => {
               </section>
             )}
           </div>
-
-          {/* Additional Problems Section - Full Width */}
-          <section className="col-span-12">
-            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-foreground">More Problems</h2>
-                <Link 
-                  to="/problems"
-                  className="inline-flex items-center px-6 py-2.5 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary hover:scale-105 active:scale-95 transition-all duration-200 font-medium text-sm"
-                >
-                  View All Problems
-                </Link>
-              </div>
-              
-              {/* Grid for additional problem cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                {problems.slice(3).map((problem) => (
-                  <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group">
-                    <div className="flex items-start justify-between mb-6">
-                      <h3 className="text-lg font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
-                        {problem.title}
-                      </h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
-                        {problem.difficulty}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleProblemClick(problem.id)}
-                      disabled={loadingProblem === problem.id}
-                      className="w-full bg-primary hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] text-primary-foreground font-bold py-3 px-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {loadingProblem === problem.id ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-                          <span>Loading...</span>
-                        </>
-                      ) : (
-                        'Solve Problem'
-                      )}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
 
         </div>
       </div>
