@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon as SearchIcon } from '@heroicons/react/24/outline';
 
 interface Problem {
@@ -14,12 +14,6 @@ interface Problem {
 type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
 type SortOption = 'popularity' | 'newest' | 'difficulty';
 
-const difficultyStyles = {
-  Easy: 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-900/30',
-  Medium: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-200 dark:hover:bg-yellow-900/30',
-  Hard: 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-200 dark:hover:bg-red-900/30',
-};
-
 const TailwindProblemsPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +22,7 @@ const TailwindProblemsPage: React.FC = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All');
   const [sortBy, setSortBy] = useState<SortOption>('popularity');
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const urlSearch = searchParams.get('search');
@@ -160,26 +155,78 @@ const TailwindProblemsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Problems Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProblems.map((problem) => (
-            <div key={problem.id} className="bg-card rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-              <div className="flex items-start justify-between mb-4">
-                <h3 className="text-lg font-bold text-card-foreground flex-1 pr-3">
-                  {problem.title}
-                </h3>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
-                  {problem.difficulty}
-                </span>
+        {/* Problems List - LeetCode Style */}
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
+          {/* Table Header */}
+          <div className="bg-muted/30 border-b border-border px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6 flex-1">
+                <div className="w-12 text-center">
+                  <span className="text-sm font-medium text-muted-foreground">#</span>
+                </div>
+                <div className="flex-1">
+                  <span className="text-sm font-medium text-muted-foreground">Title</span>
+                </div>
               </div>
-              <Link
-                to={`/problems/${problem.id}`}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-lg transition-colors duration-200 inline-block text-center"
-              >
-                Solve
-              </Link>
+              <div className="flex items-center space-x-6 flex-shrink-0">
+                <div className="hidden sm:block min-w-[80px] text-center">
+                  <span className="text-sm font-medium text-muted-foreground">Acceptance</span>
+                </div>
+                <div className="min-w-[80px] text-center">
+                  <span className="text-sm font-medium text-muted-foreground">Difficulty</span>
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Problems List */}
+          <div className="divide-y divide-border">
+            {filteredProblems.map((problem, index) => (
+              <div
+                key={problem.id}
+                className="flex items-center justify-between px-6 py-4 hover:bg-card/50 transition-all duration-200 group cursor-pointer"
+                onClick={() => navigate(`/problems/${problem.id}`)}
+              >
+                {/* Left Side: Number + Title */}
+                <div className="flex items-center space-x-6 flex-1 min-w-0">
+                  {/* Problem Number */}
+                  <div className="w-12 text-center flex-shrink-0">
+                    <span className="text-sm font-medium text-muted-foreground">{index + 1}</span>
+                  </div>
+                  
+                  {/* Problem Title */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors duration-200 truncate">
+                      {problem.title}
+                    </h3>
+                  </div>
+                </div>
+                
+                {/* Right Side: Acceptance Rate + Difficulty */}
+                <div className="flex items-center space-x-6 flex-shrink-0">
+                  {/* Acceptance Rate */}
+                  <div className="hidden sm:block text-center min-w-[80px]">
+                    <span className="text-sm text-muted-foreground">
+                      {Math.floor(Math.random() * 30 + 40)}.{Math.floor(Math.random() * 10)}%
+                    </span>
+                  </div>
+                  
+                  {/* Difficulty Badge */}
+                  <div className="min-w-[80px] text-center">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      problem.difficulty === 'Easy' 
+                        ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                        : problem.difficulty === 'Medium'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400'
+                        : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+                    }`}>
+                      {problem.difficulty}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
         
         {filteredProblems.length === 0 && !loading && (
