@@ -13,3 +13,4 @@ node_modules/
 .idea/ 
 UI_REDESIGN_SUMMARY.md
 *.md
+deploy.md
