@@ -133,7 +133,7 @@ const TailwindProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto pt-8">
         {/* Header */}
         <div className="bg-card border border-border rounded-lg p-6 mb-8">
           <div className="flex items-start justify-between">

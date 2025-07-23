@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { validateToken, isAuthenticated, getCurrentUsername } from '../utils/authUtils';
+import { validateToken as validateTokenUtil, getCurrentUsername } from '../utils/authUtils';
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -14,7 +14,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(isAuthenticated());
+    // Check if there's a token in localStorage
+    const hasToken = !!localStorage.getItem('token');
+    
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(hasToken);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [username, setUsername] = useState<string | null>(getCurrentUsername());
 
@@ -24,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const token = localStorage.getItem('token');
             const storedUsername = localStorage.getItem('username');
 
-            if (token && validateToken(token)) {
+            if (token && validateTokenUtil(token)) {
                 try {
                     // Verify token with backend
                     await axios.get('https://structures-production.up.railway.app/api/auth/debug', {
@@ -77,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             username,
             login,
             logout,
-            validateToken
+            validateToken: validateTokenUtil
         }}>
             {children}
         </AuthContext.Provider>
