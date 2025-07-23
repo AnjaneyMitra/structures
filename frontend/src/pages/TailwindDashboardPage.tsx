@@ -19,12 +19,6 @@ interface Problem {
   difficulty: string;
 }
 
-const difficultyStyles = {
-  Easy: 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800',
-  Medium: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
-  Hard: 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800',
-};
-
 const TailwindDashboardPage: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -123,20 +117,47 @@ const TailwindDashboardPage: React.FC = () => {
                 
                 {/* Scrollable Problem cards - responsive overflow */}
                 <div className="px-8 pb-8 lg:flex-1 lg:overflow-y-auto">
-                  <div className="grid grid-cols-1 gap-4">
-                    {problems.map((problem) => (
+                  <div className="space-y-2">
+                    {problems.map((problem, index) => (
                       <div 
                         key={problem.id} 
-                        className="bg-card rounded-xl border border-border/50 p-4 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group cursor-pointer"
+                        className="bg-card rounded-lg border border-border/50 p-4 hover:bg-card/80 hover:border-primary/20 transition-all duration-200 group cursor-pointer"
                         onClick={() => handleProblemClick(problem.id)}
                       >
-                        <div className="flex items-start justify-between">
-                          <h3 className="text-base font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
-                            {problem.title}
-                          </h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
-                            {problem.difficulty}
-                          </span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4 flex-1">
+                            {/* Problem Number */}
+                            <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-medium text-muted-foreground">{index + 1}</span>
+                            </div>
+                            
+                            {/* Problem Title */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors duration-200 truncate">
+                                {problem.title}
+                              </h3>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-3 flex-shrink-0">
+                            {/* Acceptance Rate Placeholder */}
+                            <div className="hidden sm:flex items-center space-x-1">
+                              <span className="text-xs text-muted-foreground">
+                                {Math.floor(Math.random() * 30 + 40)}.{Math.floor(Math.random() * 10)}%
+                              </span>
+                            </div>
+                            
+                            {/* Difficulty Badge */}
+                            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${
+                              problem.difficulty === 'Easy' 
+                                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
+                                : problem.difficulty === 'Medium'
+                                ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
+                                : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                            }`}>
+                              {problem.difficulty}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ))}
