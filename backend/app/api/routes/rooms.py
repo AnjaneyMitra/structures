@@ -38,13 +38,23 @@ async def create_room(room: schemas.RoomCreate, db: Session = Depends(deps.get_d
 @router.post("/join/", response_model=schemas.RoomOut)
 async def join_room(data: dict = Body(...), db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
     code = data.get("code")
+    print(f"Join room request: code={code}, user={user.username}")
+    
     if not code:
         raise HTTPException(status_code=422, detail="Room code is required")
+    
     room = db.query(models.Room).options(joinedload(models.Room.participants)).filter(models.Room.code == code).first()
+    print(f"Room found: {room is not None}")
+    
     if not room:
+        # List all rooms for debugging
+        all_rooms = db.query(models.Room).all()
+        print(f"Available rooms: {[r.code for r in all_rooms]}")
         raise HTTPException(status_code=404, detail="Room not found")
     
     user_was_new = user not in room.participants
+    print(f"User was new to room: {user_was_new}")
+    
     if user_was_new:
         room.participants.append(user)
         db.commit()
@@ -244,6 +254,51 @@ def get_room_submissions(room_code: str, db: Session = Depends(deps.get_db), use
         result.append(sub_dict)
     
     return result
+
+@router.post("/{room_code}/join", response_model=schemas.RoomOut)
+async def join_room_by_code(room_code: str, db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):
+    """Join a room using the room code in the URL path"""
+    print(f"Join room by code request: code={room_code}, user={user.username}")
+    
+    # Normalize the room code to uppercase
+    room_code = room_code.upper()
+    
+    # Try to find the room
+    room = db.query(models.Room).options(joinedload(models.Room.participants)).filter(models.Room.code == room_code).first()
+    print(f"Room found: {room is not None}")
+    
+    if not room:
+        # List all rooms for debugging
+        all_rooms = db.query(models.Room).all()
+        print(f"Available rooms: {[r.code for r in all_rooms]}")
+        raise HTTPException(status_code=404, detail=f"Room with code {room_code} not found")
+    
+    # Check if user is already in the room
+    user_was_new = user not in room.participants
+    print(f"User was new to room: {user_was_new}")
+    
+    if user_was_new:
+        # Add user to room
+        room.participants.append(user)
+        db.commit()
+        
+        # Emit user joined event to room
+        try:
+            await sio.emit("user_joined_room", {
+                "room_code": room_code,
+                "user": {"id": user.id, "username": user.username}
+            }, room=room_code)
+            print(f"Emitted user_joined_room event for {user.username} in room {room_code}")
+        except Exception as e:
+            print(f"Error emitting socket event: {str(e)}")
+    else:
+        # User is already in the room
+        print(f"User {user.username} is already in room {room_code}")
+        # We'll still return the room data but with a message
+        # This is not an error, just information
+    
+    db.refresh(room)
+    return room
 
 @router.post("/{room_code}/leave")
 def leave_room(room_code: str, db: Session = Depends(deps.get_db), user=Depends(deps.get_current_user)):

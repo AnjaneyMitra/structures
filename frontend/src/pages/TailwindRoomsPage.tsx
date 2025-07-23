@@ -59,32 +59,65 @@ const TailwindRoomsPage: React.FC = () => {
   const handleJoinRoom = async () => {
     if (!joinCode.trim()) return;
     
+    console.log('Attempting to join room with code:', joinCode);
     setJoining(true);
+    setError(''); // Clear previous errors
+    
     try {
       const token = localStorage.getItem('token');
-      await axios.post(
-        `https://structures-production.up.railway.app/api/rooms/${joinCode}/join`,
-        {},
+      const formattedCode = joinCode.trim().toUpperCase();
+      console.log('Making join request to:', `https://structures-production.up.railway.app/api/rooms/${formattedCode}/join`);
+      
+      // Try the new direct URL endpoint first
+      const response = await axios.post(
+        `https://structures-production.up.railway.app/api/rooms/${formattedCode}/join`,
+        {}, // No body needed for this endpoint
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Find the room in the list to get the problem_id
-      const joinedRoom = rooms.find(r => r.code === joinCode);
-      if (joinedRoom) {
-        navigate(`/rooms/${joinedRoom.code}/${joinedRoom.problem_id}`);
-      } else {
-        // fallback: reload rooms and try again
-        const res = await axios.get('https://structures-production.up.railway.app/api/rooms/', { headers: { Authorization: `Bearer ${token}` } });
-        const updatedRoom = res.data.find((r: any) => r.code === joinCode);
-        if (updatedRoom) {
-          navigate(`/rooms/${updatedRoom.code}/${updatedRoom.problem_id}`);
-        } else {
-          setError('Joined room, but could not find problem.');
-        }
-      }
+      
+      console.log('Join response:', response.data);
+      
+      // Use the response data to navigate to the room
+      const joinedRoom = response.data;
+      console.log('Navigating to room:', `/rooms/${joinedRoom.code}/${joinedRoom.problem_id}`);
+      
+      navigate(`/rooms/${joinedRoom.code}/${joinedRoom.problem_id}`);
       setShowJoinModal(false);
       setJoinCode('');
-    } catch (err) {
-      setError('Failed to join room. Check the code and try again.');
+    } catch (err: any) {
+      console.error('Room join error with direct URL:', err);
+      
+      // Try the original endpoint as fallback
+      try {
+        console.log('Trying fallback join method with /api/rooms/join/');
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+          'https://structures-production.up.railway.app/api/rooms/join/',
+          { code: joinCode.trim().toUpperCase() },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        console.log('Fallback join successful:', response.data);
+        const joinedRoom = response.data;
+        navigate(`/rooms/${joinedRoom.code}/${joinedRoom.problem_id}`);
+        setShowJoinModal(false);
+        setJoinCode('');
+        return; // Exit early if fallback succeeds
+      } catch (fallbackErr: any) {
+        console.error('Fallback join also failed:', fallbackErr);
+        console.error('Fallback error response:', fallbackErr.response?.data);
+        
+        // Use the original error for the message
+        if (err.response?.status === 404) {
+          setError('Room not found. Please check the room code.');
+        } else if (err.response?.status === 403) {
+          setError('Access denied. You may not have permission to join this room.');
+        } else if (err.response?.status === 422) {
+          setError('Invalid room code format.');
+        } else {
+          setError(err.response?.data?.detail || 'Failed to join room. Please try again.');
+        }
+      }
     } finally {
       setJoining(false);
     }

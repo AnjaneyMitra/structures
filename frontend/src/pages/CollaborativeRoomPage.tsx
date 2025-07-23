@@ -28,6 +28,23 @@ import MuiAlert from '@mui/material/Alert';
 
 const SOCKET_URL = 'https://structures-production.up.railway.app';
 
+// Helper function to create a robust socket connection
+const createSocketConnection = (url: string) => {
+  console.log('Creating socket connection to:', url);
+  
+  // Try to connect with multiple transport options
+  return io(url, {
+    transports: ['polling', 'websocket'],
+    upgrade: true,
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000,
+    autoConnect: true
+  });
+};
+
 const languageOptions = [
   { 
     label: 'Python', 
@@ -234,13 +251,79 @@ const CollaborativeRoomPage: React.FC = () => {
   }, [code, username]);
 
   useEffect(() => {
-    const socket = io(SOCKET_URL, { transports: ['websocket'] });
+    console.log('Initializing socket connection to:', SOCKET_URL);
+    
+    // Use the helper function to create a robust connection
+    const socket = createSocketConnection(SOCKET_URL);
     socketRef.current = socket;
+    
     socket.on('connect', () => {
+      console.log('Socket connected successfully with ID:', socket.id);
       setConnected(true);
+      
+      // Join the room with a small delay to ensure the connection is stable
+      setTimeout(() => {
+        console.log('Emitting join_room event for room:', roomCode, 'username:', username || 'Anonymous');
+        socket.emit('join_room', { room: roomCode, username: username || 'Anonymous' });
+      }, 500);
+    });
+    
+    socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+      setConnected(false);
+      
+      // If the disconnect was not intentional, try to reconnect
+      if (reason !== 'io client disconnect') {
+        console.log('Attempting to reconnect...');
+        setTimeout(() => {
+          socket.connect();
+        }, 1000);
+      }
+    });
+    
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+      setConnected(false);
+      
+      // Try different transport strategies
+      if (error.message.includes('websocket')) {
+        console.log('WebSocket connection failed, retrying with polling transport only...');
+        socket.io.opts.transports = ['polling'];
+        socket.connect();
+      } else if (socket.io.opts.transports.includes('websocket')) {
+        // If we're still having issues, try with polling only
+        console.log('Connection issues, falling back to polling only...');
+        socket.io.opts.transports = ['polling'];
+        socket.connect();
+      }
+    });
+    
+    socket.on('reconnect', (attemptNumber) => {
+      console.log('Socket reconnected after', attemptNumber, 'attempts');
+      setConnected(true);
+      
+      // Re-join the room after reconnection
+      console.log('Re-joining room after reconnection');
       socket.emit('join_room', { room: roomCode, username: username || 'Anonymous' });
     });
-    socket.on('disconnect', () => setConnected(false));
+    
+    socket.on('reconnect_error', (error) => {
+      console.error('Socket reconnection error:', error);
+      
+      // If we've tried multiple times with no success, show a message to the user
+      setConsoleOutput(prev => 
+        prev + '\n\nConnection issues detected. You may need to refresh the page if collaboration features are not working.'
+      );
+    });
+    
+    // Add specific handlers for room events to confirm connection is working
+    socket.on('user_joined', (data) => {
+      console.log('User joined event received:', data);
+    });
+    
+    socket.on('user_list', (data) => {
+      console.log('User list received:', data);
+    });
     socket.on('code_update', (data: any) => {
       if (data.code !== codeRef.current) setCode(data.code);
       if (data.username) {
@@ -318,11 +401,86 @@ const CollaborativeRoomPage: React.FC = () => {
         setUsers(data.users.map((u: any) => u.username));
       }
     });
+    // Set up a connection health check
+    const healthCheckInterval = setInterval(() => {
+      if (socket && !socket.connected && socketRef.current === socket) {
+        console.log('Socket health check: disconnected, attempting to reconnect...');
+        socket.connect();
+      }
+    }, 10000);
+    
     return () => {
-      socket.emit('leave_room', { room: roomCode });
+      clearInterval(healthCheckInterval);
+      if (socket.connected) {
+        socket.emit('leave_room', { room: roomCode });
+      }
       socket.disconnect();
     };
   }, [roomCode, language, username]);
+  
+  // Add a fallback polling mechanism for room state if socket connection fails
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout | null = null;
+    
+    // If socket is disconnected for more than 10 seconds, start polling
+    const startPolling = () => {
+      if (pollInterval) return; // Already polling
+      
+      console.log('Starting fallback polling for room state');
+      pollInterval = setInterval(async () => {
+        if (!connected) {
+          try {
+            console.log('Polling for room state...');
+            const token = localStorage.getItem('token');
+            const [roomRes, usersRes] = await Promise.all([
+              axios.get(`https://structures-production.up.railway.app/api/rooms/code/${roomCode}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              }),
+              axios.get(`https://structures-production.up.railway.app/api/rooms/${roomCode}/users`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+            ]);
+            
+            setRoomData(roomRes.data);
+            setRoomUsers(usersRes.data);
+            setUsers(usersRes.data.map((u: any) => u.username));
+          } catch (err) {
+            console.error('Polling error:', err);
+          }
+        }
+      }, 10000); // Poll every 10 seconds
+    };
+    
+    const stopPolling = () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+        console.log('Stopped fallback polling');
+      }
+    };
+    
+    // Start/stop polling based on connection status
+    let disconnectTimer: NodeJS.Timeout | null = null;
+    
+    if (!connected) {
+      // Start polling after 10 seconds of disconnection
+      disconnectTimer = setTimeout(startPolling, 10000);
+    } else {
+      // Stop polling when connected
+      stopPolling();
+      if (disconnectTimer) {
+        clearTimeout(disconnectTimer);
+        disconnectTimer = null;
+      }
+    }
+    
+    return () => {
+      stopPolling();
+      if (disconnectTimer) {
+        clearTimeout(disconnectTimer);
+      }
+    };
+  }, [connected, roomCode]);
 
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -340,7 +498,24 @@ const CollaborativeRoomPage: React.FC = () => {
       setRoomLoading(true);
       setRoomError('');
       try {
+        console.log(`Fetching room data for room code: ${roomCode}, problem ID: ${problemId}`);
         const token = localStorage.getItem('token');
+        
+        // First, ensure we're joined to the room
+        try {
+          console.log('Ensuring user is joined to the room');
+          await axios.post(`https://structures-production.up.railway.app/api/rooms/${roomCode}/join`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log('Successfully joined/confirmed room membership');
+        } catch (joinErr: any) {
+          // If we get a 400, it means we're already in the room, which is fine
+          if (joinErr.response?.status !== 400) {
+            console.error('Error joining room:', joinErr);
+          }
+        }
+        
+        // Now fetch the room data
         const [roomRes, usersRes, problemRes] = await Promise.all([
           axios.get(`https://structures-production.up.railway.app/api/rooms/code/${roomCode}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -684,6 +859,9 @@ Good luck! 🚀`);
       </Box>
     );
   }
+  
+  // Show connection warning if not connected after initial load
+  const showConnectionWarning = !connected && !roomLoading && roomData;
 
   if (roomError) {
     return (
@@ -727,6 +905,34 @@ Good luck! 🚀`);
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
+      {/* Connection Warning Banner */}
+      {showConnectionWarning && (
+        <Box sx={{
+          bgcolor: 'var(--color-warning)',
+          color: 'var(--color-warning-foreground)',
+          px: 3,
+          py: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2
+        }}>
+          <div className="animate-pulse">
+            <FiberManualRecordIcon sx={{ fontSize: 14 }} />
+          </div>
+          <Typography variant="body2" fontWeight={500}>
+            Connection issues detected. Real-time collaboration features may be limited. 
+            <Button 
+              size="small" 
+              sx={{ ml: 2, color: 'inherit', textDecoration: 'underline' }}
+              onClick={() => window.location.reload()}
+            >
+              Refresh page
+            </Button>
+          </Typography>
+        </Box>
+      )}
+      
       {/* Header */}
       <Box sx={{
         borderBottom: '1px solid var(--color-border)',
@@ -739,16 +945,18 @@ Good luck! 🚀`);
           <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-primary)' }}>
             Room {roomCode}
           </Typography>
-          <Chip
-            label={connected ? 'Connected' : 'Disconnected'}
-            color={connected ? 'success' : 'error'}
-            size="small"
-            sx={{
-              bgcolor: connected ? 'var(--color-success)' : 'var(--color-destructive)',
-              color: 'white',
-              fontWeight: 600
-            }}
-          />
+          <Tooltip title={connected ? 'Real-time connection active' : 'Connection issues - some features may be limited'}>
+            <Chip
+              label={connected ? 'Connected' : 'Disconnected'}
+              color={connected ? 'success' : 'error'}
+              size="small"
+              sx={{
+                bgcolor: connected ? 'var(--color-success)' : 'var(--color-destructive)',
+                color: 'white',
+                fontWeight: 600
+              }}
+            />
+          </Tooltip>
           <Badge badgeContent={Math.max(users.length, roomUsers.length)} color="primary">
             <PeopleIcon sx={{ color: 'var(--color-muted-foreground)' }} />
           </Badge>
