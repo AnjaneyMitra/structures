@@ -290,10 +290,12 @@ const CollaborativeRoomPage: React.FC = () => {
         console.log('WebSocket connection failed, retrying with polling transport only...');
         socket.io.opts.transports = ['polling'];
         socket.connect();
-      } else if (socket.io.opts.transports.includes('websocket')) {
+      } else if (socket.io.opts && socket.io.opts.transports && socket.io.opts.transports.includes('websocket')) {
         // If we're still having issues, try with polling only
         console.log('Connection issues, falling back to polling only...');
-        socket.io.opts.transports = ['polling'];
+        if (socket.io.opts) {
+          socket.io.opts.transports = ['polling'];
+        }
         socket.connect();
       }
     });
