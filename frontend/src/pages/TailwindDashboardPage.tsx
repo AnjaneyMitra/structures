@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
+  MagnifyingGlassIcon as SearchIcon, 
   BoltIcon, 
   CheckCircleIcon,
   StarIcon
@@ -31,6 +32,7 @@ const TailwindDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
+  const [quickSearch, setQuickSearch] = useState('');
   const [loadingProblem, setLoadingProblem] = useState<number | null>(null);
   const navigate = useNavigate();
 
@@ -58,6 +60,12 @@ const TailwindDashboardPage: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const handleQuickSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      navigate(`/problems?search=${encodeURIComponent(quickSearch)}`);
+    }
+  };
 
   const handleProblemClick = (problemId: number) => {
     setLoadingProblem(problemId);
@@ -110,10 +118,10 @@ const TailwindDashboardPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Stats Cards Section - Charcoal background for progress */}
+          {/* Stats Cards Section - Full Width with 24px horizontal, 32px vertical gutters */}
           {stats && (
             <section className="col-span-12 mb-8">
-              <div className="bg-[#121212] backdrop-blur-sm rounded-xl p-8 border border-border/30">
+              <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
                 <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
@@ -182,9 +190,32 @@ const TailwindDashboardPage: React.FC = () => {
             </section>
           )}
 
-          {/* Featured Problems Section - Pure black background */}
+          {/* Quick Search Section - Centered with responsive width */}
+          <section className="col-span-12 mb-8">
+            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
+              <h2 className="text-xl font-semibold text-foreground mb-6 text-center">Find Problems</h2>
+              <div className="flex justify-center">
+                <div className="relative w-full max-w-2xl">
+                  <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Quick search problems... (e.g. 'Linked List', 'Binary Tree')"
+                    value={quickSearch}
+                    onChange={(e) => setQuickSearch(e.target.value)}
+                    onKeyDown={handleQuickSearch}
+                    className="w-full pl-12 pr-4 py-4 bg-card border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-foreground placeholder:text-muted-foreground"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Press Enter to search or browse all problems
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Featured Problems Section - Full Width */}
           <section className="col-span-12">
-            <div className="bg-black backdrop-blur-sm rounded-xl p-8 border border-border/30">
+            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
                 <Link 
@@ -198,18 +229,15 @@ const TailwindDashboardPage: React.FC = () => {
               {/* 12-column grid for problem cards with consistent 24px gutters */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                 {problems.map((problem) => (
-                  <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group min-h-[200px] flex flex-col">
-                    {/* Header Layout - Split into two columns */}
+                  <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group">
                     <div className="flex items-start justify-between mb-6">
-                      <h3 className="text-base font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
+                      <h3 className="text-lg font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
                         {problem.title}
                       </h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
                         {problem.difficulty}
                       </span>
                     </div>
-                    {/* Spacer to push button to bottom */}
-                    <div className="flex-1"></div>
                     <button
                       onClick={() => handleProblemClick(problem.id)}
                       disabled={loadingProblem === problem.id}
