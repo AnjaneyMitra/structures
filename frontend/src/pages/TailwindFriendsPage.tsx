@@ -54,6 +54,7 @@ const TailwindFriendsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [refreshingFriends, setRefreshingFriends] = useState(false);
 
   const validateToken = (token: string) => {
     try {
@@ -79,6 +80,30 @@ const TailwindFriendsPage: React.FC = () => {
     }
   };
 
+  const fetchFriendsList = async () => {
+    try {
+      setRefreshingFriends(true);
+      const token = localStorage.getItem('token');
+      if (!token || !validateToken(token)) {
+        setRefreshingFriends(false);
+        return false;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      console.log('Refreshing friends list...');
+      
+      const friendsRes = await axios.get('https://structures-production.up.railway.app/api/friends/', { headers });
+      setFriends(friendsRes.data || []);
+      console.log(`Updated friends list with ${friendsRes.data?.length || 0} friends`);
+      setRefreshingFriends(false);
+      return true;
+    } catch (err) {
+      console.error('Failed to refresh friends list:', err);
+      setRefreshingFriends(false);
+      return false;
+    }
+  };
+  
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -156,6 +181,16 @@ const TailwindFriendsPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    
+    // Set up periodic refresh of friends list every 30 seconds
+    const refreshInterval = setInterval(() => {
+      if (!loading) {
+        fetchFriendsList();
+      }
+    }, 30000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, []);
 
   const searchUsers = async (query: string) => {
@@ -203,8 +238,14 @@ const TailwindFriendsPage: React.FC = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSuccess('Friend request accepted!');
-      setTimeout(() => setSuccess(''), 3000);
+      
+      // Immediately refresh the friends list to update the count
+      await fetchFriendsList();
+      
+      // Then refresh all data
       fetchData();
+      
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to accept friend request');
       setTimeout(() => setError(''), 3000);
@@ -237,8 +278,14 @@ const TailwindFriendsPage: React.FC = () => {
         `https://structures-production.up.railway.app/api/friends/${friendId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
+      // Immediately update the friends list in state to reflect the removal
+      setFriends(prevFriends => prevFriends.filter(friend => friend.id !== friendId));
+      
       setSuccess(`Removed ${username} from friends`);
       setTimeout(() => setSuccess(''), 3000);
+      
+      // Then refresh all data
       fetchData();
     } catch (err) {
       setError('Failed to remove friend');
@@ -286,12 +333,29 @@ const TailwindFriendsPage: React.FC = () => {
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <UsersIcon className="h-6 w-6 text-blue-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Friends</p>
-                  <p className="text-xl font-bold text-card-foreground">{friends.length}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <UsersIcon className="h-6 w-6 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Friends</p>
+                    <p className="text-xl font-bold text-card-foreground">{friends.length}</p>
+                  </div>
                 </div>
+                <button 
+                  onClick={fetchFriendsList} 
+                  className="p-1 rounded-full hover:bg-muted transition-colors"
+                  title="Refresh friends count"
+                  disabled={refreshingFriends}
+                >
+                  <svg 
+                    className={`h-4 w-4 ${refreshingFriends ? 'text-primary animate-spin' : 'text-muted-foreground'}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
               </div>
             </div>
             <div className="bg-card border border-border rounded-lg p-4">
