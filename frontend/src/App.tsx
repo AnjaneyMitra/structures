@@ -219,13 +219,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const isProblemPage = /^\/problems\/[\w-]+$/.test(location.pathname);
   const isRoomPage = /^\/rooms\/[\w-]+\/[\w-]+$/.test(location.pathname);
 
-  // Auto-collapse sidebar on problem/room pages
+  // Auto-collapse sidebar on problem/room pages, but don't auto-expand on other pages
   useEffect(() => {
     if (isProblemPage || isRoomPage) {
       setSidebarOpen(false);
-    } else {
-      setSidebarOpen(true);
     }
+    // Remove the auto-expand behavior for other pages
   }, [location.pathname, isProblemPage, isRoomPage]);
 
   return (
