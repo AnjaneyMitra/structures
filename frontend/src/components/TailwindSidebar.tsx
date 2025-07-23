@@ -6,7 +6,7 @@ import {
   UserGroupIcon, 
   UserIcon, 
   UsersIcon,
-  Cog6ToothIcon, 
+  ArrowRightOnRectangleIcon, 
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
@@ -125,22 +125,40 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
           
-          <div className={`flex items-center justify-between mt-4 transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`flex items-center justify-between mt-4 transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <TailwindThemeToggle />
             <button
               onClick={handleLogout}
               className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
               title="Logout"
             >
-              <Cog6ToothIcon className="h-5 w-5" />
+              <ArrowRightOnRectangleIcon className="h-5 w-5" />
             </button>
           </div>
+          
+          {/* Collapsed state controls */}
+          {!sidebarOpen && (
+            <div className="flex flex-col items-center space-y-3 mt-4">
+              <div className="scale-75">
+                <TailwindThemeToggle />
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
+                title="Logout"
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
-      {/* Toggle Button */}
+      
+      {/* Fixed Toggle Button - positioned absolutely to prevent scrolling */}
       {sidebarOpen && (
         <button
-          className="absolute top-7 left-[280px] -translate-x-1/2 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 transition-all duration-300 ease-in-out"
+          className="fixed top-7 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 transition-all duration-300 ease-in-out shadow-lg"
+          style={{ left: `${280 - 12}px` }} // 280px sidebar width minus half button width
           onClick={handleToggle}
           title="Collapse sidebar"
         >
