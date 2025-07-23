@@ -115,45 +115,45 @@ const TailwindDashboardPage: React.FC = () => {
                   </Link>
                 </div>
                 
-                {/* Scrollable Problem cards - responsive overflow */}
+                {/* Scrollable Problem List - Horizontal Layout */}
                 <div className="px-8 pb-8 lg:flex-1 lg:overflow-y-auto">
-                  <div className="space-y-2">
+                  <div className="space-y-0 divide-y divide-border/30">
                     {problems.map((problem, index) => (
                       <div 
                         key={problem.id} 
-                        className="bg-card rounded-lg border border-border/50 p-4 hover:bg-card/80 hover:border-primary/20 transition-all duration-200 group cursor-pointer"
+                        className="flex items-center justify-between py-3 px-4 hover:bg-card/50 transition-all duration-200 group cursor-pointer first:pt-0 last:pb-0"
                         onClick={() => handleProblemClick(problem.id)}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4 flex-1">
-                            {/* Problem Number */}
-                            <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
-                              <span className="text-xs font-medium text-muted-foreground">{index + 1}</span>
-                            </div>
-                            
-                            {/* Problem Title */}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors duration-200 truncate">
-                                {problem.title}
-                              </h3>
-                            </div>
+                        {/* Left Side: Number + Title */}
+                        <div className="flex items-center space-x-4 flex-1 min-w-0">
+                          {/* Problem Number */}
+                          <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-medium text-muted-foreground">{index + 1}</span>
                           </div>
                           
-                          <div className="flex items-center space-x-3 flex-shrink-0">
-                            {/* Acceptance Rate Placeholder */}
-                            <div className="hidden sm:flex items-center space-x-1">
-                              <span className="text-xs text-muted-foreground">
-                                {Math.floor(Math.random() * 30 + 40)}.{Math.floor(Math.random() * 10)}%
-                              </span>
-                            </div>
-                            
-                            {/* Difficulty Badge */}
-                            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${
+                          {/* Problem Title */}
+                          <h3 className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors duration-200 truncate">
+                            {problem.title}
+                          </h3>
+                        </div>
+                        
+                        {/* Right Side: Acceptance Rate + Difficulty */}
+                        <div className="flex items-center space-x-6 flex-shrink-0">
+                          {/* Acceptance Rate */}
+                          <div className="hidden sm:block text-right min-w-[60px]">
+                            <span className="text-sm text-muted-foreground">
+                              {Math.floor(Math.random() * 30 + 40)}.{Math.floor(Math.random() * 10)}%
+                            </span>
+                          </div>
+                          
+                          {/* Difficulty Badge */}
+                          <div className="min-w-[70px] text-right">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
                               problem.difficulty === 'Easy' 
-                                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
+                                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400'
                                 : problem.difficulty === 'Medium'
-                                ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
-                                : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                                ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400'
+                                : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'
                             }`}>
                               {problem.difficulty}
                             </span>
