@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  MagnifyingGlassIcon as SearchIcon, 
   BoltIcon, 
   CheckCircleIcon,
   StarIcon
@@ -32,7 +31,6 @@ const TailwindDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
-  const [quickSearch, setQuickSearch] = useState('');
   const [loadingProblem, setLoadingProblem] = useState<number | null>(null);
   const navigate = useNavigate();
 
@@ -60,12 +58,6 @@ const TailwindDashboardPage: React.FC = () => {
     };
     fetchData();
   }, []);
-
-  const handleQuickSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      navigate(`/problems?search=${encodeURIComponent(quickSearch)}`);
-    }
-  };
 
   const handleProblemClick = (problemId: number) => {
     setLoadingProblem(problemId);
@@ -189,29 +181,6 @@ const TailwindDashboardPage: React.FC = () => {
               </div>
             </section>
           )}
-
-          {/* Quick Search Section - Centered with responsive width */}
-          <section className="col-span-12 mb-8">
-            <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
-              <h2 className="text-xl font-semibold text-foreground mb-6 text-center">Find Problems</h2>
-              <div className="flex justify-center">
-                <div className="relative w-full max-w-2xl">
-                  <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Quick search problems... (e.g. 'Linked List', 'Binary Tree')"
-                    value={quickSearch}
-                    onChange={(e) => setQuickSearch(e.target.value)}
-                    onKeyDown={handleQuickSearch}
-                    className="w-full pl-12 pr-4 py-4 bg-card border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-foreground placeholder:text-muted-foreground"
-                  />
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Press Enter to search or browse all problems
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* Featured Problems Section - Full Width */}
           <section className="col-span-12">
