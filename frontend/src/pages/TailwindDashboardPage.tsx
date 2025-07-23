@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   BoltIcon, 
   CheckCircleIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../context/AuthContext';
 
 interface UserProfile {
   id: number;
@@ -26,6 +27,23 @@ const TailwindDashboardPage: React.FC = () => {
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  // Handle OAuth callback parameters if present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('access_token');
+    const username = params.get('username');
+    
+    if (token && username) {
+      // Store the token and username
+      login(token, username);
+      
+      // Remove the query parameters from the URL
+      navigate('/dashboard', { replace: true });
+    }
+  }, [location, login, navigate]);
 
   useEffect(() => {
     const fetchData = async () => {

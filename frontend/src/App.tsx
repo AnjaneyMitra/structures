@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Paper, Typography, Stack, Button, Grid } from '@mui/material';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TailwindDashboardPage from './pages/TailwindDashboardPage';
@@ -11,8 +11,21 @@ import TailwindFriendsPage from './pages/TailwindFriendsPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { RouteGuard } from './components/RouteGuard';
+import { useAutoRedirect } from './hooks/useAutoRedirect';
 
 function Landing() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+  
   return (
     <Box
       sx={{
@@ -267,26 +280,60 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-
-  // You can use location here for nav highlighting, etc.
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  // Auto-redirect authenticated users from public routes to dashboard
+  useAutoRedirect({
+    redirectAuthenticatedFrom: ['/', '/login', '/register'],
+    authenticatedRedirectTo: '/dashboard'
+  });
+  
+  // If still loading auth state, show minimal loading UI
+  if (isLoading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh' 
+      }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </Box>
+    );
+  }
+  
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/dashboard" element={<AppLayout><TailwindDashboardPage /></AppLayout>} />
-      <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
-      <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
-      <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
-      <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
-      <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
-      <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
+      {/* Public routes - redirect to dashboard if already logged in */}
+      <Route element={<RouteGuard requireAuth={false} />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
+      
+      {/* Protected routes - require authentication */}
+      <Route element={<RouteGuard requireAuth={true} />}>
+        <Route path="/dashboard" element={<AppLayout><TailwindDashboardPage /></AppLayout>} />
+        <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
+        <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
+        <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
+        <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
+        <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
+        <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
+      </Route>
+      
+      {/* Fallback route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
 
 function App() {
-  return <AppRoutes />;
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
 }
 
 export default App;

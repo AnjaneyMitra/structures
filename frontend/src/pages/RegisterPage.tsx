@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { authTheme } from '../theme';
+import { useAuth } from '../context/AuthContext';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -24,6 +25,7 @@ const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,14 +48,37 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
+      // Register the user
       await axios.post('https://structures-production.up.railway.app/api/auth/register', {
         username,
         password,
       });
+      
       setSuccess(true);
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
+      
+      // Auto-login after successful registration
+      try {
+        const loginRes = await axios.post('https://structures-production.up.railway.app/api/auth/login', 
+          new URLSearchParams({
+            username,
+            password,
+          }), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          }
+        );
+        
+        // Login successful, store token and redirect to dashboard
+        login(loginRes.data.access_token, username);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      } catch (loginErr) {
+        // If auto-login fails, redirect to login page
+        console.error('Auto-login failed:', loginErr);
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
     } finally {

@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { authTheme } from '../theme';
+import { useAuth } from '../context/AuthContext';
 
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -24,6 +25,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +38,7 @@ const LoginPage: React.FC = () => {
       }), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
-      localStorage.setItem('token', res.data.access_token);
-      localStorage.setItem('username', username);
+      login(res.data.access_token, username);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed');
@@ -58,12 +59,11 @@ const LoginPage: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('access_token');
     const username = params.get('username');
-    if (token) {
-      localStorage.setItem('token', token);
-      if (username) localStorage.setItem('username', username);
-      window.location.href = '/dashboard';
+    if (token && username) {
+      login(token, username);
+      navigate('/dashboard');
     }
-  }, []);
+  }, [login, navigate]);
 
   return (
     <ThemeProvider theme={authTheme}>

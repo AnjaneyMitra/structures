@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from ...db import models, schemas
 from ...core import auth
 from ...api import deps
-from datetime import timedelta
+from datetime import timedelta, datetime
 from authlib.integrations.starlette_client import OAuth
 import os
 from fastapi.responses import RedirectResponse
@@ -91,6 +91,7 @@ async def google_auth_callback(request: Request, db: Session = Depends(deps.get_
         db.commit()
         db.refresh(user)
     access_token = auth.create_access_token({"sub": user.username})
-    # Redirect to frontend with token and username
-    frontend_url = f"https://structures-nine.vercel.app/login?access_token={access_token}&username={user.username}"
+    # Always redirect to dashboard for Google OAuth users
+    # The frontend will handle the token and redirect appropriately
+    frontend_url = f"https://structures-nine.vercel.app/dashboard?access_token={access_token}&username={user.username}"
     return RedirectResponse(frontend_url) 

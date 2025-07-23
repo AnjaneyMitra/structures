@@ -11,6 +11,7 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { TailwindThemeToggle } from './TailwindThemeToggle';
+import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
@@ -32,14 +33,14 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
   onToggle 
 }) => {
   const location = useLocation();
-  const user = { name: localStorage.getItem('username') || 'User', avatar: '' };
+  const { username, logout } = useAuth();
+  const user = { name: username || 'User', avatar: '' };
 
   // Use the open prop from parent instead of internal state
   const sidebarOpen = open;
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
+    logout();
     window.location.href = '/login';
   };
 
