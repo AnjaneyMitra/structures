@@ -6,7 +6,6 @@ import {
   UserGroupIcon, 
   UserIcon, 
   UsersIcon,
-  ArrowRightOnRectangleIcon, 
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
@@ -36,12 +35,6 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
 
   // Use the open prop from parent instead of internal state
   const sidebarOpen = open;
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href = '/login';
-  };
 
   const handleToggle = () => {
     if (onToggle) {
@@ -114,8 +107,8 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
         {/* User Section */}
         <div className="p-4 border-t border-card-foreground/10">
           <div className={`flex items-center overflow-hidden`}>
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-muted to-muted-foreground/20 rounded-full flex-shrink-0" title={user.name}>
-              <UserIcon className="h-5 w-5 text-muted-foreground" />
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex-shrink-0 text-white font-bold text-sm" title={user.name}>
+              {user.name.charAt(0).toUpperCase()}
             </div>
             <div className={`pl-3 flex-1 min-w-0 transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
               <p className="text-sm font-medium text-card-foreground truncate whitespace-nowrap">
@@ -125,30 +118,17 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
           
-          <div className={`flex items-center justify-between mt-4 transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          {/* Expanded state - show theme toggle */}
+          <div className={`flex items-center justify-center mt-4 transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <TailwindThemeToggle />
-            <button
-              onClick={handleLogout}
-              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
-              title="Logout"
-            >
-              <ArrowRightOnRectangleIcon className="h-5 w-5" />
-            </button>
           </div>
           
-          {/* Collapsed state controls */}
+          {/* Collapsed state - show theme toggle */}
           {!sidebarOpen && (
-            <div className="flex flex-col items-center space-y-3 mt-4">
+            <div className="flex justify-center mt-4">
               <div className="scale-75">
                 <TailwindThemeToggle />
               </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
-                title="Logout"
-              >
-                <ArrowRightOnRectangleIcon className="h-5 w-5" />
-              </button>
             </div>
           )}
         </div>
