@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { UserGroupIcon, PlusCircleIcon, KeyIcon, PlayIcon, UserIcon } from'@heroicons/react/24/outline';
+import { UserGroupIcon, PlusCircleIcon, XMarkIcon, PlayIcon, UserIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
 interface Room {
@@ -16,6 +16,7 @@ const TailwindRoomsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const navigate = useNavigate();
   const [problems, setProblems] = useState<{ id: number; title: string }[]>([]);
   const [selectedProblem, setSelectedProblem] = useState<number | ''>('');
@@ -80,6 +81,8 @@ const TailwindRoomsPage: React.FC = () => {
           setError('Joined room, but could not find problem.');
         }
       }
+      setShowJoinModal(false);
+      setJoinCode('');
     } catch (err) {
       setError('Failed to join room. Check the code and try again.');
     } finally {
@@ -122,7 +125,10 @@ const TailwindRoomsPage: React.FC = () => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
             <UserGroupIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Collaborative Rooms</h1>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Collaborative Rooms</h1>
+              <p className="text-muted-foreground text-lg mt-1">Work on coding challenges with your peers in real-time</p>
+            </div>
           </div>
         </div>
 
@@ -132,74 +138,59 @@ const TailwindRoomsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Join Room Section */}
-        <div className="bg-card border border-border rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-card-foreground mb-4 flex items-center">
-            <KeyIcon className="h-5 w-5 mr-2 text-primary" />
-            Join Room
-          </h2>
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              placeholder="Enter room code"
-              value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value)}
-              className="flex-1 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-            />
-            <button
-              onClick={handleJoinRoom}
-              disabled={joining || !joinCode.trim()}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {joining ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-              ) : (
-                <>
-                  <PlayIcon className="h-4 w-4 mr-2" />
-                  Join
-                </>
-              )}
-            </button>
+        {/* Primary: Create Room Section */}
+        <div className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-primary/20 rounded-xl p-8 mb-8">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center">
+              <PlusCircleIcon className="h-6 w-6 mr-2 text-primary" />
+              Create New Room
+            </h2>
+            <p className="text-muted-foreground">Select a problem to get started</p>
           </div>
-        </div>
-
-        {/* Create Room Section */}
-        <div className="bg-card border border-border rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-card-foreground mb-4 flex items-center">
-            <PlusCircleIcon className="h-5 w-5 mr-2 text-primary" />
-            Create New Room
-          </h2>
-          <div className="flex space-x-4">
+          
+          <div className="max-w-md mx-auto space-y-4">
             <select
               value={selectedProblem}
               onChange={(e) => setSelectedProblem(Number(e.target.value) || '')}
-              className="flex-1 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+              className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground text-center"
             >
-              <option value="">Select a problem</option>
+              <option value="">Select a problem to collaborate on</option>
               {problems.map((problem) => (
                 <option key={problem.id} value={problem.id}>
                   {problem.title}
                 </option>
               ))}
             </select>
+            
             <button
               onClick={handleCreateRoom}
               disabled={creating || !selectedProblem}
-              className="px-6 py-2 bg-accent text-accent-foreground rounded-md hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="w-full px-8 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-semibold transition-all hover:scale-105 active:scale-95"
             >
               {creating ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent-foreground"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
               ) : (
                 <>
-                  <PlusCircleIcon className="h-4 w-4 mr-2" />
-                  Create
+                  <PlusCircleIcon className="h-5 w-5 mr-2" />
+                  Create Room
                 </>
               )}
             </button>
+            
+            {createError && (
+              <div className="mt-3 text-destructive text-sm text-center">{createError}</div>
+            )}
           </div>
-          {createError && (
-            <div className="mt-3 text-destructive text-sm">{createError}</div>
-          )}
+        </div>
+
+        {/* Secondary: Join Room Link */}
+        <div className="text-center mb-8">
+          <button 
+            onClick={() => setShowJoinModal(true)}
+            className="text-muted-foreground hover:text-foreground transition-colors text-sm underline underline-offset-4"
+          >
+            Have a room code? Join with code
+          </button>
         </div>
 
         {/* Active Rooms */}
@@ -245,6 +236,57 @@ const TailwindRoomsPage: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Join Room Modal */}
+        {showJoinModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-card-foreground">Join Room</h3>
+                <button 
+                  onClick={() => setShowJoinModal(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Enter room code"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+                  autoFocus
+                />
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setShowJoinModal(false)}
+                    className="flex-1 px-4 py-2 border border-border text-muted-foreground rounded-lg hover:bg-muted/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleJoinRoom}
+                    disabled={joining || !joinCode.trim()}
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {joining ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                    ) : (
+                      <>
+                        <PlayIcon className="h-4 w-4 mr-2" />
+                        Join
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
