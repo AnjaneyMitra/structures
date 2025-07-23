@@ -110,83 +110,110 @@ const TailwindDashboardPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Stats Cards Section - Full Width with 24px horizontal, 32px vertical gutters */}
-          {stats && (
-            <section className="col-span-12 mb-8">
-              <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
-                <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div>
+          {/* Main Content Section - Split Layout */}
+          <div className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            {/* Featured Problems Section - Left Side */}
+            <section className="lg:col-span-1">
+              <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 h-full">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
+                  <Link 
+                    to="/problems"
+                    className="inline-flex items-center px-4 py-2 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary hover:scale-105 active:scale-95 transition-all duration-200 font-medium text-sm"
+                  >
+                    View All
+                  </Link>
+                </div>
+                
+                {/* Problem cards with reduced grid */}
+                <div className="grid grid-cols-1 gap-4">
+                  {problems.slice(0, 3).map((problem) => (
+                    <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-4 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group">
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="text-base font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
+                          {problem.title}
+                        </h3>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${difficultyStyles[problem.difficulty as keyof typeof difficultyStyles] || 'bg-muted text-muted-foreground border-border'}`}>
+                          {problem.difficulty}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleProblemClick(problem.id)}
+                        disabled={loadingProblem === problem.id}
+                        className="w-full bg-primary hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] text-primary-foreground font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {loadingProblem === problem.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                            <span>Loading...</span>
+                          </>
+                        ) : (
+                          'Solve Problem'
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Stats Cards Section - Right Side in 2x2 Grid */}
+            {stats && (
+              <section className="lg:col-span-1">
+                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 h-full">
+                  <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
+                  <div className="grid grid-cols-2 gap-4 h-fit">
+                    <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="p-3 bg-primary/10 rounded-lg mb-3">
+                          <CheckCircleIcon className="h-8 w-8 text-primary" />
+                        </div>
                         <p className="text-sm font-medium text-muted-foreground mb-2">Problems Solved</p>
-                        <p className="text-3xl font-bold text-primary">{stats.problems_solved}</p>
-                      </div>
-                      <div className="p-3 bg-primary/10 rounded-lg">
-                        <CheckCircleIcon className="h-8 w-8 text-primary" />
+                        <p className="text-2xl font-bold text-primary">{stats.problems_solved}</p>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div>
+                    
+                    <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="p-3 bg-accent/10 rounded-lg mb-3">
+                          <BoltIcon className="h-8 w-8 text-accent" />
+                        </div>
                         <p className="text-sm font-medium text-muted-foreground mb-2">Total Submissions</p>
-                        <p className="text-3xl font-bold text-accent">{stats.total_submissions}</p>
-                      </div>
-                      <div className="p-3 bg-accent/10 rounded-lg">
-                        <BoltIcon className="h-8 w-8 text-accent" />
+                        <p className="text-2xl font-bold text-accent">{stats.total_submissions}</p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Total XP Card */}
-                  <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="bg-card rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="p-3 bg-yellow-500/10 rounded-lg mb-3">
+                          <StarIcon className="h-8 w-8 text-yellow-500" />
+                        </div>
                         <p className="text-sm font-medium text-muted-foreground mb-2">Total XP</p>
-                        <p className="text-3xl font-bold text-yellow-600">{stats.total_xp || 0}</p>
-                      </div>
-                      <div className="p-3 bg-yellow-500/10 rounded-lg">
-                        <StarIcon className="h-8 w-8 text-yellow-500" />
+                        <p className="text-2xl font-bold text-yellow-600">{stats.total_xp || 0}</p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Placeholder card for future metric */}
-                  <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">Success Rate</p>
-                        <p className="text-3xl font-bold text-muted-foreground">--%</p>
-                      </div>
-                      <div className="p-3 bg-muted/10 rounded-lg">
-                        <div className="h-8 w-8 bg-muted/20 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-6 opacity-60">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="p-3 bg-muted/10 rounded-lg mb-3">
+                          <div className="h-8 w-8 bg-muted/20 rounded"></div>
+                        </div>
                         <p className="text-sm font-medium text-muted-foreground mb-2">Streak</p>
-                        <p className="text-3xl font-bold text-muted-foreground">--</p>
-                      </div>
-                      <div className="p-3 bg-muted/10 rounded-lg">
-                        <div className="h-8 w-8 bg-muted/20 rounded"></div>
+                        <p className="text-2xl font-bold text-muted-foreground">--</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </section>
-          )}
+              </section>
+            )}
+          </div>
 
-          {/* Featured Problems Section - Full Width */}
+          {/* Additional Problems Section - Full Width */}
           <section className="col-span-12">
             <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
+                <h2 className="text-2xl font-bold text-foreground">More Problems</h2>
                 <Link 
                   to="/problems"
                   className="inline-flex items-center px-6 py-2.5 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary hover:scale-105 active:scale-95 transition-all duration-200 font-medium text-sm"
@@ -195,9 +222,9 @@ const TailwindDashboardPage: React.FC = () => {
                 </Link>
               </div>
               
-              {/* 12-column grid for problem cards with consistent 24px gutters */}
+              {/* Grid for additional problem cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                {problems.map((problem) => (
+                {problems.slice(3).map((problem) => (
                   <div key={problem.id} className="bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 group">
                     <div className="flex items-start justify-between mb-6">
                       <h3 className="text-lg font-bold text-card-foreground flex-1 pr-4 group-hover:text-primary transition-colors duration-200">
