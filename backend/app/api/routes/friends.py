@@ -234,20 +234,25 @@ def get_friends(
     
     friends = []
     try:
+        print(f"Processing {len(friendships)} friendships for user {user.username}")
         for friendship in friendships:
             # Get the friend (the other person in the friendship)
             friend_id = friendship.addressee_id if friendship.requester_id == user.id else friendship.requester_id
+            print(f"Looking up friend with ID: {friend_id}")
             friend = db.query(models.User).filter(models.User.id == friend_id).first()
             
             if friend:
+                print(f"Found friend: {friend.username} (ID: {friend.id})")
                 friends.append({
                     "id": friend.id,
                     "username": friend.username,
                     "total_xp": friend.total_xp or 0
                 })
+            else:
+                print(f"Friend with ID {friend_id} not found in database")
         
         # Sort by XP descending
-        friends.sort(key=lambda x: x.total_xp, reverse=True)
+        friends.sort(key=lambda x: x["total_xp"], reverse=True)
         print(f"Returning {len(friends)} friends for user {user.username}")
         return friends
         
