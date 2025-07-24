@@ -20,23 +20,47 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Ensure user preferences exist with proper defaults for production."""
-    # This migration ensures the columns exist and have proper defaults
-    # Safe to run multiple times
+    # Get database connection to check which database we're using
+    connection = op.get_bind()
     
-    # Add columns if they don't exist (PostgreSQL compatible)
-    try:
-        op.add_column('users', sa.Column('theme_preference', sa.String(), nullable=True))
-    except Exception:
-        pass  # Column already exists
+    # Check database type
+    if connection.dialect.name == 'postgresql':
+        # Use PostgreSQL-specific syntax
+        op.execute("""
+            DO $$ 
+            BEGIN 
+                -- Add theme_preference column if it doesn't exist
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_name = 'users' AND column_name = 'theme_preference'
+                ) THEN
+                    ALTER TABLE users ADD COLUMN theme_preference VARCHAR;
+                END IF;
+                
+                -- Add font_size column if it doesn't exist
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_name = 'users' AND column_name = 'font_size'
+                ) THEN
+                    ALTER TABLE users ADD COLUMN font_size VARCHAR;
+                END IF;
+            END $$;
+        """)
+    else:
+        # Use standard Alembic operations for SQLite and other databases
+        try:
+            op.add_column('users', sa.Column('theme_preference', sa.String(), nullable=True))
+        except Exception:
+            pass  # Column might already exist
+        
+        try:
+            op.add_column('users', sa.Column('font_size', sa.String(), nullable=True))
+        except Exception:
+            pass  # Column might already exist
     
-    try:
-        op.add_column('users', sa.Column('font_size', sa.String(), nullable=True))
-    except Exception:
-        pass  # Column already exists
-    
-    # Set default values for any NULL entries
-    op.execute("UPDATE users SET theme_preference = 'light' WHERE theme_preference IS NULL OR theme_preference = ''")
-    op.execute("UPDATE users SET font_size = 'medium' WHERE font_size IS NULL OR font_size = ''")
+    # Always run these updates to ensure data consistency (works for all databases)
+    op.execute("UPDATE users SET theme_preference = 'light' WHERE theme_preference IS NULL")
+    op.execute("UPDATE users SET font_size = 'medium' WHERE font_size IS NULL")
 
 
 def downgrade() -> None:

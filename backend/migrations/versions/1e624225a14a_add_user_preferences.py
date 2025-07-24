@@ -20,18 +20,38 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add user preferences fields with proper defaults."""
-    # Use try/except for cross-database compatibility
-    try:
-        op.add_column('users', sa.Column('theme_preference', sa.String(), nullable=True, default='light'))
-    except:
-        pass  # Column might already exist
+    # Get database connection to check which database we're using
+    connection = op.get_bind()
     
-    try:
-        op.add_column('users', sa.Column('font_size', sa.String(), nullable=True, default='medium'))
-    except:
-        pass  # Column might already exist
+    # Check database type
+    if connection.dialect.name == 'postgresql':
+        # Use PostgreSQL-specific syntax
+        op.execute("""
+            DO $$ 
+            BEGIN 
+                -- Add theme_preference column if it doesn't exist
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_name = 'users' AND column_name = 'theme_preference'
+                ) THEN
+                    ALTER TABLE users ADD COLUMN theme_preference VARCHAR;
+                END IF;
+                
+                -- Add font_size column if it doesn't exist
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_name = 'users' AND column_name = 'font_size'
+                ) THEN
+                    ALTER TABLE users ADD COLUMN font_size VARCHAR;
+                END IF;
+            END $$;
+        """)
+    else:
+        # Use standard Alembic operations for SQLite and other databases
+        op.add_column('users', sa.Column('theme_preference', sa.String(), nullable=True))
+        op.add_column('users', sa.Column('font_size', sa.String(), nullable=True))
     
-    # Set default values for existing users
+    # Set default values for existing users (works for all databases)
     op.execute("UPDATE users SET theme_preference = 'light' WHERE theme_preference IS NULL")
     op.execute("UPDATE users SET font_size = 'medium' WHERE font_size IS NULL")
 
