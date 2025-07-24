@@ -380,10 +380,10 @@ const TailwindProblemsPage: React.FC = () => {
                   <div className="min-w-[80px] text-center">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       problem.difficulty === 'Easy' 
-                        ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                        ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300'
                         : problem.difficulty === 'Medium'
-                        ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400'
-                        : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300'
+                        : 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300'
                     }`}>
                       {problem.difficulty}
                     </span>

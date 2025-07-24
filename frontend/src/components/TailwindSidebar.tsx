@@ -192,10 +192,11 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
       {/* Fixed Toggle Button - positioned absolutely to prevent scrolling */}
       {sidebarOpen && (
         <button
-          className="fixed top-7 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 shadow-lg"
+          className={`fixed top-7 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 shadow-lg transition-opacity duration-300 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
           style={{ 
             left: `${280 - 12}px`,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transitionDelay: sidebarOpen ? '0.3s' : '0s'
           }}
           onClick={handleToggle}
           title="Collapse sidebar"
