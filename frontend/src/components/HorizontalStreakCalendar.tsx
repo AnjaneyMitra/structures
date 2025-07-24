@@ -83,30 +83,30 @@ export const HorizontalStreakCalendar: React.FC<HorizontalStreakCalendarProps> =
   const monthsShown = new Set<string>();
 
   return (
-    <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-foreground">Solve Calendar</h3>
+    <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-base font-semibold text-foreground">Solve Calendar</h3>
         <div className="flex items-center space-x-2 text-xs text-muted-foreground">
           <span>Less</span>
           <div className="flex space-x-1">
-            <div className="w-2.5 h-2.5 rounded-sm bg-muted/30"></div>
-            <div className="w-2.5 h-2.5 rounded-sm bg-green-200 dark:bg-green-900"></div>
-            <div className="w-2.5 h-2.5 rounded-sm bg-green-300 dark:bg-green-700"></div>
-            <div className="w-2.5 h-2.5 rounded-sm bg-green-400 dark:bg-green-600"></div>
-            <div className="w-2.5 h-2.5 rounded-sm bg-green-500 dark:bg-green-500"></div>
+            <div className="w-2 h-2 rounded-sm bg-muted/30"></div>
+            <div className="w-2 h-2 rounded-sm bg-green-200 dark:bg-green-900"></div>
+            <div className="w-2 h-2 rounded-sm bg-green-300 dark:bg-green-700"></div>
+            <div className="w-2 h-2 rounded-sm bg-green-400 dark:bg-green-600"></div>
+            <div className="w-2 h-2 rounded-sm bg-green-500 dark:bg-green-500"></div>
           </div>
           <span>More</span>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="flex space-x-1">
+      <div className="w-full">
+        <div className="flex justify-center">
           {/* Month labels */}
-          <div className="flex flex-col justify-start mr-2">
-            <div className="h-4 mb-1"></div> {/* Space for weekday labels */}
+          <div className="flex flex-col justify-start mr-3">
+            <div className="h-3 mb-1"></div> {/* Space for weekday labels */}
             {weeks.map((week, weekIndex) => {
               const firstDayOfWeek = week.find(day => day !== null);
-              if (!firstDayOfWeek) return <div key={weekIndex} className="h-2.5 mb-1"></div>;
+              if (!firstDayOfWeek) return <div key={weekIndex} className="h-2 mb-1"></div>;
               
               const date = new Date(firstDayOfWeek.date);
               const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
@@ -115,34 +115,34 @@ export const HorizontalStreakCalendar: React.FC<HorizontalStreakCalendarProps> =
               if (!monthsShown.has(monthKey)) {
                 monthsShown.add(monthKey);
                 return (
-                  <div key={weekIndex} className="h-2.5 mb-1 text-xs text-muted-foreground leading-none">
+                  <div key={weekIndex} className="h-2 mb-1 text-xs text-muted-foreground leading-none">
                     {monthName}
                   </div>
                 );
               }
-              return <div key={weekIndex} className="h-2.5 mb-1"></div>;
+              return <div key={weekIndex} className="h-2 mb-1"></div>;
             })}
           </div>
 
           {/* Calendar grid */}
           <div className="flex flex-col">
             {/* Weekday labels */}
-            <div className="flex space-x-1 mb-1">
+            <div className="flex space-x-1.5 mb-1">
               {weekdays.map((day, index) => (
-                <div key={index} className="w-2.5 h-4 text-xs text-muted-foreground text-center leading-4">
+                <div key={index} className="w-2 h-3 text-xs text-muted-foreground text-center leading-3">
                   {index % 2 === 1 ? day : ''}
                 </div>
               ))}
             </div>
 
             {/* Calendar weeks */}
-            <div className="flex space-x-1">
+            <div className="flex space-x-1.5">
               {Array.from({ length: 7 }, (_, dayIndex) => (
                 <div key={dayIndex} className="flex flex-col space-y-1">
                   {weeks.map((week, weekIndex) => {
                     const day = week[dayIndex];
                     if (!day) {
-                      return <div key={weekIndex} className="w-2.5 h-2.5"></div>;
+                      return <div key={weekIndex} className="w-2 h-2"></div>;
                     }
 
                     const colorClass = day.solved 
@@ -152,7 +152,7 @@ export const HorizontalStreakCalendar: React.FC<HorizontalStreakCalendarProps> =
                     return (
                       <div
                         key={weekIndex}
-                        className={`w-2.5 h-2.5 rounded-sm transition-colors duration-200 cursor-pointer ${colorClass} ${
+                        className={`w-2 h-2 rounded-sm transition-colors duration-200 cursor-pointer ${colorClass} ${
                           day.is_today ? 'ring-1 ring-primary ring-offset-1' : ''
                         }`}
                         title={`${formatTooltipDate(day.date)} - ${day.solved ? 'Solved a problem' : 'No problems solved'}${day.is_today ? ' (Today)' : ''}`}
@@ -166,7 +166,7 @@ export const HorizontalStreakCalendar: React.FC<HorizontalStreakCalendarProps> =
         </div>
       </div>
 
-      <div className="mt-4 text-xs text-muted-foreground">
+      <div className="mt-3 text-xs text-muted-foreground text-center">
         {calendarData.filter(day => day.solved).length} days with activity in the last {days} days
       </div>
     </div>

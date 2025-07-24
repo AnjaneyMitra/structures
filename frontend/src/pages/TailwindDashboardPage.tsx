@@ -152,13 +152,13 @@ const TailwindDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="lg:h-screen bg-background lg:overflow-hidden">
+    <div className="min-h-screen bg-background">
       {/* Main Container with 12-column grid system */}
-      <div className="max-w-7xl mx-auto px-6 py-8 lg:h-full lg:flex lg:flex-col">
-        <div className="grid grid-cols-12 gap-6 lg:h-full">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-12 gap-6">
           
           {/* Welcome Header - Full Width */}
-          <section className="col-span-12 lg:flex-shrink-0">
+          <section className="col-span-12">
             <div className="bg-card/30 backdrop-blur-sm rounded-xl p-8 border border-border/50">
               <div className="flex items-center justify-between">
                 <div>
@@ -198,12 +198,12 @@ const TailwindDashboardPage: React.FC = () => {
           </section>
 
           {/* Main Content Section - Split Layout */}
-          <div className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:flex-1 lg:min-h-0">
+          <div className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             {/* Featured Problems Section - Left Side with Scroll */}
-            <section className="lg:col-span-1 lg:flex lg:flex-col">
-              <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 lg:h-full lg:flex lg:flex-col">
-                <div className="flex items-center justify-between p-8 pb-4 lg:flex-shrink-0">
+            <section className="lg:col-span-1">
+              <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 h-fit max-h-[600px] flex flex-col">
+                <div className="flex items-center justify-between p-8 pb-4">
                   <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
                   <Link 
                     to="/problems"
@@ -214,7 +214,7 @@ const TailwindDashboardPage: React.FC = () => {
                 </div>
                 
                 {/* Scrollable Problem List - Horizontal Layout */}
-                <div className="px-8 pb-8 lg:flex-1 lg:overflow-y-auto">
+                <div className="px-8 pb-8 overflow-y-auto flex-1">
                   <div className="space-y-0 divide-y divide-border/30">
                     {problems.map((problem, index) => (
                       <div 
@@ -266,10 +266,10 @@ const TailwindDashboardPage: React.FC = () => {
 
             {/* Stats Cards Section - Right Side Fixed */}
             {stats && (
-              <section className="lg:col-span-1 lg:flex lg:flex-col">
-                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 lg:h-full lg:flex lg:flex-col">
-                  <h2 className="text-xl font-semibold text-foreground mb-6 lg:flex-shrink-0">Your Progress</h2>
-                  <div className="grid grid-cols-2 gap-4 h-fit lg:flex-shrink-0">
+              <section className="lg:col-span-1">
+                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 h-fit">
+                  <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
+                  <div className="grid grid-cols-2 gap-4 h-fit">
                     <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
                         <div className="p-2.5 bg-primary/10 rounded-lg mb-2.5">
@@ -341,7 +341,7 @@ const TailwindDashboardPage: React.FC = () => {
                   
                   {/* Recent Achievements Section */}
                   {recentAchievements.length > 0 && (
-                    <div className="mt-6 lg:flex-1 lg:flex lg:flex-col">
+                    <div className="mt-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-foreground">Recent Achievements</h3>
                         <Link 
@@ -385,7 +385,7 @@ const TailwindDashboardPage: React.FC = () => {
         {/* Streak Calendar Section - Moved down with proper spacing */}
         <div className="mt-8 pt-6 border-t border-border/20">
           <div className="w-full flex justify-center">
-            <div className="w-full max-w-5xl">
+            <div className="w-full max-w-4xl">
               <HorizontalStreakCalendar days={100} />
             </div>
           </div>

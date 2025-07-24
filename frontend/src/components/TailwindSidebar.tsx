@@ -12,7 +12,6 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { ThemeSelector } from './ThemeSelector';
-import { FontSizeSelector } from './FontSizeSelector';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
@@ -131,11 +130,10 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
           
-          {/* Controls - Always visible at bottom */}
+          {/* Controls */}
           {sidebarOpen ? (
             <div className="flex items-center justify-between">
               <ThemeSelector />
-              <FontSizeSelector />
               <button
                 onClick={handleLogout}
                 className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
@@ -147,13 +145,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           ) : (
-            <div className="flex flex-col items-center space-y-3">
-              <div className="scale-75">
-                <ThemeSelector />
-              </div>
-              <div className="scale-75">
-                <FontSizeSelector />
-              </div>
+            <div className="flex justify-center">
               <button
                 onClick={handleLogout}
                 className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
