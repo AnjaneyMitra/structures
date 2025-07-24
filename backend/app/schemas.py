@@ -94,4 +94,14 @@ class LeaderboardEntry(BaseModel):
     total_xp: int
     problems_solved: int
     class Config:
+        orm_mode = True
+
+# Bookmark Schemas
+class BookmarkOut(BaseModel):
+    id: int
+    user_id: int
+    problem_id: int
+    created_at: datetime.datetime
+    problem: ProblemOut
+    class Config:
         orm_mode = True 

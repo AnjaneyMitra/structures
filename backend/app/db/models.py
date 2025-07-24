@@ -74,6 +74,21 @@ class TestCase(Base):
     problem_id = Column(Integer, ForeignKey("problems.id"))
     problem = relationship("Problem", back_populates="test_cases")
 
+class Bookmark(Base):
+    __tablename__ = "bookmarks"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    problem_id = Column(Integer, ForeignKey("problems.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User", backref="bookmarks")
+    problem = relationship("Problem", backref="bookmarked_by")
+    
+    # Ensure unique bookmark pairs
+    __table_args__ = (
+        sa.UniqueConstraint('user_id', 'problem_id', name='unique_bookmark'),
+    )
+
 class Friendship(Base):
     __tablename__ = "friendships"
     id = Column(Integer, primary_key=True, index=True)

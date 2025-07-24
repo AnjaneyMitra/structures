@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
-from .api.routes import auth, problems, submissions, profile, rooms, friends
+from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks
 import socketio
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
@@ -61,6 +61,7 @@ app.include_router(submissions.router, prefix="/api/submissions", tags=["submiss
 app.include_router(profile.router, prefix="/api/profile", tags=["profile"])
 app.include_router(rooms.router, prefix="/api/rooms", tags=["rooms"])
 app.include_router(friends.router, prefix="/api/friends", tags=["friends"])
+app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["bookmarks"])
 
 @app.get("/")
 def read_root():

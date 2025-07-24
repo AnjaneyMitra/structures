@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon as SearchIcon } from '@heroicons/react/24/outline';
+import { BookmarkButton } from '../components/BookmarkButton';
 
 interface Problem {
   id: number;
@@ -175,6 +176,9 @@ const TailwindProblemsPage: React.FC = () => {
                 <div className="min-w-[80px] text-center">
                   <span className="text-sm font-medium text-muted-foreground">Difficulty</span>
                 </div>
+                <div className="w-12 text-center">
+                  <span className="text-sm font-medium text-muted-foreground">Save</span>
+                </div>
               </div>
             </div>
           </div>
@@ -222,6 +226,11 @@ const TailwindProblemsPage: React.FC = () => {
                     }`}>
                       {problem.difficulty}
                     </span>
+                  </div>
+                  
+                  {/* Bookmark Button */}
+                  <div className="w-12 text-center">
+                    <BookmarkButton problemId={problem.id} size="small" />
                   </div>
                 </div>
               </div>

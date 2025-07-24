@@ -20,34 +20,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Ensure XP fields exist in database."""
-    # This migration will definitely run since it's new
-    # Use PostgreSQL-specific syntax for Railway's database
-    op.execute("""
-        DO $$ 
-        BEGIN 
-            -- Add total_xp to users if it doesn't exist
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns 
-                WHERE table_name = 'users' AND column_name = 'total_xp'
-            ) THEN
-                ALTER TABLE users ADD COLUMN total_xp INTEGER DEFAULT 0;
-                RAISE NOTICE 'Added total_xp column to users table';
-            ELSE
-                RAISE NOTICE 'total_xp column already exists in users table';
-            END IF;
-            
-            -- Add xp_awarded to submissions if it doesn't exist
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns 
-                WHERE table_name = 'submissions' AND column_name = 'xp_awarded'
-            ) THEN
-                ALTER TABLE submissions ADD COLUMN xp_awarded INTEGER DEFAULT 0;
-                RAISE NOTICE 'Added xp_awarded column to submissions table';
-            ELSE
-                RAISE NOTICE 'xp_awarded column already exists in submissions table';
-            END IF;
-        END $$;
-    """)
+    # Use standard Alembic operations for cross-database compatibility
+    try:
+        op.add_column('users', sa.Column('total_xp', sa.Integer(), nullable=True, default=0))
+    except:
+        pass  # Column might already exist
+    
+    try:
+        op.add_column('submissions', sa.Column('xp_awarded', sa.Integer(), nullable=True, default=0))
+    except:
+        pass  # Column might already exist
     
     # Always run these updates to ensure data consistency
     op.execute("UPDATE users SET total_xp = 0 WHERE total_xp IS NULL")

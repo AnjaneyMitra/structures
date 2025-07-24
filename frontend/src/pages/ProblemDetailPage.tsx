@@ -3,6 +3,7 @@ import {
   Box, Typography, CircularProgress, Alert, Chip, Stack, Button, 
   MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab, Divider
 } from '@mui/material';
+import { BookmarkButton } from '../components/BookmarkButton';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BoltIcon from '@mui/icons-material/Bolt';
@@ -472,6 +473,7 @@ Good luck! 🚀`);
               '& .MuiChip-icon': { color: diffConfig.color }
             }}
           />
+          <BookmarkButton problemId={problem.id} />
           <Box sx={{ flexGrow: 1 }} />
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <Select

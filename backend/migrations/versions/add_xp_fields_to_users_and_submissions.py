@@ -20,30 +20,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add XP fields to users and submissions tables."""
-    # Use raw SQL with IF NOT EXISTS to avoid duplicate column errors
-    op.execute("""
-        DO $$ 
-        BEGIN 
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns 
-                WHERE table_name = 'users' AND column_name = 'total_xp'
-            ) THEN
-                ALTER TABLE users ADD COLUMN total_xp INTEGER DEFAULT 0;
-            END IF;
-        END $$;
-    """)
+    # Use standard Alembic operations for cross-database compatibility
+    try:
+        op.add_column('users', sa.Column('total_xp', sa.Integer(), nullable=True, default=0))
+    except:
+        pass  # Column might already exist
     
-    op.execute("""
-        DO $$ 
-        BEGIN 
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns 
-                WHERE table_name = 'submissions' AND column_name = 'xp_awarded'
-            ) THEN
-                ALTER TABLE submissions ADD COLUMN xp_awarded INTEGER DEFAULT 0;
-            END IF;
-        END $$;
-    """)
+    try:
+        op.add_column('submissions', sa.Column('xp_awarded', sa.Integer(), nullable=True, default=0))
+    except:
+        pass  # Column might already exist
     
     # Update existing records to have 0 XP (safe to run multiple times)
     op.execute("UPDATE users SET total_xp = 0 WHERE total_xp IS NULL")
