@@ -6,7 +6,6 @@ import {
   CheckCircleIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/AuthContext';
 import AchievementBadge from '../components/AchievementBadge';
 import { Achievement } from '../types/achievements';
 import LevelBadge from '../components/LevelBadge';
@@ -36,7 +35,6 @@ const TailwindDashboardPage: React.FC = () => {
   const [recentAchievements, setRecentAchievements] = useState<Achievement[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
 
   // Handle OAuth callback parameters if present
   useEffect(() => {

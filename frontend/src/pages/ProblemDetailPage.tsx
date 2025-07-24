@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Box, Typography, CircularProgress, Alert, Chip, Stack, Button, 
-  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab, Divider
+  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab
 } from '@mui/material';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { useTheme } from '../context/ThemeContext';
@@ -12,7 +12,6 @@ import { useLevelUp } from '../hooks/useLevelUp';
 import LevelUpModal from '../components/LevelUpModal';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import BoltIcon from '@mui/icons-material/Bolt';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -100,19 +99,6 @@ const languageOptions = [
 ` 
   },
 ];
-
-function stringToColor(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = '#';
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += ('00' + value.toString(16)).slice(-2);
-  }
-  return color;
-}
 
 function generateProblemTemplate(problemData: any, language: string): string {
   if (!problemData) {
@@ -584,9 +570,42 @@ Good luck! 🚀`);
           <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-card-foreground)' }}>
             {problem.id}. {problem.title}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', ml: 2 }}>
-            Press ? for shortcuts
-          </Typography>
+          <div className="group relative ml-2">
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'var(--color-muted-foreground)', 
+                cursor: 'pointer',
+                '&:hover': { color: 'var(--color-card-foreground)' }
+              }}
+              className="transition-colors duration-200"
+            >
+              ?
+            </Typography>
+            <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-50">
+              <div className="bg-card border border-border rounded-lg shadow-lg p-4 min-w-[300px]">
+                <h3 className="text-sm font-semibold mb-3">Keyboard Shortcuts</h3>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span>Run code</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Enter</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Submit solution</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Shift+Enter</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Reset code</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+R</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Toggle theme</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+D</kbd>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <Chip
             icon={diffConfig.icon}
             label={problem.difficulty}

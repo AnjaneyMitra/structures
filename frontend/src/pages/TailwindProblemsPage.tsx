@@ -16,8 +16,7 @@ interface Problem {
 }
 
 type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
-type SortOption = 'popularity' | 'newest' | 'difficulty';
-type BookmarkFilter = 'all' | 'bookmarked' | 'not-bookmarked';
+type SortOption = 'popularity' | 'newest' | 'difficulty' | 'bookmarked';
 
 const TailwindProblemsPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -25,7 +24,6 @@ const TailwindProblemsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All');
-  const [bookmarkFilter, setBookmarkFilter] = useState<BookmarkFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('popularity');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -99,17 +97,6 @@ const TailwindProblemsPage: React.FC = () => {
         action: () => setDifficultyFilter('All')
       },
       {
-        key: 'b',
-        ctrlKey: true,
-        description: 'Toggle bookmarked filter',
-        category: 'Filters',
-        action: () => {
-          setBookmarkFilter(current => 
-            current === 'bookmarked' ? 'all' : 'bookmarked'
-          );
-        }
-      },
-      {
         key: 'c',
         ctrlKey: true,
         description: 'Clear all filters',
@@ -117,7 +104,6 @@ const TailwindProblemsPage: React.FC = () => {
         action: () => {
           setSearch('');
           setDifficultyFilter('All');
-          setBookmarkFilter('all');
         }
       },
       {
@@ -140,6 +126,13 @@ const TailwindProblemsPage: React.FC = () => {
         description: 'Sort by difficulty',
         category: 'Sorting',
         action: () => setSortBy('difficulty')
+      },
+      {
+        key: '4',
+        altKey: true,
+        description: 'Sort bookmarked first',
+        category: 'Sorting',
+        action: () => setSortBy('bookmarked')
       }
     ];
 
@@ -148,16 +141,13 @@ const TailwindProblemsPage: React.FC = () => {
     return () => {
       unregisterShortcuts();
     };
-  }, [registerShortcuts, unregisterShortcuts, setDifficultyFilter, setBookmarkFilter, setSearch, setSortBy]);
+  }, [registerShortcuts, unregisterShortcuts, setDifficultyFilter, setSearch, setSortBy]);
 
   const filteredProblems = problems
     .filter(p => {
       const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
       const matchesDifficulty = difficultyFilter === 'All' || p.difficulty === difficultyFilter;
-      const matchesBookmark = bookmarkFilter === 'all' || 
-        (bookmarkFilter === 'bookmarked' && isBookmarked(p.id)) ||
-        (bookmarkFilter === 'not-bookmarked' && !isBookmarked(p.id));
-      return matchesSearch && matchesDifficulty && matchesBookmark;
+      return matchesSearch && matchesDifficulty;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -172,6 +162,12 @@ const TailwindProblemsPage: React.FC = () => {
           const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
           return difficultyOrder[a.difficulty as keyof typeof difficultyOrder] - 
                  difficultyOrder[b.difficulty as keyof typeof difficultyOrder];
+        case 'bookmarked':
+          const aBookmarked = isBookmarked(a.id);
+          const bBookmarked = isBookmarked(b.id);
+          if (aBookmarked && !bBookmarked) return -1;
+          if (!aBookmarked && bBookmarked) return 1;
+          return 0;
         default:
           return 0;
       }
@@ -203,8 +199,33 @@ const TailwindProblemsPage: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-4xl font-bold text-foreground">Problems</h1>
-            <div className="text-sm text-muted-foreground">
-              Press <kbd className="px-2 py-1 bg-muted border border-border rounded text-xs">?</kbd> for keyboard shortcuts
+            <div className="group relative">
+              <button className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
+                <kbd className="px-2 py-1 bg-muted border border-border rounded text-xs group-hover:bg-card">?</kbd>
+              </button>
+              <div className="absolute right-0 top-full mt-2 hidden group-hover:block z-50">
+                <div className="bg-card border border-border rounded-lg shadow-lg p-4 min-w-[300px]">
+                  <h3 className="text-sm font-semibold mb-3">Keyboard Shortcuts</h3>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span>Focus search</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+/</kbd>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Filter Easy/Medium/Hard/All</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+E/M/H/A</kbd>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Clear filters</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+C</kbd>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sort by Popularity/Newest/Difficulty/Bookmarked</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Alt+1/2/3/4</kbd>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -245,43 +266,6 @@ const TailwindProblemsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Bookmark Filter */}
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Filter by Bookmarks:</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setBookmarkFilter('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
-                    bookmarkFilter === 'all'
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card text-card-foreground border-border hover:border-primary'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setBookmarkFilter('bookmarked')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
-                    bookmarkFilter === 'bookmarked'
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card text-card-foreground border-border hover:border-primary'
-                  }`}
-                >
-                  Bookmarked
-                </button>
-                <button
-                  onClick={() => setBookmarkFilter('not-bookmarked')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
-                    bookmarkFilter === 'not-bookmarked'
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card text-card-foreground border-border hover:border-primary'
-                  }`}
-                >
-                  Not Bookmarked
-                </button>
-              </div>
-            </div>
-
             {/* Sort Dropdown */}
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-2">Sort by:</p>
@@ -293,6 +277,7 @@ const TailwindProblemsPage: React.FC = () => {
                 <option value="popularity">Popularity</option>
                 <option value="newest">Newest</option>
                 <option value="difficulty">Difficulty</option>
+                <option value="bookmarked">Bookmarked First</option>
               </select>
             </div>
           </div>
@@ -301,8 +286,6 @@ const TailwindProblemsPage: React.FC = () => {
           <p className="text-muted-foreground">
             {filteredProblems.length} problem{filteredProblems.length !== 1 ? 's' : ''} found
             {difficultyFilter !== 'All' && ` (${difficultyFilter} difficulty)`}
-            {bookmarkFilter === 'bookmarked' && ' (bookmarked)'}
-            {bookmarkFilter === 'not-bookmarked' && ' (not bookmarked)'}
           </p>
         </div>
 
@@ -395,15 +378,12 @@ const TailwindProblemsPage: React.FC = () => {
             <p className="text-muted-foreground mb-4">
               {search ? `No problems match "${search}"` : 'No problems match your current filters'}
               {difficultyFilter !== 'All' && ` for ${difficultyFilter} difficulty`}
-              {bookmarkFilter === 'bookmarked' && ' in your bookmarks'}
-              {bookmarkFilter === 'not-bookmarked' && ' that are not bookmarked'}
             </p>
-            {(search || difficultyFilter !== 'All' || bookmarkFilter !== 'all') && (
+            {(search || difficultyFilter !== 'All') && (
               <button 
                 onClick={() => {
                   setSearch('');
                   setDifficultyFilter('All');
-                  setBookmarkFilter('all');
                 }}
                 className="px-4 py-2 border border-primary text-primary bg-transparent rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
               >
