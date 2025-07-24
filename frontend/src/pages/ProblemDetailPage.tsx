@@ -571,9 +571,42 @@ Good luck! 🚀`);
           <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-card-foreground)' }}>
             {problem.id}. {problem.title}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', ml: 2 }}>
-            Press ? for shortcuts
-          </Typography>
+          <div className="group relative ml-2">
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'var(--color-muted-foreground)', 
+                cursor: 'pointer',
+                '&:hover': { color: 'var(--color-card-foreground)' }
+              }}
+              className="transition-colors duration-200"
+            >
+              ?
+            </Typography>
+            <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-50">
+              <div className="bg-card border border-border rounded-lg shadow-lg p-4 min-w-[300px]">
+                <h3 className="text-sm font-semibold mb-3">Keyboard Shortcuts</h3>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span>Run code</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Enter</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Submit solution</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Shift+Enter</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Reset code</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+R</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Toggle theme</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+D</kbd>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <Chip
             icon={diffConfig.icon}
             label={problem.difficulty}

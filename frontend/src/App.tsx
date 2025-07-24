@@ -256,6 +256,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         className={`flex-grow min-h-screen bg-background relative page-transition ${
           sidebarOpen ? 'ml-[280px]' : 'ml-[72px]'
         }`}
+        style={{ zIndex: 1 }}
       >
         {/* Background Effects */}
         <div className="absolute inset-0 opacity-30 pointer-events-none">
@@ -277,7 +278,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             }}
           />
         </div>
-        <div className="relative z-10 page-slide-in">
+        <div className="relative z-0 page-slide-in">
           {children}
         </div>
       </main>
@@ -286,7 +287,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   
   // Auto-redirect authenticated users from public routes to dashboard
   useAutoRedirect({
