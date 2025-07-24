@@ -8,6 +8,8 @@ import { useTheme } from '../context/ThemeContext';
 import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
 import { useAchievements } from '../contexts/AchievementsContext';
 import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
+import { useLevelUp } from '../hooks/useLevelUp';
+import LevelUpModal from '../components/LevelUpModal';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BoltIcon from '@mui/icons-material/Bolt';
@@ -219,6 +221,7 @@ const ProblemDetailPage: React.FC = () => {
   const { fontSize, themeMode } = useTheme();
   const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
   const { showAchievements } = useAchievements();
+  const { levelUpInfo, showLevelUpModal, handleLevelUp, closeLevelUpModal } = useLevelUp();
   const [problem, setProblem] = useState<Problem | null>(null);
 
   // Font size mapping for Monaco Editor
@@ -314,6 +317,11 @@ Good luck! 🚀`);
         showAchievements(res.data.newly_earned_achievements);
       }
       
+      // Show level up notification if user leveled up
+      if (res.data.level_up_info) {
+        handleLevelUp(res.data.level_up_info);
+      }
+      
       // Show submission summary in console
       const testResults = res.data.test_case_results || [];
       const passedCount = testResults.filter((r: any) => r.passed).length;
@@ -329,6 +337,11 @@ Good luck! 🚀`);
         summaryMessage += `\n🎉 All tests passed! Great job!`;
         if (res.data.xp_awarded && res.data.xp_awarded > 0) {
           summaryMessage += `\n⭐ +${res.data.xp_awarded} XP earned!`;
+        }
+        
+        // Show level up message if user leveled up
+        if (res.data.level_up_info && res.data.level_up_info.leveled_up) {
+          summaryMessage += `\n🎊 LEVEL UP! You are now a ${res.data.level_up_info.new_title} (Level ${res.data.level_up_info.new_level})!`;
         }
         
         // Show streak information if available
@@ -1054,6 +1067,21 @@ Good luck! 🚀`);
           </Box>
         </Box>
       </Box>
+    </Box>
+      {/* Level Up Modal */}
+      <LevelUpModal 
+        levelUpInfo={levelUpInfo}
+        open={showLevelUpModal}
+        onClose={closeLevelUpModal}
+      />
+    </Box>
+  );
+      {/* Level Up Modal */}
+      <LevelUpModal 
+        levelUpInfo={levelUpInfo}
+        open={showLevelUpModal}
+        onClose={closeLevelUpModal}
+      />
     </Box>
   );
 };

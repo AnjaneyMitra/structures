@@ -11,11 +11,14 @@ import {
   UserIcon,
   UsersIcon
 } from '@heroicons/react/24/outline';
+import LevelBadge from '../components/LevelBadge';
 
 interface Friend {
   id: number;
   username: string;
   total_xp: number;
+  level: number;
+  title: string;
 }
 
 interface FriendRequest {
@@ -34,12 +37,16 @@ interface LeaderboardEntry {
   username: string;
   total_xp: number;
   problems_solved: number;
+  level: number;
+  title: string;
 }
 
 interface SearchResult {
   id: number;
   username: string;
   total_xp: number;
+  level: number;
+  title: string;
   friendship_status: string;
 }
 
@@ -458,7 +465,15 @@ const TailwindFriendsPage: React.FC = () => {
                               <UserIcon className="h-5 w-5 text-primary" />
                             </div>
                             <div>
-                              <p className="font-medium text-card-foreground">{entry.username}</p>
+                              <div className="flex items-center space-x-2">
+                                <p className="font-medium text-card-foreground">{entry.username}</p>
+                                <LevelBadge 
+                                  level={entry.level} 
+                                  title={entry.title}
+                                  size="small"
+                                  showTitle={false}
+                                />
+                              </div>
                               <p className="text-sm text-muted-foreground">
                                 {entry.problems_solved} problems solved
                               </p>
@@ -496,7 +511,15 @@ const TailwindFriendsPage: React.FC = () => {
                               <UserIcon className="h-5 w-5 text-primary" />
                             </div>
                             <div>
-                              <p className="font-medium text-card-foreground">{friend.username}</p>
+                              <div className="flex items-center space-x-2 mb-1">
+                                <p className="font-medium text-card-foreground">{friend.username}</p>
+                                <LevelBadge 
+                                  level={friend.level} 
+                                  title={friend.title}
+                                  size="small"
+                                  showTitle={false}
+                                />
+                              </div>
                               <div className="flex items-center space-x-1">
                                 <StarIcon className="h-4 w-4 text-yellow-500" />
                                 <span className="text-sm text-yellow-600">{friend.total_xp} XP</span>

@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from ...db.base import get_db
 from ...db.models import User
 from ...schemas import LevelInfo, UserLevelProgress
 from ...utils.level_calculator import get_all_levels, get_level_progress
-from ..deps import get_current_user
+from ..deps import get_current_user, get_db
 
 router = APIRouter()
 
