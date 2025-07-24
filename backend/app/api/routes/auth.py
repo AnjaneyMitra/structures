@@ -93,6 +93,5 @@ async def google_auth_callback(request: Request, db: Session = Depends(deps.get_
     access_token = auth.create_access_token({"sub": user.username})
     # Always redirect to dashboard for Google OAuth users
     # The frontend will handle the token and redirect appropriately
-    frontend_base_url = os.getenv("FRONTEND_URL", "https://structures-nine.vercel.app")
-    frontend_url = f"{frontend_base_url}/dashboard?access_token={access_token}&username={user.username}"
+    frontend_url = f"https://structures-nine.vercel.app/dashboard?access_token={access_token}&username={user.username}"
     return RedirectResponse(frontend_url) 

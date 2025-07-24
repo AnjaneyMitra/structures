@@ -98,13 +98,17 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 db.add(user)
                 print(f"🎉 XP AWARDED: User {user.id} earned {xp_awarded} XP for {problem.difficulty} problem. Total XP: {old_xp} -> {user.total_xp}")
                 
-                # Update user's streak
-                from ...utils.streak_calculator import update_user_streak
-                streak_info = update_user_streak(user.id, db)
-                if streak_info.get("streak_updated"):
-                    print(f"🔥 STREAK UPDATED: User {user.id} current streak: {streak_info['current_streak']}, longest: {streak_info['longest_streak']}")
-                    if streak_info.get("is_new_record"):
-                        print(f"🏆 NEW STREAK RECORD: User {user.id} achieved a new personal best streak!")
+                # Update user's streak (with error handling for missing columns)
+                try:
+                    from ...utils.streak_calculator import update_user_streak
+                    streak_info = update_user_streak(user.id, db)
+                    if streak_info.get("streak_updated"):
+                        print(f"🔥 STREAK UPDATED: User {user.id} current streak: {streak_info['current_streak']}, longest: {streak_info['longest_streak']}")
+                        if streak_info.get("is_new_record"):
+                            print(f"🏆 NEW STREAK RECORD: User {user.id} achieved a new personal best streak!")
+                except Exception as e:
+                    print(f"⚠️ Streak update failed (database might need migration): {e}")
+                    streak_info = None
                 
                 # Check for achievements after successful submission
                 newly_earned_achievements = check_achievements(
