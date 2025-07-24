@@ -8,9 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import LevelBadge from '../components/LevelBadge';
 import LevelProgressBar from '../components/LevelProgressBar';
 import { UserProfileWithLevel } from '../types/levels';
-import LevelBadge from '../components/LevelBadge';
-import LevelProgressBar from '../components/LevelProgressBar';
-import { UserProfileWithLevel } from '../types/levels';
 
 interface Submission {
   id: number;
