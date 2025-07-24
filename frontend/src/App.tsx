@@ -253,10 +253,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         onToggle={setSidebarOpen}
       />
       <main 
-        className={`flex-grow min-h-screen bg-background relative page-transition ${
+        className={`flex-grow min-h-screen bg-background relative ${
           sidebarOpen ? 'ml-[280px]' : 'ml-[72px]'
         }`}
-        style={{ zIndex: 1 }}
+        style={{ 
+          zIndex: 1,
+          transition: 'margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          willChange: 'margin-left'
+        }}
       >
         {/* Background Effects */}
         <div className="absolute inset-0 opacity-30 pointer-events-none">

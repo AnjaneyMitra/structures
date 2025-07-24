@@ -39,7 +39,7 @@ const PreferencesTab: React.FC = () => {
   const themeLabels = {
     light: 'Light',
     dark: 'Dark', 
-    'high-contrast': 'High Contrast',
+    'soft-pop': 'Soft Pop',
     blue: 'Blue Dark',
     green: 'Green Dark',
     purple: 'Purple Dark'

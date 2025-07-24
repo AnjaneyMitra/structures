@@ -32,10 +32,10 @@ const themeOptions = [
     color: '#6366f1' 
   },
   { 
-    value: 'high-contrast' as const, 
-    label: 'High Contrast', 
+    value: 'soft-pop' as const, 
+    label: 'Soft Pop', 
     icon: <Contrast />, 
-    color: '#ffff00' 
+    color: '#6366f1' 
   },
   { 
     value: 'blue' as const, 
