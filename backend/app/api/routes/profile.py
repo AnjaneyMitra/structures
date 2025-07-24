@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 from ...api import deps
-from ...db import models, schemas
+from ...db import models
+from ...schemas import UserOut, UserPreferencesUpdate
 from ...core import auth
 
 router = APIRouter()
 
-@router.get("/", response_model=schemas.UserOut)
+@router.get("/", response_model=UserOut)
 def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
     # Refresh user from database to get latest XP
     db.refresh(user)
@@ -79,4 +80,29 @@ def update_username(new_username: str = Body(..., embed=True), user=Depends(deps
     db.commit()
     db.refresh(user)
     access_token = auth.create_access_token({"sub": user.username})
-    return {"user": user, "access_token": access_token} 
+    return {"user": user, "access_token": access_token}
+
+@router.put("/preferences", response_model=UserOut)
+def update_preferences(
+    preferences: UserPreferencesUpdate,
+    user=Depends(deps.get_current_user), 
+    db: Session = Depends(deps.get_db)
+):
+    """Update user preferences (theme, font size, etc.)"""
+    if preferences.theme_preference is not None:
+        # Validate theme preference
+        valid_themes = ['light', 'dark', 'high-contrast', 'blue', 'green', 'purple']
+        if preferences.theme_preference not in valid_themes:
+            raise HTTPException(status_code=400, detail=f"Invalid theme. Must be one of: {valid_themes}")
+        user.theme_preference = preferences.theme_preference
+    
+    if preferences.font_size is not None:
+        # Validate font size
+        valid_sizes = ['small', 'medium', 'large', 'extra-large']
+        if preferences.font_size not in valid_sizes:
+            raise HTTPException(status_code=400, detail=f"Invalid font size. Must be one of: {valid_sizes}")
+        user.font_size = preferences.font_size
+    
+    db.commit()
+    db.refresh(user)
+    return user 

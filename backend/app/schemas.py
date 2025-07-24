@@ -11,8 +11,14 @@ class UserCreate(UserBase):
 class UserOut(UserBase):
     id: int
     total_xp: int = 0
+    theme_preference: str = 'light'
+    font_size: str = 'medium'
     class Config:
         orm_mode = True
+
+class UserPreferencesUpdate(BaseModel):
+    theme_preference: Optional[str] = None
+    font_size: Optional[str] = None
 
 class ProblemBase(BaseModel):
     title: str

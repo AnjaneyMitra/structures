@@ -13,6 +13,7 @@ import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { BookmarkProvider } from './context/BookmarkContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { RouteGuard } from './components/RouteGuard';
 import { useAutoRedirect } from './hooks/useAutoRedirect';
 
@@ -332,9 +333,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <BookmarkProvider>
-        <AppRoutes />
-      </BookmarkProvider>
+      <ThemeProvider>
+        <BookmarkProvider>
+          <AppRoutes />
+        </BookmarkProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

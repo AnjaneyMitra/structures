@@ -4,6 +4,7 @@ import {
   MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab, Divider
 } from '@mui/material';
 import { BookmarkButton } from '../components/BookmarkButton';
+import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BoltIcon from '@mui/icons-material/Bolt';
@@ -212,7 +213,22 @@ function getJSReturnType(problemData: any): string {
 
 const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { fontSize, themeMode } = useTheme();
   const [problem, setProblem] = useState<Problem | null>(null);
+
+  // Font size mapping for Monaco Editor
+  const fontSizeMap = {
+    small: 12,
+    medium: 14,
+    large: 16,
+    'extra-large': 18
+  };
+
+  // Theme mapping for Monaco Editor
+  const getMonacoTheme = () => {
+    if (themeMode === 'light') return 'vs';
+    return 'vs-dark'; // All other themes use dark mode
+  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [language, setLanguage] = useState(languageOptions[0].value);
@@ -668,9 +684,9 @@ Good luck! 🚀`);
               height="100%"
               language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
               value={code}
-              theme="vs-dark"
+              theme={getMonacoTheme()}
               options={{
-                fontSize: 14,
+                fontSize: fontSizeMap[fontSize],
                 fontFamily: 'JetBrains Mono, Fira Code, monospace',
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,

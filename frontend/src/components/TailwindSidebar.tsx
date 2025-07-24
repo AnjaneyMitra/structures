@@ -9,7 +9,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
-import { TailwindThemeToggle } from './TailwindThemeToggle';
+import { ThemeSelector } from './ThemeSelector';
+import { FontSizeSelector } from './FontSizeSelector';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
@@ -124,25 +125,31 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
           
-          {/* Expanded state - show theme toggle and logout */}
-          <div className={`flex items-center justify-between mt-4 transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <TailwindThemeToggle />
-            <button
-              onClick={handleLogout}
-              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
-              title="Logout"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-              </svg>
-            </button>
+          {/* Expanded state - show theme controls and logout */}
+          <div className={`mt-4 transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <ThemeSelector />
+              <FontSizeSelector />
+              <button
+                onClick={handleLogout}
+                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-200"
+                title="Logout"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+              </button>
+            </div>
           </div>
           
-          {/* Collapsed state - show theme toggle and logout */}
+          {/* Collapsed state - show theme controls and logout */}
           {!sidebarOpen && (
             <div className="flex flex-col items-center space-y-3 mt-4">
               <div className="scale-75">
-                <TailwindThemeToggle />
+                <ThemeSelector />
+              </div>
+              <div className="scale-75">
+                <FontSizeSelector />
               </div>
               <button
                 onClick={handleLogout}

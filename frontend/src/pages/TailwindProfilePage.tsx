@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { UserIcon, PencilIcon, CheckIcon, XMarkIcon, TrophyIcon, ChartBarIcon, CodeBracketIcon, StarIcon } from '@heroicons/react/24/outline';
+import { UserIcon, PencilIcon, CheckIcon, XMarkIcon, TrophyIcon, ChartBarIcon, CodeBracketIcon, StarIcon, CogIcon } from '@heroicons/react/24/outline';
+import { ThemeSelector } from '../components/ThemeSelector';
+import { FontSizeSelector } from '../components/FontSizeSelector';
+import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
 interface Submission {
@@ -30,6 +33,100 @@ interface UserStats {
   medium_solved: number;
   hard_solved: number;
 }
+
+const PreferencesTab: React.FC = () => {
+  const { themeMode, fontSize } = useTheme();
+
+  const themeLabels = {
+    light: 'Light',
+    dark: 'Dark', 
+    'high-contrast': 'High Contrast',
+    blue: 'Blue Dark',
+    green: 'Green Dark',
+    purple: 'Purple Dark'
+  };
+
+  const fontSizeLabels = {
+    small: 'Small (14px)',
+    medium: 'Medium (16px)',
+    large: 'Large (18px)',
+    'extra-large': 'Extra Large (20px)'
+  };
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-lg font-semibold text-card-foreground mb-4">Appearance</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Theme Selection */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-card-foreground">
+              Theme
+            </label>
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
+              <div>
+                <p className="text-sm font-medium text-card-foreground">
+                  Current: {themeLabels[themeMode]}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Choose your preferred color scheme
+                </p>
+              </div>
+              <ThemeSelector />
+            </div>
+          </div>
+
+          {/* Font Size Selection */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-card-foreground">
+              Font Size
+            </label>
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
+              <div>
+                <p className="text-sm font-medium text-card-foreground">
+                  Current: {fontSizeLabels[fontSize]}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Adjust text size for better readability
+                </p>
+              </div>
+              <FontSizeSelector />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold text-card-foreground mb-4">Accessibility</h3>
+        <div className="p-4 bg-muted/30 rounded-lg border border-border">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
+              <CheckIcon className="w-3 h-3 text-primary-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-card-foreground">High Contrast Theme Available</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Use the theme selector above to enable high contrast mode for better accessibility.
+                This theme uses bright colors on dark backgrounds for improved visibility.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold text-card-foreground mb-4">About Preferences</h3>
+        <div className="space-y-3 text-sm text-muted-foreground">
+          <p>• Your preferences are automatically saved and synced across all your devices</p>
+          <p>• Theme changes apply to the entire application including the code editor</p>
+          <p>• Font size adjustments affect both the interface and code editor for consistency</p>
+          <p>• High contrast theme is designed to meet WCAG accessibility guidelines</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TailwindProfilePage: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -310,6 +407,17 @@ const TailwindProfilePage: React.FC = () => {
               >
                 Statistics
               </button>
+              <button
+                onClick={() => setActiveTab(2)}
+                className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 2
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-card-foreground'
+                }`}
+              >
+                <CogIcon className="w-4 h-4 inline mr-2" />
+                Preferences
+              </button>
             </div>
           </div>
 
@@ -394,6 +502,10 @@ const TailwindProfilePage: React.FC = () => {
                 <p className="text-lg mb-2">Detailed Statistics</p>
                 <p className="text-sm">Coming soon - charts and analytics</p>
               </div>
+            )}
+
+            {activeTab === 2 && (
+              <PreferencesTab />
             )}
           </div>
         </div>

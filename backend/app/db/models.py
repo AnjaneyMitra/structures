@@ -14,6 +14,11 @@ class User(Base):
     oauth_sub = Column(String, nullable=True)  # Google's unique user id
     is_admin = Column(Boolean, default=False)  # Admin flag
     total_xp = Column(Integer, default=0)  # Total XP earned
+    
+    # User preferences
+    theme_preference = Column(String, default='light')  # 'light', 'dark', 'high-contrast', 'blue', 'green', 'purple'
+    font_size = Column(String, default='medium')  # 'small', 'medium', 'large', 'extra-large'
+    
     submissions = relationship("Submission", back_populates="user")
 
 class Problem(Base):

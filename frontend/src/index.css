@@ -5,6 +5,41 @@
 /* Import our custom effects and variables */
 @import './styles/advanced-effects.css';
 
+/* Font Size Variables */
+:root {
+  --font-size-small: 0.875rem;
+  --font-size-medium: 1rem;
+  --font-size-large: 1.125rem;
+  --font-size-extra-large: 1.25rem;
+  --base-font-size: var(--font-size-medium);
+}
+
+[data-font-size="small"] { --base-font-size: var(--font-size-small); }
+[data-font-size="medium"] { --base-font-size: var(--font-size-medium); }
+[data-font-size="large"] { --base-font-size: var(--font-size-large); }
+[data-font-size="extra-large"] { --base-font-size: var(--font-size-extra-large); }
+
+/* Apply font size to body and common elements */
+body {
+  font-size: var(--base-font-size);
+}
+
+/* Scale other text elements proportionally */
+h1 { font-size: calc(var(--base-font-size) * 2.25); }
+h2 { font-size: calc(var(--base-font-size) * 1.875); }
+h3 { font-size: calc(var(--base-font-size) * 1.5); }
+h4 { font-size: calc(var(--base-font-size) * 1.25); }
+h5 { font-size: calc(var(--base-font-size) * 1.125); }
+h6 { font-size: var(--base-font-size); }
+
+.text-sm { font-size: calc(var(--base-font-size) * 0.875); }
+.text-xs { font-size: calc(var(--base-font-size) * 0.75); }
+.text-lg { font-size: calc(var(--base-font-size) * 1.125); }
+.text-xl { font-size: calc(var(--base-font-size) * 1.25); }
+.text-2xl { font-size: calc(var(--base-font-size) * 1.5); }
+.text-3xl { font-size: calc(var(--base-font-size) * 1.875); }
+.text-4xl { font-size: calc(var(--base-font-size) * 2.25); }
+
 * {
   box-sizing: border-box;
 }
