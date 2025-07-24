@@ -39,14 +39,18 @@ const TailwindDashboardPage: React.FC = () => {
     const token = params.get('access_token');
     const username = params.get('username');
     
+    console.log('Dashboard: OAuth callback params:', { 
+      hasToken: !!token, 
+      hasUsername: !!username,
+      url: location.search 
+    });
+    
     if (token && username) {
-      // Store the token and username
-      login(token, username);
-      
-      // Remove the query parameters from the URL
+      console.log('Dashboard: Cleaning up URL parameters');
+      // Remove the query parameters from the URL (AuthContext handles the token)
       navigate('/dashboard', { replace: true });
     }
-  }, [location, login, navigate]);
+  }, [location, navigate]);
 
   useEffect(() => {
     const fetchData = async () => {

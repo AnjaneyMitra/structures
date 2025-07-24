@@ -24,26 +24,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check authentication status on mount
     useEffect(() => {
         const checkAuth = async () => {
+            console.log('AuthContext: Starting authentication check');
+            
+            // First check if there are OAuth callback parameters in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const oauthToken = urlParams.get('access_token');
+            const oauthUsername = urlParams.get('username');
+            
+            console.log('AuthContext: OAuth params found:', { 
+                hasToken: !!oauthToken, 
+                hasUsername: !!oauthUsername 
+            });
+            
+            // If OAuth parameters exist, use them immediately
+            if (oauthToken && oauthUsername) {
+                console.log('AuthContext: Processing OAuth callback');
+                try {
+                    // Verify the OAuth token with backend
+                    const response = await axios.get('https://structures-production.up.railway.app/api/auth/debug', {
+                        headers: { Authorization: `Bearer ${oauthToken}` }
+                    });
+                    
+                    console.log('AuthContext: OAuth token validation successful', response.data);
+
+                    // Store the token and set authentication state
+                    localStorage.setItem('token', oauthToken);
+                    localStorage.setItem('username', oauthUsername);
+                    setIsAuthenticated(true);
+                    setUsername(oauthUsername);
+                    setIsLoading(false);
+                    return;
+                } catch (error) {
+                    console.error('AuthContext: OAuth token validation failed:', error);
+                    // Continue to check localStorage token
+                }
+            }
+
+            // Check existing token in localStorage
             const token = localStorage.getItem('token');
             const storedUsername = localStorage.getItem('username');
+            
+            console.log('AuthContext: Checking localStorage token:', { 
+                hasToken: !!token, 
+                hasUsername: !!storedUsername 
+            });
 
             if (token && validateTokenUtil(token)) {
                 try {
                     // Verify token with backend
-                    await axios.get('https://structures-production.up.railway.app/api/auth/debug', {
+                    const response = await axios.get('https://structures-production.up.railway.app/api/auth/debug', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-
+                    
+                    console.log('AuthContext: Token validation successful', response.data);
                     setIsAuthenticated(true);
                     setUsername(storedUsername);
                 } catch (error) {
-                    console.error('Token validation failed:', error);
+                    console.error('AuthContext: Token validation failed:', error);
                     localStorage.removeItem('token');
                     localStorage.removeItem('username');
                     setIsAuthenticated(false);
                     setUsername(null);
                 }
             } else {
+                console.log('AuthContext: No valid token found');
                 // Clear invalid tokens
                 if (token) {
                     localStorage.removeItem('token');
@@ -53,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
             }
 
+            console.log('AuthContext: Authentication check complete');
             setIsLoading(false);
         };
 
