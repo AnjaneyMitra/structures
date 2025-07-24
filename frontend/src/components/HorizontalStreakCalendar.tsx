@@ -89,7 +89,7 @@ export const HorizontalStreakCalendar: React.FC<HorizontalStreakCalendarProps> =
         <div className="flex items-center space-x-2 text-xs text-muted-foreground">
           <span>Less</span>
           <div className="flex space-x-1">
-            <div className="w-2 h-2 rounded-sm bg-muted/30"></div>
+            <div className="w-2 h-2 rounded-sm bg-gray-200 dark:bg-muted/30 border border-gray-300 dark:border-muted/50"></div>
             <div className="w-2 h-2 rounded-sm bg-green-200 dark:bg-green-900"></div>
             <div className="w-2 h-2 rounded-sm bg-green-300 dark:bg-green-700"></div>
             <div className="w-2 h-2 rounded-sm bg-green-400 dark:bg-green-600"></div>
@@ -147,7 +147,7 @@ export const HorizontalStreakCalendar: React.FC<HorizontalStreakCalendarProps> =
 
                     const colorClass = day.solved 
                       ? 'bg-green-500 dark:bg-green-500' 
-                      : 'bg-muted/30 hover:bg-muted/50';
+                      : 'bg-gray-200 dark:bg-muted/30 border border-gray-300 dark:border-muted/50 hover:bg-gray-300 dark:hover:bg-muted/50';
 
                     return (
                       <div
