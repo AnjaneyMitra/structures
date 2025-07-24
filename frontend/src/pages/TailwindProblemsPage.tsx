@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon as SearchIcon } from '@heroicons/react/24/outline';
 import { BookmarkButton } from '../components/BookmarkButton';
+import { useBookmarks } from '../context/BookmarkContext';
 
 interface Problem {
   id: number;
@@ -14,6 +15,7 @@ interface Problem {
 
 type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
 type SortOption = 'popularity' | 'newest' | 'difficulty';
+type BookmarkFilter = 'all' | 'bookmarked' | 'not-bookmarked';
 
 const TailwindProblemsPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -21,9 +23,11 @@ const TailwindProblemsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All');
+  const [bookmarkFilter, setBookmarkFilter] = useState<BookmarkFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('popularity');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isBookmarked } = useBookmarks();
 
   useEffect(() => {
     const urlSearch = searchParams.get('search');
@@ -52,7 +56,10 @@ const TailwindProblemsPage: React.FC = () => {
     .filter(p => {
       const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
       const matchesDifficulty = difficultyFilter === 'All' || p.difficulty === difficultyFilter;
-      return matchesSearch && matchesDifficulty;
+      const matchesBookmark = bookmarkFilter === 'all' || 
+        (bookmarkFilter === 'bookmarked' && isBookmarked(p.id)) ||
+        (bookmarkFilter === 'not-bookmarked' && !isBookmarked(p.id));
+      return matchesSearch && matchesDifficulty && matchesBookmark;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -134,6 +141,43 @@ const TailwindProblemsPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Bookmark Filter */}
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-2">Filter by Bookmarks:</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setBookmarkFilter('all')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
+                    bookmarkFilter === 'all'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card text-card-foreground border-border hover:border-primary'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setBookmarkFilter('bookmarked')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
+                    bookmarkFilter === 'bookmarked'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card text-card-foreground border-border hover:border-primary'
+                  }`}
+                >
+                  Bookmarked
+                </button>
+                <button
+                  onClick={() => setBookmarkFilter('not-bookmarked')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
+                    bookmarkFilter === 'not-bookmarked'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card text-card-foreground border-border hover:border-primary'
+                  }`}
+                >
+                  Not Bookmarked
+                </button>
+              </div>
+            </div>
+
             {/* Sort Dropdown */}
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-2">Sort by:</p>
@@ -153,6 +197,8 @@ const TailwindProblemsPage: React.FC = () => {
           <p className="text-muted-foreground">
             {filteredProblems.length} problem{filteredProblems.length !== 1 ? 's' : ''} found
             {difficultyFilter !== 'All' && ` (${difficultyFilter} difficulty)`}
+            {bookmarkFilter === 'bookmarked' && ' (bookmarked)'}
+            {bookmarkFilter === 'not-bookmarked' && ' (not bookmarked)'}
           </p>
         </div>
 
@@ -245,12 +291,15 @@ const TailwindProblemsPage: React.FC = () => {
             <p className="text-muted-foreground mb-4">
               {search ? `No problems match "${search}"` : 'No problems match your current filters'}
               {difficultyFilter !== 'All' && ` for ${difficultyFilter} difficulty`}
+              {bookmarkFilter === 'bookmarked' && ' in your bookmarks'}
+              {bookmarkFilter === 'not-bookmarked' && ' that are not bookmarked'}
             </p>
-            {(search || difficultyFilter !== 'All') && (
+            {(search || difficultyFilter !== 'All' || bookmarkFilter !== 'all') && (
               <button 
                 onClick={() => {
                   setSearch('');
                   setDifficultyFilter('All');
+                  setBookmarkFilter('all');
                 }}
                 className="px-4 py-2 border border-primary text-primary bg-transparent rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
               >

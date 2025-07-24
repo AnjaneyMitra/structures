@@ -6,7 +6,6 @@ import {
   UserGroupIcon, 
   UserIcon, 
   UsersIcon,
-  BookmarkIcon,
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
@@ -16,7 +15,6 @@ import { useAuth } from '../context/AuthContext';
 const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
-  { label: 'Bookmarks', path: '/bookmarks', icon: BookmarkIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
