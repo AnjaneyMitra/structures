@@ -11,7 +11,7 @@ from sqlalchemy import text
 
 # revision identifiers, used by Alembic.
 revision = 'streak_tracking_001'
-down_revision = 'a4e73afef3b3'
+down_revision = '8992f42614c0'
 branch_labels = None
 depends_on = None
 
