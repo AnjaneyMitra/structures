@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/st
 import { useAuth } from './AuthContext';
 import axios from 'axios';
 
-type ThemeMode = 'light' | 'dark' | 'soft-pop' | 'blue' | 'green' | 'purple';
+type ThemeMode = 'light' | 'dark' | 'soft-pop' | 'blue' | 'green' | 'neo-brutalism';
 type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
 
 interface ThemeContextType {
@@ -93,9 +93,27 @@ const themes = {
       info: { main: 'hsl(243.3962, 75.3555%, 58.6275%)' },
     },
   }),
+  'neo-brutalism': createTheme({
+    palette: {
+      mode: 'dark',
+      primary: { main: 'hsl(0, 100%, 70%)' },
+      secondary: { main: 'hsl(60, 100%, 60%)' },
+      background: {
+        default: 'hsl(0, 0%, 0%)',
+        paper: 'hsl(0, 0%, 20%)',
+      },
+      text: {
+        primary: 'hsl(0, 0%, 100%)',
+        secondary: 'hsl(0, 0%, 80%)',
+      },
+      error: { main: 'hsl(0, 0%, 100%)' },
+      success: { main: 'hsl(120, 60%, 50%)' },
+      warning: { main: 'hsl(60, 100%, 60%)' },
+      info: { main: 'hsl(210, 100%, 60%)' },
+    },
+  }),
   blue: createAdvancedTheme('dark', '#2563eb'),
   green: createAdvancedTheme('dark', '#059669'),
-  purple: createAdvancedTheme('dark', '#7c3aed'),
 };
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
