@@ -9,6 +9,7 @@ import TailwindRoomsPage from './pages/TailwindRoomsPage';
 import TailwindProfilePage from './pages/TailwindProfilePage';
 import TailwindFriendsPage from './pages/TailwindFriendsPage';
 import AchievementsPage from './pages/AchievementsPage';
+import StreakPage from './pages/StreakPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
@@ -326,6 +327,7 @@ function AppRoutes() {
         <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
         <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
         <Route path="/achievements" element={<AppLayout><AchievementsPage /></AppLayout>} />
+        <Route path="/streaks" element={<AppLayout><StreakPage /></AppLayout>} />
       </Route>
       
       {/* Fallback route */}

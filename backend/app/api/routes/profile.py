@@ -72,13 +72,20 @@ def get_user_stats(user=Depends(deps.get_current_user), db: Session = Depends(de
         models.Problem.difficulty == "hard"
     ).distinct().count()
     
+    # Get streak information
+    from ...utils.streak_calculator import get_user_streak_info
+    streak_info = get_user_streak_info(user.id, db)
+    
     return {
         "total_submissions": total_submissions,
         "problems_solved": problems_solved,
         "total_xp": user.total_xp or 0,
         "easy_solved": easy_solved,
         "medium_solved": medium_solved,
-        "hard_solved": hard_solved
+        "hard_solved": hard_solved,
+        "current_streak": streak_info.get("current_streak", 0),
+        "longest_streak": streak_info.get("longest_streak", 0),
+        "streak_active": streak_info.get("streak_active", False)
     }
 
 @router.put("/username")

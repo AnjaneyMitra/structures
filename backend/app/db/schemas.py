@@ -65,6 +65,13 @@ class SubmissionOut(SubmissionBase):
     overall_status: Optional[str] = None  # 'pass', 'fail', 'partial'
     error_message: Optional[str] = None  # Error message if execution fails
     
+    # XP and achievements
+    xp_awarded: Optional[int] = 0
+    newly_earned_achievements: Optional[List[Dict[str, Any]]] = []
+    
+    # Streak information
+    streak_info: Optional[Dict[str, Any]] = None
+    
     class Config:
         orm_mode = True
 

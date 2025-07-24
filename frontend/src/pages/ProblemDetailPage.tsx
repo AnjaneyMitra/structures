@@ -330,6 +330,19 @@ Good luck! 🚀`);
         if (res.data.xp_awarded && res.data.xp_awarded > 0) {
           summaryMessage += `\n⭐ +${res.data.xp_awarded} XP earned!`;
         }
+        
+        // Show streak information if available
+        if (res.data.streak_info) {
+          const streakInfo = res.data.streak_info;
+          if (streakInfo.streak_updated) {
+            summaryMessage += `\n🔥 Streak: ${streakInfo.current_streak} day${streakInfo.current_streak !== 1 ? 's' : ''}!`;
+            if (streakInfo.is_new_record) {
+              summaryMessage += ` (New personal best!)`;
+            }
+          } else if (streakInfo.message) {
+            summaryMessage += `\n🔥 ${streakInfo.message}`;
+          }
+        }
       } else if (passedCount > 0) {
         summaryMessage += `\n⚠️ Some tests failed. Check the results below.`;
       } else {

@@ -19,6 +19,11 @@ class User(Base):
     theme_preference = Column(String, nullable=True, default='light')  # 'light', 'dark', 'high-contrast', 'blue', 'green', 'purple'
     font_size = Column(String, nullable=True, default='medium')  # 'small', 'medium', 'large', 'extra-large'
     
+    # Streak tracking
+    current_streak = Column(Integer, default=0)
+    longest_streak = Column(Integer, default=0)
+    last_solve_date = Column(DateTime, nullable=True)
+    
     submissions = relationship("Submission", back_populates="user")
 
 class Problem(Base):

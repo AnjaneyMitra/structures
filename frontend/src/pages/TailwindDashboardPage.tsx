@@ -27,7 +27,14 @@ const TailwindDashboardPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
+  const [stats, setStats] = useState<{ 
+    total_submissions: number; 
+    problems_solved: number; 
+    total_xp: number;
+    current_streak: number;
+    longest_streak: number;
+    streak_active: boolean;
+  } | null>(null);
   const [recentAchievements, setRecentAchievements] = useState<Achievement[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -244,15 +251,43 @@ const TailwindDashboardPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="bg-card/50 rounded-xl border border-dashed border-border/50 p-5 opacity-60">
+                    <Link 
+                      to="/streaks"
+                      className={`bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer block ${
+                        stats.current_streak > 0 ? '' : 'opacity-60'
+                      }`}
+                    >
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-2.5 bg-muted/10 rounded-lg mb-2.5">
-                          <div className="h-7 w-7 bg-muted/20 rounded"></div>
+                        <div className={`p-2.5 rounded-lg mb-2.5 ${
+                          stats.current_streak > 0 
+                            ? 'bg-orange-500/10' 
+                            : 'bg-muted/10'
+                        }`}>
+                          <div className={`h-7 w-7 flex items-center justify-center ${
+                            stats.current_streak > 0 
+                              ? 'text-orange-500' 
+                              : 'text-muted-foreground'
+                          }`}>
+                            🔥
+                          </div>
                         </div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Streak</p>
-                        <p className="text-xl font-bold text-muted-foreground">--</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1.5">
+                          Current Streak
+                        </p>
+                        <p className={`text-xl font-bold ${
+                          stats.current_streak > 0 
+                            ? 'text-orange-500' 
+                            : 'text-muted-foreground'
+                        }`}>
+                          {stats.current_streak || 0}
+                        </p>
+                        {stats.longest_streak > 0 && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Best: {stats.longest_streak}
+                          </p>
+                        )}
                       </div>
-                    </div>
+                    </Link>
                   </div>
                   
                   {/* Recent Achievements Section */}
