@@ -156,10 +156,51 @@
   --primary-foreground: 153.3333 13.0435% 13.5294%;
 }
 
-/* Purple theme */
-[data-theme="purple"] {
-  --primary: 258.3117 89.5349% 66.2745%;
-  --primary-foreground: 222.2222 84% 4.9020%;
+/* Neo Brutalism theme */
+[data-theme="neo-brutalism"] {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 20%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 20%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 0 100.0000% 70%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 60 100% 60%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 80%;
+  --accent: 210 100% 60%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 0% 100%;
+  --destructive-foreground: 0 0% 0%;
+  --border: 0 0% 100%;
+  --input: 0 0% 100%;
+  --ring: 0 100.0000% 70%;
+  --chart-1: 0 100.0000% 70%;
+  --chart-2: 60 100% 60%;
+  --chart-3: 210 100% 60%;
+  --chart-4: 120 60.0000% 50%;
+  --chart-5: 300 60.0000% 50%;
+  --sidebar: 0 0% 0%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 0 100.0000% 70%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 210 100% 60%;
+  --sidebar-accent-foreground: 0 0% 0%;
+  --sidebar-border: 0 0% 100%;
+  --sidebar-ring: 0 100.0000% 70%;
+  --success: 120 60.0000% 50%;
+  --success-foreground: 0 0% 0%;
+  --radius: 0px;
+  --shadow-2xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.50);
+  --shadow-xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.50);
+  --shadow-sm: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 1px 2px -1px hsl(0 0% 0% / 1.00);
+  --shadow: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 1px 2px -1px hsl(0 0% 0% / 1.00);
+  --shadow-md: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 2px 4px -1px hsl(0 0% 0% / 1.00);
+  --shadow-lg: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 4px 6px -1px hsl(0 0% 0% / 1.00);
+  --shadow-xl: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 8px 10px -1px hsl(0 0% 0% / 1.00);
+  --shadow-2xl: 4px 4px 0px 0px hsl(0 0% 0% / 2.50);
 }
 
 /* Body Styling */

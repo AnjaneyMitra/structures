@@ -233,24 +233,30 @@ function Landing() {
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  // Determine if we are on a problem or room page for auto-collapse
-  const isProblemPage = /^\/problems\/[\w-]+$/.test(location.pathname);
-  const isRoomPage = /^\/rooms\/[\w-]+\/[\w-]+$/.test(location.pathname);
-
-  // Auto-collapse sidebar on problem/room pages, but don't auto-expand on other pages
+  // Auto-collapse sidebar on specific pages for better focus
   useEffect(() => {
-    if (isProblemPage || isRoomPage) {
+    const isProblemPage = location.pathname.includes('/problems/');
+    const isRoomPage = location.pathname.includes('/room/');
+    
+    // Only auto-collapse if user hasn't manually interacted with sidebar
+    if ((isProblemPage || isRoomPage) && !hasUserInteracted) {
       setSidebarOpen(false);
     }
-    // Remove the auto-expand behavior for other pages
-  }, [location.pathname, isProblemPage, isRoomPage]);
+  }, [location.pathname, hasUserInteracted]);
+
+  // Track when user manually toggles sidebar
+  const handleSidebarToggle = (newState: boolean | ((prev: boolean) => boolean)) => {
+    setHasUserInteracted(true);
+    setSidebarOpen(newState);
+  };
 
   return (
     <div className="flex">
       <TailwindSidebar 
         open={sidebarOpen} 
-        onToggle={setSidebarOpen}
+        onToggle={handleSidebarToggle}
       />
       <main 
         className={`flex-grow min-h-screen bg-background relative ${

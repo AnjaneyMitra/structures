@@ -42,7 +42,7 @@ const PreferencesTab: React.FC = () => {
     'soft-pop': 'Soft Pop',
     blue: 'Blue Dark',
     green: 'Green Dark',
-    purple: 'Purple Dark'
+    'neo-brutalism': 'Neo Brutalism'
   };
 
   const fontSizeLabels = {

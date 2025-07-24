@@ -50,10 +50,10 @@ const themeOptions = [
     color: '#059669' 
   },
   { 
-    value: 'purple' as const, 
-    label: 'Purple Dark', 
+    value: 'neo-brutalism' as const, 
+    label: 'Neo Brutalism', 
     icon: <Circle />, 
-    color: '#7c3aed' 
+    color: '#ff4444' 
   },
 ];
 

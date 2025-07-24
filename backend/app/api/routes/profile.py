@@ -136,7 +136,7 @@ def update_preferences(
     """Update user preferences (theme, font size, etc.)"""
     if preferences.theme_preference is not None:
         # Validate theme preference
-        valid_themes = ['light', 'dark', 'soft-pop', 'blue', 'green', 'purple']
+        valid_themes = ['light', 'dark', 'soft-pop', 'blue', 'green', 'neo-brutalism']
         if preferences.theme_preference not in valid_themes:
             raise HTTPException(status_code=400, detail=f"Invalid theme. Must be one of: {valid_themes}")
         user.theme_preference = preferences.theme_preference
