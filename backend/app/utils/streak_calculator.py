@@ -18,9 +18,20 @@ def update_user_streak(user_id: int, db: Session) -> dict:
     Returns:
         dict: Updated streak information
     """
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return {"error": "User not found"}
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return {"error": "User not found"}
+        
+        # Check if streak columns exist by trying to access them
+        _ = user.current_streak
+        _ = user.longest_streak
+        _ = user.last_solve_date
+        
+    except AttributeError as e:
+        return {"error": f"Streak columns not available: {e}"}
+    except Exception as e:
+        return {"error": f"Database error: {e}"}
     
     today = datetime.date.today()
     
@@ -77,9 +88,20 @@ def get_user_streak_info(user_id: int, db: Session) -> dict:
     Returns:
         dict: User's streak information
     """
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return {"error": "User not found"}
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return {"error": "User not found"}
+        
+        # Check if streak columns exist by trying to access them
+        _ = user.current_streak
+        _ = user.longest_streak
+        _ = user.last_solve_date
+        
+    except AttributeError as e:
+        return {"error": f"Streak columns not available: {e}"}
+    except Exception as e:
+        return {"error": f"Database error: {e}"}
     
     today = datetime.date.today()
     streak_active = False

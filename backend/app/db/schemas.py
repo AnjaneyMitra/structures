@@ -11,7 +11,7 @@ class UserCreate(UserBase):
 class UserOut(UserBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TestCaseBase(BaseModel):
     input: str
@@ -23,7 +23,7 @@ class TestCaseCreate(TestCaseBase):
 class TestCaseOut(TestCaseBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProblemBase(BaseModel):
     title: str
@@ -40,7 +40,7 @@ class ProblemOut(ProblemBase):
     id: int
     test_cases: list[TestCaseOut] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SubmissionBase(BaseModel):
     code: str
@@ -69,8 +69,11 @@ class SubmissionOut(SubmissionBase):
     xp_awarded: Optional[int] = 0
     newly_earned_achievements: Optional[List[Dict[str, Any]]] = []
     
+    # Streak information (optional)
+    streak_info: Optional[Dict[str, Any]] = None
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TestCaseResult(BaseModel):
     input: str
@@ -92,7 +95,7 @@ class RoomOut(RoomBase):
     created_at: datetime.datetime
     participants: list[UserOut] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str

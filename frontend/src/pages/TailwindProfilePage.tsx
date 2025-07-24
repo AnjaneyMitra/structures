@@ -5,6 +5,12 @@ import { ThemeSelector } from '../components/ThemeSelector';
 import { FontSizeSelector } from '../components/FontSizeSelector';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
+import LevelBadge from '../components/LevelBadge';
+import LevelProgressBar from '../components/LevelProgressBar';
+import { UserProfileWithLevel } from '../types/levels';
+import LevelBadge from '../components/LevelBadge';
+import LevelProgressBar from '../components/LevelProgressBar';
+import { UserProfileWithLevel } from '../types/levels';
 
 interface Submission {
   id: number;
@@ -19,11 +25,7 @@ interface Submission {
   xp_awarded?: number;
 }
 
-interface UserProfile {
-  id: number;
-  username: string;
-  total_xp: number;
-}
+interface UserProfile extends UserProfileWithLevel {}
 
 interface UserStats {
   total_submissions: number;
@@ -275,8 +277,15 @@ const TailwindProfilePage: React.FC = () => {
                     </button>
                   </div>
                 )}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <p className="text-muted-foreground">Competitive Programmer</p>
+                  {user?.level && user?.title && (
+                    <LevelBadge 
+                      level={user.level} 
+                      title={user.title}
+                      size="medium"
+                    />
+                  )}
                   <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 px-2 py-1 rounded-full">
                     <StarIcon className="h-4 w-4 text-yellow-500" />
                     <span className="text-sm font-medium text-yellow-600">{user?.total_xp || 0} XP</span>
@@ -298,6 +307,26 @@ const TailwindProfilePage: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Level Progress Card */}
+        {user?.level_progress && (
+          <div className="bg-card border border-border rounded-lg p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-card-foreground">Level Progress</h3>
+              <button
+                onClick={() => navigate('/levels')}
+                className="text-sm text-primary hover:text-primary-dark transition-colors duration-200"
+              >
+                View All Levels →
+              </button>
+            </div>
+            <LevelProgressBar 
+              levelProgress={user.level_progress} 
+              size="large"
+              showDetails={true}
+            />
+          </div>
+        )}
 
         {/* Stats Cards */}
         {stats && (

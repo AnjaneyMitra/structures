@@ -9,7 +9,8 @@ import {
   TrophyIcon,
   FireIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 import { ThemeSelector } from './ThemeSelector';
 import { FontSizeSelector } from './FontSizeSelector';
@@ -19,6 +20,7 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
+  { label: 'Levels', path: '/levels', icon: StarIcon },
   { label: 'Streaks', path: '/streaks', icon: FireIcon },
   { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },

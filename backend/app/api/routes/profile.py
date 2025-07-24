@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 from ...api import deps
 from ...db import models
-from ...schemas import UserOut, UserPreferencesUpdate
+from ...schemas import UserOut, UserPreferencesUpdate, UserProfileOut
 from ...core import auth
+from ...utils.level_calculator import calculate_level, get_level_progress
 
 router = APIRouter()
 
-@router.get("/", response_model=UserOut)
+@router.get("/", response_model=UserProfileOut)
 def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
     # Refresh user from database to get latest XP
     db.refresh(user)
@@ -20,7 +21,23 @@ def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.
         user.font_size = 'medium'
         db.commit()
     
-    return user
+    # Calculate level information
+    level, title = calculate_level(user.total_xp or 0)
+    level_progress = get_level_progress(user.total_xp or 0)
+    
+    # Create response with level information
+    user_dict = {
+        "id": user.id,
+        "username": user.username,
+        "total_xp": user.total_xp or 0,
+        "theme_preference": user.theme_preference,
+        "font_size": user.font_size,
+        "level": level,
+        "title": title,
+        "level_progress": level_progress
+    }
+    
+    return user_dict
 
 @router.get("/submissions/")
 def get_user_submissions(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
@@ -72,13 +89,32 @@ def get_user_stats(user=Depends(deps.get_current_user), db: Session = Depends(de
         models.Problem.difficulty == "hard"
     ).distinct().count()
     
+    # Get streak information (with graceful error handling)
+    current_streak = 0
+    longest_streak = 0
+    streak_active = False
+    
+    try:
+        from ...utils.streak_calculator import get_user_streak_info
+        streak_info = get_user_streak_info(user.id, db)
+        if streak_info:
+            current_streak = streak_info.get("current_streak", 0)
+            longest_streak = streak_info.get("longest_streak", 0)
+            streak_active = streak_info.get("streak_active", False)
+    except Exception as e:
+        print(f"⚠️ Streak info retrieval failed (columns may not exist yet): {e}")
+        # Use default values (already set above)
+    
     return {
         "total_submissions": total_submissions,
         "problems_solved": problems_solved,
         "total_xp": user.total_xp or 0,
         "easy_solved": easy_solved,
         "medium_solved": medium_solved,
-        "hard_solved": hard_solved
+        "hard_solved": hard_solved,
+        "current_streak": current_streak,
+        "longest_streak": longest_streak,
+        "streak_active": streak_active
     }
 
 @router.put("/username")

@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
-from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements
+from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks, levels
 import socketio
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
@@ -38,6 +38,51 @@ try:
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created successfully")
     
+    # Add streak columns manually (safe for production)
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            # Check if streak columns exist and add them if they don't
+            try:
+                # Test if columns exist by querying them
+                conn.execute(text("SELECT current_streak FROM users LIMIT 1"))
+                print("✅ Streak columns already exist")
+            except Exception:
+                # Columns don't exist, add them
+                print("🔄 Adding streak tracking columns...")
+                try:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN current_streak INTEGER DEFAULT 0"))
+                    conn.commit()
+                    print("✅ Added current_streak column")
+                except Exception as e:
+                    print(f"⚠️ current_streak column may already exist: {e}")
+                
+                try:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN longest_streak INTEGER DEFAULT 0"))
+                    conn.commit()
+                    print("✅ Added longest_streak column")
+                except Exception as e:
+                    print(f"⚠️ longest_streak column may already exist: {e}")
+                
+                try:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN last_solve_date TIMESTAMP"))
+                    conn.commit()
+                    print("✅ Added last_solve_date column")
+                except Exception as e:
+                    print(f"⚠️ last_solve_date column may already exist: {e}")
+                
+                # Update existing users to have default values
+                try:
+                    conn.execute(text("UPDATE users SET current_streak = 0 WHERE current_streak IS NULL"))
+                    conn.execute(text("UPDATE users SET longest_streak = 0 WHERE longest_streak IS NULL"))
+                    conn.commit()
+                    print("✅ Updated existing users with default streak values")
+                except Exception as e:
+                    print(f"⚠️ Default value update failed: {e}")
+                    
+    except Exception as e:
+        print(f"⚠️ Streak column setup failed (will continue without): {e}")
+    
     # Verify friendship table exists
     from sqlalchemy import text
     with engine.connect() as conn:
@@ -63,6 +108,8 @@ app.include_router(rooms.router, prefix="/api/rooms", tags=["rooms"])
 app.include_router(friends.router, prefix="/api/friends", tags=["friends"])
 app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["bookmarks"])
 app.include_router(achievements.router, prefix="/api/achievements", tags=["achievements"])
+app.include_router(streaks.router, prefix="/api/streaks", tags=["streaks"])
+app.include_router(levels.router, prefix="/api/levels", tags=["levels"])
 
 @app.get("/")
 def read_root():

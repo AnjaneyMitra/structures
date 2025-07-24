@@ -9,12 +9,12 @@ import {
 import { useAuth } from '../context/AuthContext';
 import AchievementBadge from '../components/AchievementBadge';
 import { Achievement } from '../types/achievements';
+import LevelBadge from '../components/LevelBadge';
+import { UserProfileWithLevel } from '../types/levels';
+import LevelBadge from '../components/LevelBadge';
+import { UserProfileWithLevel } from '../types/levels';
 
-interface UserProfile {
-  id: number;
-  username: string;
-  total_xp: number;
-}
+interface UserProfile extends UserProfileWithLevel {}
 
 interface Problem {
   id: number;
@@ -139,12 +139,25 @@ const TailwindDashboardPage: React.FC = () => {
           {/* Welcome Header - Full Width */}
           <section className="col-span-12 lg:flex-shrink-0">
             <div className="bg-card/30 backdrop-blur-sm rounded-xl p-8 border border-border/50">
-              <h2 className="text-2xl font-bold text-foreground mb-3">
-                Good morning, {user?.username ? formatUsername(user.username) : ''}
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                Ready to solve some problems today?
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground mb-3">
+                    Good morning, {user?.username ? formatUsername(user.username) : ''}
+                  </h2>
+                  <p className="text-muted-foreground text-lg">
+                    Ready to solve some problems today?
+                  </p>
+                </div>
+                {user?.level && user?.title && (
+                  <div className="hidden md:block">
+                    <LevelBadge 
+                      level={user.level} 
+                      title={user.title}
+                      size="large"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
