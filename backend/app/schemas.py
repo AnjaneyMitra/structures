@@ -13,6 +13,8 @@ class UserOut(UserBase):
     total_xp: int = 0
     theme_preference: Optional[str] = 'light'
     font_size: Optional[str] = 'medium'
+    level: Optional[int] = None
+    title: Optional[str] = None
     class Config:
         from_attributes = True
 
@@ -51,6 +53,7 @@ class SubmissionOut(SubmissionBase):
     submission_time: datetime.datetime
     xp_awarded: int = 0
     newly_earned_achievements: List[Dict[str, Any]] = []
+    level_up_info: Optional[Dict[str, Any]] = None
     class Config:
         from_attributes = True
 
@@ -91,6 +94,8 @@ class FriendOut(BaseModel):
     id: int
     username: str
     total_xp: int
+    level: int
+    title: str
     class Config:
         from_attributes = True
 
@@ -100,6 +105,8 @@ class LeaderboardEntry(BaseModel):
     username: str
     total_xp: int
     problems_solved: int
+    level: int
+    title: str
     class Config:
         from_attributes = True
 
@@ -111,4 +118,25 @@ class BookmarkOut(BaseModel):
     created_at: datetime.datetime
     problem: ProblemOut
     class Config:
-        from_attributes = True 
+        from_attributes = True
+
+# Level System Schemas
+class LevelInfo(BaseModel):
+    level: int
+    title: str
+    xp_required: int
+    is_max_level: bool
+
+class UserLevelProgress(BaseModel):
+    level: int
+    title: str
+    total_xp: int
+    xp_to_next_level: int
+    level_start_xp: int
+    level_end_xp: int
+    progress_percentage: float
+
+class UserProfileOut(UserOut):
+    level_progress: UserLevelProgress
+    class Config:
+        from_attributes = True

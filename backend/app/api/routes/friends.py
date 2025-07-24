@@ -4,6 +4,7 @@ from sqlalchemy import or_, and_
 from typing import List
 from ...db import models, schemas
 from ...api import deps
+from ...utils.level_calculator import calculate_level
 
 router = APIRouter()
 
@@ -243,10 +244,13 @@ def get_friends(
             
             if friend:
                 print(f"Found friend: {friend.username} (ID: {friend.id})")
+                level, title = calculate_level(friend.total_xp or 0)
                 friends.append({
                     "id": friend.id,
                     "username": friend.username,
-                    "total_xp": friend.total_xp or 0
+                    "total_xp": friend.total_xp or 0,
+                    "level": level,
+                    "title": title
                 })
             else:
                 print(f"Friend with ID {friend_id} not found in database")
@@ -327,11 +331,14 @@ def get_friends_leaderboard(
                     models.Submission.overall_status == "pass"
                 ).distinct().count()
                 
+                level, title = calculate_level(friend.total_xp or 0)
                 leaderboard.append({
                     "id": friend.id,
                     "username": friend.username,
                     "total_xp": friend.total_xp or 0,
-                    "problems_solved": problems_solved
+                    "problems_solved": problems_solved,
+                    "level": level,
+                    "title": title
                 })
         
         # Sort by XP descending
@@ -345,7 +352,9 @@ def get_friends_leaderboard(
                 "id": entry["id"],
                 "username": entry["username"],
                 "total_xp": entry["total_xp"],
-                "problems_solved": entry["problems_solved"]
+                "problems_solved": entry["problems_solved"],
+                "level": entry["level"],
+                "title": entry["title"]
             })
         
         print(f"Returning leaderboard with {len(result)} entries")
@@ -356,12 +365,15 @@ def get_friends_leaderboard(
         import traceback
         traceback.print_exc()
         # Return just current user as fallback
+        level, title = calculate_level(user.total_xp or 0)
         return [{
             "rank": 1,
             "id": user.id,
             "username": user.username,
             "total_xp": user.total_xp or 0,
-            "problems_solved": 0
+            "problems_solved": 0,
+            "level": level,
+            "title": title
         }]
 
 @router.get("/search/{username}")
@@ -399,10 +411,13 @@ def search_users(
                 else:
                     status = "request_received"
         
+        level, title = calculate_level(found_user.total_xp or 0)
         result.append({
             "id": found_user.id,
             "username": found_user.username,
             "total_xp": found_user.total_xp or 0,
+            "level": level,
+            "title": title,
             "friendship_status": status
         })
     

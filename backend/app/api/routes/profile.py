@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 from ...api import deps
 from ...db import models
-from ...schemas import UserOut, UserPreferencesUpdate
+from ...schemas import UserOut, UserPreferencesUpdate, UserProfileOut
 from ...core import auth
+from ...utils.level_calculator import calculate_level, get_level_progress
 
 router = APIRouter()
 
-@router.get("/", response_model=UserOut)
+@router.get("/", response_model=UserProfileOut)
 def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
     # Refresh user from database to get latest XP
     db.refresh(user)
@@ -20,7 +21,23 @@ def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.
         user.font_size = 'medium'
         db.commit()
     
-    return user
+    # Calculate level information
+    level, title = calculate_level(user.total_xp or 0)
+    level_progress = get_level_progress(user.total_xp or 0)
+    
+    # Create response with level information
+    user_dict = {
+        "id": user.id,
+        "username": user.username,
+        "total_xp": user.total_xp or 0,
+        "theme_preference": user.theme_preference,
+        "font_size": user.font_size,
+        "level": level,
+        "title": title,
+        "level_progress": level_progress
+    }
+    
+    return user_dict
 
 @router.get("/submissions/")
 def get_user_submissions(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):

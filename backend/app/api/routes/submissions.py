@@ -5,6 +5,7 @@ from ...api import deps
 from ...code_runner.executor import CodeExecutor
 from ...utils.xp_calculator import calculate_xp_for_problem, should_award_xp
 from ...utils.achievements import check_achievements
+from ...utils.level_calculator import calculate_level
 import datetime
 
 router = APIRouter()
@@ -89,13 +90,33 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
             xp_awarded = 0
             newly_earned_achievements = []
             streak_info = None
+            level_up_info = None
             
             if execution_results['overall_status'] == 'pass' and should_award_xp(user.id, problem.id, db):
                 xp_awarded = calculate_xp_for_problem(problem.difficulty)
                 old_xp = user.total_xp or 0
+                
+                # Check level before XP update
+                old_level, old_title = calculate_level(old_xp)
+                
                 # Update user's total XP
                 user.total_xp = old_xp + xp_awarded
                 db.add(user)
+                
+                # Check level after XP update
+                new_level, new_title = calculate_level(user.total_xp)
+                
+                # Check if user leveled up
+                if new_level > old_level:
+                    level_up_info = {
+                        "leveled_up": True,
+                        "old_level": old_level,
+                        "old_title": old_title,
+                        "new_level": new_level,
+                        "new_title": new_title
+                    }
+                    print(f"🎊 LEVEL UP! User {user.id} leveled up from {old_level} ({old_title}) to {new_level} ({new_title})")
+                
                 print(f"🎉 XP AWARDED: User {user.id} earned {xp_awarded} XP for {problem.difficulty} problem. Total XP: {old_xp} -> {user.total_xp}")
                 
                 # Update user's streak (with graceful error handling)
@@ -162,7 +183,7 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 error_message=new_submission.error_message,
                 xp_awarded=new_submission.xp_awarded,
                 newly_earned_achievements=newly_earned_achievements,
-                streak_info=streak_info
+                level_up_info=level_up_info
             )
     except Exception as e:
         print(f"Submission error: {str(e)}")
