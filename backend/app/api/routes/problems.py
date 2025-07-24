@@ -2,6 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from ...db import models, schemas
 from ...api import deps
+from ...utils.problem_tracker import (
+    increment_problem_view, 
+    get_popular_problems, 
+    get_trending_problems,
+    get_problem_stats
+)
 
 router = APIRouter()
 
@@ -14,6 +20,10 @@ def get_problem(problem_id: int, db: Session = Depends(deps.get_db)):
     problem = db.query(models.Problem).options(joinedload(models.Problem.test_cases)).filter(models.Problem.id == problem_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
+    
+    # Track problem view
+    increment_problem_view(problem_id, db)
+    
     return problem
 
 @router.post("/", response_model=schemas.ProblemOut)
@@ -56,3 +66,21 @@ def update_problem(problem_id: int, problem: schemas.ProblemCreate, db: Session 
     db.commit()
     db.refresh(db_problem)
     return db_problem 
+
+@router.get("/popular/list", response_model=list[schemas.ProblemOut])
+def get_popular_problems_list(limit: int = 10, db: Session = Depends(deps.get_db)):
+    """Get the most popular problems based on view count."""
+    return get_popular_problems(db, limit)
+
+@router.get("/trending/list", response_model=list[schemas.ProblemOut])
+def get_trending_problems_list(limit: int = 10, days: int = 7, db: Session = Depends(deps.get_db)):
+    """Get trending problems based on recent activity."""
+    return get_trending_problems(db, limit, days)
+
+@router.get("/{problem_id}/stats")
+def get_problem_statistics(problem_id: int, db: Session = Depends(deps.get_db)):
+    """Get detailed statistics for a specific problem."""
+    stats = get_problem_stats(problem_id, db)
+    if not stats:
+        raise HTTPException(status_code=404, detail="Problem not found")
+    return stats 

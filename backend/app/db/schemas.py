@@ -38,6 +38,9 @@ class ProblemCreate(ProblemBase):
 
 class ProblemOut(ProblemBase):
     id: int
+    view_count: int = 0
+    solve_count: int = 0
+    attempt_count: int = 0
     test_cases: list[TestCaseOut] = []
     class Config:
         from_attributes = True
