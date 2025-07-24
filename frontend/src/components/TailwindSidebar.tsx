@@ -7,7 +7,6 @@ import {
   UserIcon, 
   UsersIcon,
   TrophyIcon,
-  FireIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   StarIcon
@@ -21,7 +20,6 @@ const navItems = [
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
   { label: 'Levels', path: '/levels', icon: StarIcon },
-  { label: 'Streaks', path: '/streaks', icon: FireIcon },
   { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
@@ -57,9 +55,11 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div className={`${
-        sidebarOpen ? 'w-[280px]' : 'w-[72px]'
-      } h-screen bg-gradient-to-b from-background to-card backdrop-blur-2xl border-r border-card-foreground/10 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300 ease-in-out`}>
+          <div 
+      className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-50 bg-card/95 backdrop-blur-sm border-r border-border/30 ${
+        sidebarOpen ? 'w-72' : 'w-20'
+      }`}
+    >
         
         {/* Header */}
         <div className="relative z-10 flex items-center h-[88px] px-4 border-b border-card-foreground/10">
