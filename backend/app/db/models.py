@@ -16,7 +16,7 @@ class User(Base):
     total_xp = Column(Integer, default=0)  # Total XP earned
     
     # User preferences
-    theme_preference = Column(String, nullable=True, default='light')  # 'light', 'dark', 'high-contrast', 'blue', 'green', 'purple'
+    theme_preference = Column(String, nullable=True, default='light')  # 'light', 'dark', 'soft-pop', 'blue', 'green', 'purple'
     font_size = Column(String, nullable=True, default='medium')  # 'small', 'medium', 'large', 'extra-large'
     
     # Streak tracking (optional - will be None if columns don't exist)

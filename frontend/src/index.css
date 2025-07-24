@@ -22,6 +22,26 @@
 /* Apply font size to body and common elements */
 body {
   font-size: var(--base-font-size);
+  letter-spacing: var(--tracking-normal);
+  font-family: var(--font-sans);
+}
+
+/* Global font and spacing variables for soft-pop theme */
+:root {
+  --font-sans: DM Sans, sans-serif;
+  --font-serif: DM Sans, sans-serif;
+  --font-mono: Space Mono, monospace;
+  --radius: 1rem;
+  --tracking-normal: normal;
+  --spacing: 0.25rem;
+  --shadow-2xs: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.03);
+  --shadow-xs: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.03);
+  --shadow-sm: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.05), 0px 1px 2px -1px hsl(0 0% 10.1961% / 0.05);
+  --shadow: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.05), 0px 1px 2px -1px hsl(0 0% 10.1961% / 0.05);
+  --shadow-md: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.05), 0px 2px 4px -1px hsl(0 0% 10.1961% / 0.05);
+  --shadow-lg: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.05), 0px 4px 6px -1px hsl(0 0% 10.1961% / 0.05);
+  --shadow-xl: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.05), 0px 8px 10px -1px hsl(0 0% 10.1961% / 0.05);
+  --shadow-2xl: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.13);
 }
 
 /* Scale other text elements proportionally */
@@ -87,7 +107,35 @@ textarea:focus-visible {
 
 /* Smooth transitions for all interactive elements */
 button, a, input, textarea {
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced sidebar and layout transitions */
+.sidebar-transition {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: width, margin-left;
+}
+
+/* Icon and text transitions */
+.icon-transition {
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Opacity transitions with stagger */
+.opacity-transition {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.opacity-transition-delayed {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 0.1s;
+}
+
+/* Layout animation improvements */
+* {
+  will-change: auto;
 }
 
 /* Prevent horizontal scroll */

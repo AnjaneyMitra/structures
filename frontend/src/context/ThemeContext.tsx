@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/st
 import { useAuth } from './AuthContext';
 import axios from 'axios';
 
-type ThemeMode = 'light' | 'dark' | 'high-contrast' | 'blue' | 'green' | 'purple';
+type ThemeMode = 'light' | 'dark' | 'soft-pop' | 'blue' | 'green' | 'purple';
 type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
 
 interface ThemeContextType {
@@ -74,23 +74,23 @@ const themes = {
       },
     },
   }),
-  'high-contrast': createTheme({
+  'soft-pop': createTheme({
     palette: {
-      mode: 'dark',
-      primary: { main: '#ffff00' },
-      secondary: { main: '#00ffff' },
+      mode: 'light',
+      primary: { main: 'hsl(243.3962, 75.3555%, 58.6275%)' },
+      secondary: { main: 'hsl(173.4146, 80.3922%, 40%)' },
       background: {
-        default: '#000000',
-        paper: '#1a1a1a',
+        default: 'hsl(80.0000, 33.3333%, 96.4706%)',
+        paper: 'hsl(0, 0%, 100%)',
       },
       text: {
-        primary: '#ffffff',
-        secondary: '#ffff00',
+        primary: 'hsl(0, 0%, 0%)',
+        secondary: 'hsl(0, 0%, 20%)',
       },
-      error: { main: '#ff0000' },
-      success: { main: '#00ff00' },
-      warning: { main: '#ffff00' },
-      info: { main: '#00ffff' },
+      error: { main: 'hsl(0, 84.2365%, 60.1961%)' },
+      success: { main: 'hsl(142.0859, 70.5628%, 45.2941%)' },
+      warning: { main: 'hsl(37.6923, 92.1260%, 50.1961%)' },
+      info: { main: 'hsl(243.3962, 75.3555%, 58.6275%)' },
     },
   }),
   blue: createAdvancedTheme('dark', '#2563eb'),

@@ -1023,10 +1023,11 @@ Good luck! 🚀`);
         {/* Left Panel - Problem & Description */}
         <Box sx={{
           width: sidebarOpen ? 400 : 0,
-          transition: 'width 0.3s ease',
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           borderRight: '1px solid var(--color-border)',
           bgcolor: 'var(--color-card)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          willChange: 'width'
         }}>
           {sidebarOpen && (
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -1278,7 +1279,15 @@ Good luck! 🚀`);
                 sx={{
                   color: 'var(--color-muted-foreground)',
                   minWidth: 'auto',
-                  p: 1
+                  p: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    color: 'var(--color-primary)',
+                    bgcolor: 'var(--color-primary-hover)'
+                  },
+                  '& .MuiSvgIcon-root': {
+                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }
                 }}
               >
                 {sidebarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
