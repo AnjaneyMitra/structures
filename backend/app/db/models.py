@@ -35,6 +35,12 @@ class Problem(Base):
     sample_input = Column(Text)
     sample_output = Column(Text)
     reference_solution = Column(Text)  # New field for admin reference solution
+    
+    # Popular problems tracking
+    view_count = Column(Integer, default=0)
+    solve_count = Column(Integer, default=0)
+    attempt_count = Column(Integer, default=0)
+    
     submissions = relationship("Submission", back_populates="problem")
     test_cases = relationship("TestCase", back_populates="problem", cascade="all, delete-orphan")
 

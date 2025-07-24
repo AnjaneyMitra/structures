@@ -6,6 +6,7 @@ import { BookmarkButton } from '../components/BookmarkButton';
 import { useBookmarks } from '../context/BookmarkContext';
 import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
 import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
+import TrendingBadge from '../components/TrendingBadge';
 
 interface Problem {
   id: number;
@@ -13,10 +14,13 @@ interface Problem {
   difficulty: string;
   created_at?: string;
   popularity?: number;
+  view_count: number;
+  solve_count: number;
+  attempt_count: number;
 }
 
 type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
-type SortOption = 'popularity' | 'newest' | 'difficulty' | 'bookmarked';
+type SortOption = 'popular' | 'trending' | 'newest' | 'difficulty' | 'bookmarked';
 
 const TailwindProblemsPage: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -24,7 +28,7 @@ const TailwindProblemsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('All');
-  const [sortBy, setSortBy] = useState<SortOption>('popularity');
+  const [sortBy, setSortBy] = useState<SortOption>('popular');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { isBookmarked } = useBookmarks();
@@ -43,7 +47,16 @@ const TailwindProblemsPage: React.FC = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get('https://structures-production.up.railway.app/api/problems/');
+        let url = 'https://structures-production.up.railway.app/api/problems/';
+        
+        // Use specific endpoints for popular and trending
+        if (sortBy === 'popular') {
+          url = 'https://structures-production.up.railway.app/api/problems/popular/list';
+        } else if (sortBy === 'trending') {
+          url = 'https://structures-production.up.railway.app/api/problems/trending/list';
+        }
+        
+        const res = await axios.get(url);
         setProblems(res.data);
       } catch (err) {
         setError('Failed to load problems.');
@@ -52,7 +65,7 @@ const TailwindProblemsPage: React.FC = () => {
       }
     };
     fetchProblems();
-  }, []);
+  }, [sortBy]); // Re-fetch when sort changes
 
   // Register keyboard shortcuts for this page
   useEffect(() => {
@@ -109,26 +122,33 @@ const TailwindProblemsPage: React.FC = () => {
       {
         key: '1',
         altKey: true,
-        description: 'Sort by popularity',
+        description: 'Sort by popular',
         category: 'Sorting',
-        action: () => setSortBy('popularity')
+        action: () => setSortBy('popular')
       },
       {
         key: '2',
+        altKey: true,
+        description: 'Sort by trending',
+        category: 'Sorting',
+        action: () => setSortBy('trending')
+      },
+      {
+        key: '3',
         altKey: true,
         description: 'Sort by newest',
         category: 'Sorting',
         action: () => setSortBy('newest')
       },
       {
-        key: '3',
+        key: '4',
         altKey: true,
         description: 'Sort by difficulty',
         category: 'Sorting',
         action: () => setSortBy('difficulty')
       },
       {
-        key: '4',
+        key: '5',
         altKey: true,
         description: 'Sort bookmarked first',
         category: 'Sorting',
@@ -151,8 +171,12 @@ const TailwindProblemsPage: React.FC = () => {
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'popularity':
-          return (b.popularity || 0) - (a.popularity || 0);
+        case 'popular':
+          return (b.view_count || 0) - (a.view_count || 0);
+        case 'trending':
+          // For trending, we prioritize recent activity (view_count for now)
+          // In a real implementation, you could weight recent views more heavily
+          return (b.view_count || 0) - (a.view_count || 0);
         case 'newest':
           if (a.created_at && b.created_at) {
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -220,8 +244,8 @@ const TailwindProblemsPage: React.FC = () => {
                       <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+C</kbd>
                     </div>
                     <div className="flex justify-between">
-                      <span>Sort by Popularity/Newest/Difficulty/Bookmarked</span>
-                      <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Alt+1/2/3/4</kbd>
+                      <span>Sort by Popular/Trending/Newest/Difficulty/Bookmarked</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Alt+1/2/3/4/5</kbd>
                     </div>
                   </div>
                 </div>
@@ -274,7 +298,8 @@ const TailwindProblemsPage: React.FC = () => {
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
                 className="px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground"
               >
-                <option value="popularity">Popularity</option>
+                <option value="popular">Popular</option>
+                <option value="trending">Trending</option>
                 <option value="newest">Newest</option>
                 <option value="difficulty">Difficulty</option>
                 <option value="bookmarked">Bookmarked First</option>
@@ -331,20 +356,23 @@ const TailwindProblemsPage: React.FC = () => {
                     <span className="text-sm font-medium text-muted-foreground">{index + 1}</span>
                   </div>
                   
-                  {/* Problem Title */}
-                  <div className="flex-1 min-w-0">
+                  {/* Problem Title with Trending Badge */}
+                  <div className="flex-1 min-w-0 flex items-center gap-3">
                     <h3 className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors duration-200 truncate">
                       {problem.title}
                     </h3>
+                    {sortBy === 'trending' && (
+                      <TrendingBadge trending={true} />
+                    )}
                   </div>
                 </div>
                 
-                {/* Right Side: Acceptance Rate + Difficulty */}
+                {/* Right Side: View Count + Difficulty */}
                 <div className="flex items-center space-x-6 flex-shrink-0">
-                  {/* Acceptance Rate */}
+                  {/* View Count */}
                   <div className="hidden sm:block text-center min-w-[80px]">
                     <span className="text-sm text-muted-foreground">
-                      {Math.floor(Math.random() * 30 + 40)}.{Math.floor(Math.random() * 10)}%
+                      {problem.view_count || 0} view{(problem.view_count || 0) !== 1 ? 's' : ''}
                     </span>
                   </div>
                   

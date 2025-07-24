@@ -18,6 +18,9 @@ interface Problem {
   id: number;
   title: string;
   difficulty: string;
+  view_count: number;
+  solve_count: number;
+  attempt_count: number;
 }
 
 const TailwindDashboardPage: React.FC = () => {
@@ -70,8 +73,8 @@ const TailwindDashboardPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
-        const probRes = await axios.get('https://structures-production.up.railway.app/api/problems/');
-        setProblems(probRes.data.slice(0, 6));
+        const probRes = await axios.get('https://structures-production.up.railway.app/api/problems/popular/list?limit=6');
+        setProblems(probRes.data);
         const statsRes = await axios.get('https://structures-production.up.railway.app/api/profile/stats/', {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -204,7 +207,7 @@ const TailwindDashboardPage: React.FC = () => {
             <section className="lg:col-span-1">
               <div className="bg-card/20 backdrop-blur-sm rounded-xl border border-border/30 h-fit max-h-[600px] flex flex-col">
                 <div className="flex items-center justify-between p-8 pb-4">
-                  <h2 className="text-2xl font-bold text-foreground">Featured Problems</h2>
+                  <h2 className="text-2xl font-bold text-foreground">Popular Problems</h2>
                   <Link 
                     to="/problems"
                     className="inline-flex items-center px-4 py-2 border border-primary/60 text-primary bg-transparent rounded-lg hover:bg-primary/10 hover:border-primary hover:scale-105 active:scale-95 transition-all duration-200 font-medium text-sm"
@@ -235,12 +238,12 @@ const TailwindDashboardPage: React.FC = () => {
                           </h3>
                         </div>
                         
-                        {/* Right Side: Acceptance Rate + Difficulty */}
+                        {/* Right Side: View Count + Difficulty */}
                         <div className="flex items-center space-x-6 flex-shrink-0">
-                          {/* Acceptance Rate */}
+                          {/* View Count */}
                           <div className="hidden sm:block text-right min-w-[60px]">
                             <span className="text-sm text-muted-foreground">
-                              {Math.floor(Math.random() * 30 + 40)}.{Math.floor(Math.random() * 10)}%
+                              {problem.view_count} view{problem.view_count !== 1 ? 's' : ''}
                             </span>
                           </div>
                           

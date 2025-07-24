@@ -6,6 +6,7 @@ from ...code_runner.executor import CodeExecutor
 from ...utils.xp_calculator import calculate_xp_for_problem, should_award_xp
 from ...utils.achievements import check_achievements
 from ...utils.level_calculator import calculate_level
+from ...utils.problem_tracker import increment_problem_attempt, increment_problem_solve
 import datetime
 
 router = APIRouter()
@@ -46,6 +47,9 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
         
         # Execute code against test cases using dynamic function execution
         execution_results = executor.run_all_test_cases(submission.code, test_case_data, function_name=function_name)
+
+        # Track problem attempt (every submission counts as an attempt)
+        increment_problem_attempt(problem.id, db)
 
         # Determine if all test cases failed due to error (collect errors)
         all_failed = all(not tc['passed'] for tc in execution_results['test_case_results'])
@@ -93,6 +97,9 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
             level_up_info = None
             
             if execution_results['overall_status'] == 'pass' and should_award_xp(user.id, problem.id, db):
+                # Track successful solve (only for first-time solves that award XP)
+                increment_problem_solve(problem.id, db)
+                
                 xp_awarded = calculate_xp_for_problem(problem.difficulty)
                 old_xp = user.total_xp or 0
                 
