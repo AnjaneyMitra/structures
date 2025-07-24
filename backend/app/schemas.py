@@ -14,7 +14,7 @@ class UserOut(UserBase):
     theme_preference: Optional[str] = 'light'
     font_size: Optional[str] = 'medium'
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserPreferencesUpdate(BaseModel):
     theme_preference: Optional[str] = None
@@ -33,7 +33,7 @@ class ProblemCreate(ProblemBase):
 class ProblemOut(ProblemBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SubmissionBase(BaseModel):
     code: str
@@ -50,8 +50,9 @@ class SubmissionOut(SubmissionBase):
     runtime: Optional[str]
     submission_time: datetime.datetime
     xp_awarded: int = 0
+    newly_earned_achievements: List[Dict[str, Any]] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RoomBase(BaseModel):
     code: str
@@ -65,7 +66,7 @@ class RoomOut(RoomBase):
     created_at: datetime.datetime
     participants: List[UserOut] = []
     class Config:
-        orm_mode = True 
+        from_attributes = True 
 
 class Token(BaseModel):
     access_token: str
@@ -84,14 +85,14 @@ class FriendshipOut(BaseModel):
     requester_username: str
     addressee_username: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FriendOut(BaseModel):
     id: int
     username: str
     total_xp: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LeaderboardEntry(BaseModel):
     rank: int
@@ -100,7 +101,7 @@ class LeaderboardEntry(BaseModel):
     total_xp: int
     problems_solved: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Bookmark Schemas
 class BookmarkOut(BaseModel):
@@ -110,4 +111,4 @@ class BookmarkOut(BaseModel):
     created_at: datetime.datetime
     problem: ProblemOut
     class Config:
-        orm_mode = True 
+        from_attributes = True 

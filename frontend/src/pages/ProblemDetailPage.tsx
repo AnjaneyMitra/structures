@@ -6,6 +6,7 @@ import {
 import { BookmarkButton } from '../components/BookmarkButton';
 import { useTheme } from '../context/ThemeContext';
 import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
+import { useAchievements } from '../contexts/AchievementsContext';
 import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -217,6 +218,7 @@ const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { fontSize, themeMode } = useTheme();
   const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
+  const { showAchievements } = useAchievements();
   const [problem, setProblem] = useState<Problem | null>(null);
 
   // Font size mapping for Monaco Editor
@@ -306,6 +308,11 @@ Good luck! 🚀`);
         }
       );
       setResults(res.data);
+      
+      // Show achievements if any were earned
+      if (res.data.newly_earned_achievements && res.data.newly_earned_achievements.length > 0) {
+        showAchievements(res.data.newly_earned_achievements);
+      }
       
       // Show submission summary in console
       const testResults = res.data.test_case_results || [];

@@ -6,6 +6,7 @@ import {
   UserGroupIcon, 
   UserIcon, 
   UsersIcon,
+  TrophyIcon,
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
@@ -17,6 +18,7 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
+  { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
 ];

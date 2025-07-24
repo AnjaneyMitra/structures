@@ -8,6 +8,7 @@ import TailwindProblemsPage from './pages/TailwindProblemsPage';
 import TailwindRoomsPage from './pages/TailwindRoomsPage';
 import TailwindProfilePage from './pages/TailwindProfilePage';
 import TailwindFriendsPage from './pages/TailwindFriendsPage';
+import AchievementsPage from './pages/AchievementsPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
@@ -15,6 +16,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { BookmarkProvider } from './context/BookmarkContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
+import { AchievementsProvider } from './contexts/AchievementsContext';
 import { RouteGuard } from './components/RouteGuard';
 import { useAutoRedirect } from './hooks/useAutoRedirect';
 
@@ -323,6 +325,7 @@ function AppRoutes() {
         <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
         <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
         <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
+        <Route path="/achievements" element={<AppLayout><AchievementsPage /></AppLayout>} />
       </Route>
       
       {/* Fallback route */}
@@ -336,9 +339,11 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <BookmarkProvider>
-          <KeyboardShortcutsProvider>
-            <AppRoutes />
-          </KeyboardShortcutsProvider>
+          <AchievementsProvider>
+            <KeyboardShortcutsProvider>
+              <AppRoutes />
+            </KeyboardShortcutsProvider>
+          </AchievementsProvider>
         </BookmarkProvider>
       </ThemeProvider>
     </AuthProvider>

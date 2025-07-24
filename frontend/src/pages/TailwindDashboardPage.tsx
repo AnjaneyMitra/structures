@@ -7,6 +7,8 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
+import AchievementBadge from '../components/AchievementBadge';
+import { Achievement } from '../types/achievements';
 
 interface UserProfile {
   id: number;
@@ -26,6 +28,7 @@ const TailwindDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ total_submissions: number; problems_solved: number; total_xp: number } | null>(null);
+  const [recentAchievements, setRecentAchievements] = useState<Achievement[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -61,6 +64,23 @@ const TailwindDashboardPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(statsRes.data);
+        
+        // Fetch recent achievements
+        try {
+          const achievementsRes = await axios.get('https://structures-production.up.railway.app/api/achievements/user', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const earnedAchievements = achievementsRes.data.achievements
+            .filter((a: Achievement) => a.earned)
+            .sort((a: Achievement, b: Achievement) => 
+              new Date(b.earned_at!).getTime() - new Date(a.earned_at!).getTime()
+            )
+            .slice(0, 4); // Show only 4 most recent
+          setRecentAchievements(earnedAchievements);
+        } catch (achievementError) {
+          console.log('Failed to load achievements:', achievementError);
+          // Don't fail the whole dashboard if achievements fail
+        }
       } catch (err: any) {
         setError('Failed to load dashboard data.');
       } finally {
@@ -230,6 +250,44 @@ const TailwindDashboardPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Recent Achievements Section */}
+                  {recentAchievements.length > 0 && (
+                    <div className="mt-6 lg:flex-1 lg:flex lg:flex-col">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">Recent Achievements</h3>
+                        <Link 
+                          to="/achievements"
+                          className="text-sm text-primary hover:text-primary-dark transition-colors duration-200"
+                        >
+                          View All
+                        </Link>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {recentAchievements.map((achievement) => (
+                          <div 
+                            key={achievement.id}
+                            className="bg-card rounded-xl border p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                            onClick={() => navigate('/achievements')}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-shrink-0">
+                                <AchievementBadge achievement={achievement} size="small" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">
+                                  {achievement.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  +{achievement.xp_reward} XP
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
             )}

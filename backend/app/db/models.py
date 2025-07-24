@@ -110,4 +110,31 @@ class Friendship(Base):
     # Ensure unique friendship pairs
     __table_args__ = (
         sa.UniqueConstraint('requester_id', 'addressee_id', name='unique_friendship'),
-    ) 
+    )
+
+class Achievement(Base):
+    __tablename__ = "achievements"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
+    icon = Column(String, nullable=False)  # Icon name/path
+    condition_type = Column(String, nullable=False)  # 'first_solve', 'streak', 'count', 'difficulty'
+    condition_value = Column(Integer, nullable=True)  # Threshold value
+    xp_reward = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+class UserAchievement(Base):
+    __tablename__ = "user_achievements"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    achievement_id = Column(Integer, ForeignKey("achievements.id"), nullable=False)
+    earned_at = Column(DateTime, default=datetime.datetime.utcnow)
+    progress = Column(Integer, default=0)  # Current progress towards achievement
+    
+    user = relationship("User", backref="earned_achievements")
+    achievement = relationship("Achievement")
+    
+    # Ensure unique user-achievement pairs
+    __table_args__ = (
+        sa.UniqueConstraint('user_id', 'achievement_id', name='unique_user_achievement'),
+    )

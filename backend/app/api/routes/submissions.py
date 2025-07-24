@@ -4,6 +4,7 @@ from ...db import models, schemas
 from ...api import deps
 from ...code_runner.executor import CodeExecutor
 from ...utils.xp_calculator import calculate_xp_for_problem, should_award_xp
+from ...utils.achievements import check_achievements
 import datetime
 
 router = APIRouter()
@@ -86,6 +87,7 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
         else:
             # Calculate XP if problem is solved successfully
             xp_awarded = 0
+            newly_earned_achievements = []
             if execution_results['overall_status'] == 'pass' and should_award_xp(user.id, problem.id, db):
                 xp_awarded = calculate_xp_for_problem(problem.difficulty)
                 old_xp = user.total_xp or 0
@@ -93,6 +95,20 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 user.total_xp = old_xp + xp_awarded
                 db.add(user)
                 print(f"🎉 XP AWARDED: User {user.id} earned {xp_awarded} XP for {problem.difficulty} problem. Total XP: {old_xp} -> {user.total_xp}")
+                
+                # Check for achievements after successful submission
+                newly_earned_achievements = check_achievements(
+                    user.id, 
+                    "submission_success", 
+                    db,
+                    execution_time=execution_results['total_execution_time'],
+                    difficulty=problem.difficulty
+                )
+                
+                if newly_earned_achievements:
+                    print(f"🏆 ACHIEVEMENTS EARNED: User {user.id} earned {len(newly_earned_achievements)} new achievements!")
+                    for achievement in newly_earned_achievements:
+                        print(f"   - {achievement['name']}: {achievement['description']}")
             else:
                 print(f"❌ NO XP: User {user.id}, Status: {execution_results['overall_status']}, Should award: {should_award_xp(user.id, problem.id, db) if execution_results['overall_status'] == 'pass' else 'N/A (not passed)'}")
             
@@ -130,7 +146,8 @@ async def submit_code(submission: schemas.SubmissionCreate = Body(...), db: Sess
                 memory_usage=new_submission.memory_usage,
                 overall_status=new_submission.overall_status,
                 error_message=new_submission.error_message,
-                xp_awarded=new_submission.xp_awarded
+                xp_awarded=new_submission.xp_awarded,
+                newly_earned_achievements=newly_earned_achievements
             )
     except Exception as e:
         print(f"Submission error: {str(e)}")
