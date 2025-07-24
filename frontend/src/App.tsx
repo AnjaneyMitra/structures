@@ -14,6 +14,7 @@ import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { BookmarkProvider } from './context/BookmarkContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 import { RouteGuard } from './components/RouteGuard';
 import { useAutoRedirect } from './hooks/useAutoRedirect';
 
@@ -335,7 +336,9 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <BookmarkProvider>
-          <AppRoutes />
+          <KeyboardShortcutsProvider>
+            <AppRoutes />
+          </KeyboardShortcutsProvider>
         </BookmarkProvider>
       </ThemeProvider>
     </AuthProvider>

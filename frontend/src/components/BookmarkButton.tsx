@@ -30,6 +30,7 @@ export const BookmarkButton: React.FC<BookmarkButtonProps> = ({
         disabled={loading}
         size={size}
         className={className}
+        data-testid="bookmark-button"
         sx={{
           color: bookmarked ? 'warning.main' : 'text.secondary',
           '&:hover': {

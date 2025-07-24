@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon as SearchIcon } from '@heroicons/react/24/outline';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { useBookmarks } from '../context/BookmarkContext';
+import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
+import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
 
 interface Problem {
   id: number;
@@ -28,6 +30,8 @@ const TailwindProblemsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { isBookmarked } = useBookmarks();
+  const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const urlSearch = searchParams.get('search');
@@ -51,6 +55,100 @@ const TailwindProblemsPage: React.FC = () => {
     };
     fetchProblems();
   }, []);
+
+  // Register keyboard shortcuts for this page
+  useEffect(() => {
+    const shortcuts: ShortcutConfig[] = [
+      {
+        key: '/',
+        ctrlKey: true,
+        description: 'Focus search input',
+        category: 'Navigation',
+        action: () => {
+          if (searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+        }
+      },
+      {
+        key: 'e',
+        ctrlKey: true,
+        description: 'Filter Easy problems',
+        category: 'Filters',
+        action: () => setDifficultyFilter('Easy')
+      },
+      {
+        key: 'm',
+        ctrlKey: true,
+        description: 'Filter Medium problems',
+        category: 'Filters',
+        action: () => setDifficultyFilter('Medium')
+      },
+      {
+        key: 'h',
+        ctrlKey: true,
+        description: 'Filter Hard problems',
+        category: 'Filters',
+        action: () => setDifficultyFilter('Hard')
+      },
+      {
+        key: 'a',
+        ctrlKey: true,
+        description: 'Show All problems',
+        category: 'Filters',
+        action: () => setDifficultyFilter('All')
+      },
+      {
+        key: 'b',
+        ctrlKey: true,
+        description: 'Toggle bookmarked filter',
+        category: 'Filters',
+        action: () => {
+          setBookmarkFilter(current => 
+            current === 'bookmarked' ? 'all' : 'bookmarked'
+          );
+        }
+      },
+      {
+        key: 'c',
+        ctrlKey: true,
+        description: 'Clear all filters',
+        category: 'Filters',
+        action: () => {
+          setSearch('');
+          setDifficultyFilter('All');
+          setBookmarkFilter('all');
+        }
+      },
+      {
+        key: '1',
+        altKey: true,
+        description: 'Sort by popularity',
+        category: 'Sorting',
+        action: () => setSortBy('popularity')
+      },
+      {
+        key: '2',
+        altKey: true,
+        description: 'Sort by newest',
+        category: 'Sorting',
+        action: () => setSortBy('newest')
+      },
+      {
+        key: '3',
+        altKey: true,
+        description: 'Sort by difficulty',
+        category: 'Sorting',
+        action: () => setSortBy('difficulty')
+      }
+    ];
+
+    registerShortcuts(shortcuts);
+
+    return () => {
+      unregisterShortcuts();
+    };
+  }, [registerShortcuts, unregisterShortcuts, setDifficultyFilter, setBookmarkFilter, setSearch, setSortBy]);
 
   const filteredProblems = problems
     .filter(p => {
@@ -103,15 +201,21 @@ const TailwindProblemsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-6">Problems</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-4xl font-bold text-foreground">Problems</h1>
+            <div className="text-sm text-muted-foreground">
+              Press <kbd className="px-2 py-1 bg-muted border border-border rounded text-xs">?</kbd> for keyboard shortcuts
+            </div>
+          </div>
           
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative max-w-2xl">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search problems... (e.g. 'Linked List', 'Binary Tree')"
+                placeholder="Search problems... (Ctrl+/ to focus)"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"

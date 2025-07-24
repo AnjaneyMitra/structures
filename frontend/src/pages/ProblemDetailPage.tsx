@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { useTheme } from '../context/ThemeContext';
+import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
+import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BoltIcon from '@mui/icons-material/Bolt';
@@ -214,6 +216,7 @@ function getJSReturnType(problemData: any): string {
 const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { fontSize, themeMode } = useTheme();
+  const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
   const [problem, setProblem] = useState<Problem | null>(null);
 
   // Font size mapping for Monaco Editor
@@ -413,6 +416,76 @@ Good luck! 🚀`);
     }
   };
 
+  // Register keyboard shortcuts for this page
+  useEffect(() => {
+    const shortcuts: ShortcutConfig[] = [
+      {
+        key: 'r',
+        ctrlKey: true,
+        description: 'Run code with sample input',
+        category: 'Code Actions',
+        action: handleRun,
+        disabled: running || submitting
+      },
+      {
+        key: 's',
+        ctrlKey: true,
+        description: 'Submit solution',
+        category: 'Code Actions',
+        action: handleSubmit,
+        disabled: running || submitting
+      },
+      {
+        key: 't',
+        ctrlKey: true,
+        shiftKey: true,
+        description: 'Test run (show console output)',
+        category: 'Code Actions',
+        action: handleTestRun,
+        disabled: running || submitting
+      },
+      {
+        key: 'b',
+        ctrlKey: true,
+        description: 'Toggle bookmark',
+        category: 'Problem Actions',
+        action: () => {
+          // The BookmarkButton component handles the bookmark toggle
+          const bookmarkButton = document.querySelector('[data-testid="bookmark-button"]') as HTMLButtonElement;
+          if (bookmarkButton) {
+            bookmarkButton.click();
+          }
+        }
+      },
+      {
+        key: 'Tab',
+        description: 'Toggle problem description panel',
+        category: 'Navigation',
+        action: () => setSidebarOpen(!sidebarOpen)
+      },
+      {
+        key: '1',
+        altKey: true,
+        description: 'Switch to Description tab',
+        category: 'Navigation',
+        action: () => setActiveTab(0)
+      },
+      {
+        key: '2',
+        altKey: true,
+        description: 'Switch to Submissions tab',
+        category: 'Navigation',
+        action: () => setActiveTab(1)
+      }
+    ];
+
+    registerShortcuts(shortcuts);
+
+    return () => {
+      unregisterShortcuts();
+    };
+  }, [registerShortcuts, unregisterShortcuts, handleRun, handleSubmit, handleTestRun, running, submitting, sidebarOpen, setSidebarOpen, setActiveTab]);
+
   if (loading) return (
     <Box sx={{ 
       height: '100vh', 
@@ -477,6 +550,9 @@ Good luck! 🚀`);
           <CodeIcon sx={{ color: 'var(--color-primary)', fontSize: 28 }} />
           <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-card-foreground)' }}>
             {problem.id}. {problem.title}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', ml: 2 }}>
+            Press ? for shortcuts
           </Typography>
           <Chip
             icon={diffConfig.icon}
@@ -742,7 +818,7 @@ Good luck! 🚀`);
                     }
                   }}
                 >
-                  {running ? 'Testing...' : 'Test Run'}
+                  {running ? 'Testing...' : 'Test Run (Ctrl+Shift+T)'}
                 </Button>
                 <Button
                   variant="outlined"
@@ -760,7 +836,7 @@ Good luck! 🚀`);
                     }
                   }}
                 >
-                  {running ? 'Running...' : 'Run Sample'}
+                  {running ? 'Running...' : 'Run Sample (Ctrl+R)'}
                 </Button>
                 <Button
                   variant="contained"
@@ -774,7 +850,7 @@ Good luck! 🚀`);
                     fontWeight: 600
                   }}
                 >
-                  {submitting ? 'Submitting...' : 'Submit'}
+                  {submitting ? 'Submitting...' : 'Submit (Ctrl+S)'}
                 </Button>
               </Stack>
             </Box>
