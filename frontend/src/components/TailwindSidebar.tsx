@@ -55,14 +55,13 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-          <div 
-      className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-50 bg-card/95 backdrop-blur-sm border-r border-border/30 ${
-        sidebarOpen ? 'w-72' : 'w-20'
-      }`}
-    >
-        
+      <div 
+        className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-50 bg-card border-r border-border ${
+          sidebarOpen ? 'w-72' : 'w-20'
+        } flex flex-col`}
+      >
         {/* Header */}
-        <div className="relative z-10 flex items-center h-[88px] px-4 border-b border-card-foreground/10">
+        <div className="flex items-center h-[88px] px-4 border-b border-border/20">
           <div className={`flex items-center gap-3 overflow-hidden`}>
             {sidebarOpen ? (
               <>
@@ -99,7 +98,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                   className={`flex items-center h-[52px] rounded-xl group transition-all duration-200 overflow-hidden ${
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                      : 'text-card-foreground hover:bg-card hover:shadow-md'
+                      : 'text-card-foreground hover:bg-muted/50 hover:shadow-md'
                   }`}
                   title={!sidebarOpen ? item.label : undefined}
                 >
@@ -117,9 +116,10 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* User Section */}
-        <div className="p-4 border-t border-card-foreground/10">
-          <div className={`flex items-center overflow-hidden`}>
+        {/* User Section - Always at bottom */}
+        <div className="mt-auto p-4 border-t border-border/20">
+          {/* User Profile */}
+          <div className={`flex items-center overflow-hidden mb-4`}>
             <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex-shrink-0 text-white font-bold text-sm" title={user.name}>
               {user.name.charAt(0).toUpperCase()}
             </div>
@@ -131,9 +131,9 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
           
-          {/* Expanded state - show theme controls and logout */}
-          <div className={`mt-4 transition-all duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div className="flex items-center justify-between mb-2">
+          {/* Controls - Always visible at bottom */}
+          {sidebarOpen ? (
+            <div className="flex items-center justify-between">
               <ThemeSelector />
               <FontSizeSelector />
               <button
@@ -146,11 +146,8 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 </svg>
               </button>
             </div>
-          </div>
-          
-          {/* Collapsed state - show theme controls and logout */}
-          {!sidebarOpen && (
-            <div className="flex flex-col items-center space-y-3 mt-4">
+          ) : (
+            <div className="flex flex-col items-center space-y-3">
               <div className="scale-75">
                 <ThemeSelector />
               </div>

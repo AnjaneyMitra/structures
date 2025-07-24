@@ -125,6 +125,13 @@ const TailwindDashboardPage: React.FC = () => {
     ).join(' ') : '';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -156,7 +163,7 @@ const TailwindDashboardPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-3">
-                    Good morning, {user?.username ? formatUsername(user.username) : ''}
+                    {getGreeting()}, {user?.username ? formatUsername(user.username) : ''}
                   </h2>
                   <p className="text-muted-foreground text-lg">
                     Ready to solve some problems today?
@@ -262,7 +269,7 @@ const TailwindDashboardPage: React.FC = () => {
               <section className="lg:col-span-1 lg:flex lg:flex-col">
                 <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 lg:h-full lg:flex lg:flex-col">
                   <h2 className="text-xl font-semibold text-foreground mb-6 lg:flex-shrink-0">Your Progress</h2>
-                  <div className="grid grid-cols-2 gap-3 h-fit lg:flex-shrink-0">
+                  <div className="grid grid-cols-2 gap-4 h-fit lg:flex-shrink-0">
                     <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
                         <div className="p-2.5 bg-primary/10 rounded-lg mb-2.5">
@@ -373,12 +380,15 @@ const TailwindDashboardPage: React.FC = () => {
               </section>
             )}
           </div>
+        </div>
 
-          {/* Streak Calendar Section */}
-          <section className="col-span-12 mt-6">
-            <HorizontalStreakCalendar days={100} />
-          </section>
-
+        {/* Streak Calendar Section - Moved down with proper spacing */}
+        <div className="mt-8 pt-6 border-t border-border/20">
+          <div className="w-full flex justify-center">
+            <div className="w-full max-w-5xl">
+              <HorizontalStreakCalendar days={100} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
