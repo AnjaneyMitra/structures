@@ -242,6 +242,8 @@ def get_user_achievements(user_id: int, db: Session) -> Dict[str, Any]:
             "name": achievement.name,
             "description": achievement.description,
             "icon": achievement.icon,
+            "condition_type": achievement.condition_type,
+            "condition_value": achievement.condition_value,
             "xp_reward": achievement.xp_reward,
             "earned": achievement.id in earned_dict,
             "earned_at": None,
