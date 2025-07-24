@@ -10,6 +10,7 @@ import AchievementBadge from '../components/AchievementBadge';
 import { Achievement } from '../types/achievements';
 import LevelBadge from '../components/LevelBadge';
 import { UserProfileWithLevel } from '../types/levels';
+import HorizontalStreakCalendar from '../components/HorizontalStreakCalendar';
 
 interface UserProfile extends UserProfileWithLevel {}
 
@@ -31,6 +32,10 @@ const TailwindDashboardPage: React.FC = () => {
     current_streak: number;
     longest_streak: number;
     streak_active: boolean;
+  } | null>(null);
+  const [streakStats, setStreakStats] = useState<{
+    current_streak_rank: number;
+    longest_streak: number;
   } | null>(null);
   const [recentAchievements, setRecentAchievements] = useState<Achievement[]>([]);
   const navigate = useNavigate();
@@ -71,6 +76,19 @@ const TailwindDashboardPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(statsRes.data);
+        
+        // Fetch streak stats for detailed information
+        try {
+          const streakStatsRes = await axios.get('https://structures-production.up.railway.app/api/streaks/stats', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setStreakStats({
+            current_streak_rank: streakStatsRes.data.current_streak_rank,
+            longest_streak: streakStatsRes.data.longest_streak
+          });
+        } catch (streakError) {
+          console.log('Failed to load streak stats:', streakError);
+        }
         
         // Fetch recent achievements
         try {
@@ -145,12 +163,27 @@ const TailwindDashboardPage: React.FC = () => {
                   </p>
                 </div>
                 {user?.level && user?.title && (
-                  <div className="hidden md:block">
+                  <div className="hidden md:flex md:items-center md:space-x-6">
                     <LevelBadge 
                       level={user.level} 
                       title={user.title}
                       size="large"
                     />
+                    {/* Streak Stats */}
+                    {stats && (
+                      <div className="flex items-center space-x-4 text-sm">
+                        <div className="text-center">
+                          <div className="text-orange-500 font-bold text-lg">{stats.longest_streak}</div>
+                          <div className="text-muted-foreground text-xs">Personal Best</div>
+                        </div>
+                        {streakStats && (
+                          <div className="text-center">
+                            <div className="text-primary font-bold text-lg">#{streakStats.current_streak_rank}</div>
+                            <div className="text-muted-foreground text-xs">Current Rank</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -340,6 +373,11 @@ const TailwindDashboardPage: React.FC = () => {
               </section>
             )}
           </div>
+
+          {/* Streak Calendar Section */}
+          <section className="col-span-12 mt-6">
+            <HorizontalStreakCalendar days={100} />
+          </section>
 
         </div>
       </div>
