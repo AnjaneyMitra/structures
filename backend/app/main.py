@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
-from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks
+from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements
 import socketio
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
@@ -38,34 +38,6 @@ try:
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created successfully")
     
-    # Check and add streak columns if they don't exist (for production deployment)
-    from sqlalchemy import text
-    with engine.connect() as conn:
-        try:
-            # Check if streak columns exist
-            result = conn.execute(text("PRAGMA table_info(users)"))
-            columns = [row[1] for row in result.fetchall()]
-            
-            # Add streak columns if they don't exist
-            if 'current_streak' not in columns:
-                conn.execute(text("ALTER TABLE users ADD COLUMN current_streak INTEGER DEFAULT 0"))
-                conn.commit()
-                print("✓ Added current_streak column")
-            
-            if 'longest_streak' not in columns:
-                conn.execute(text("ALTER TABLE users ADD COLUMN longest_streak INTEGER DEFAULT 0"))
-                conn.commit()
-                print("✓ Added longest_streak column")
-            
-            if 'last_solve_date' not in columns:
-                conn.execute(text("ALTER TABLE users ADD COLUMN last_solve_date DATETIME"))
-                conn.commit()
-                print("✓ Added last_solve_date column")
-                
-        except Exception as e:
-            print(f"⚠ Streak column migration failed: {e}")
-            # Continue without streak columns - the error handling in routes will manage this
-    
     # Verify friendship table exists
     from sqlalchemy import text
     with engine.connect() as conn:
@@ -91,7 +63,6 @@ app.include_router(rooms.router, prefix="/api/rooms", tags=["rooms"])
 app.include_router(friends.router, prefix="/api/friends", tags=["friends"])
 app.include_router(bookmarks.router, prefix="/api/bookmarks", tags=["bookmarks"])
 app.include_router(achievements.router, prefix="/api/achievements", tags=["achievements"])
-app.include_router(streaks.router, prefix="/api/streaks", tags=["streaks"])
 
 @app.get("/")
 def read_root():

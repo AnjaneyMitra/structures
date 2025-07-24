@@ -69,9 +69,6 @@ class SubmissionOut(SubmissionBase):
     xp_awarded: Optional[int] = 0
     newly_earned_achievements: Optional[List[Dict[str, Any]]] = []
     
-    # Streak information
-    streak_info: Optional[Dict[str, Any]] = None
-    
     class Config:
         orm_mode = True
 
