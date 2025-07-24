@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 import datetime
 
 class UserBase(BaseModel):
@@ -11,8 +11,8 @@ class UserCreate(UserBase):
 class UserOut(UserBase):
     id: int
     total_xp: int = 0
-    theme_preference: str = 'light'
-    font_size: str = 'medium'
+    theme_preference: Optional[str] = 'light'
+    font_size: Optional[str] = 'medium'
     class Config:
         orm_mode = True
 

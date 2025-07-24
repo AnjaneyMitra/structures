@@ -11,6 +11,15 @@ router = APIRouter()
 def get_profile(user=Depends(deps.get_current_user), db: Session = Depends(deps.get_db)):
     # Refresh user from database to get latest XP
     db.refresh(user)
+    
+    # Ensure default values for preferences if they're None
+    if user.theme_preference is None:
+        user.theme_preference = 'light'
+        db.commit()
+    if user.font_size is None:
+        user.font_size = 'medium'
+        db.commit()
+    
     return user
 
 @router.get("/submissions/")

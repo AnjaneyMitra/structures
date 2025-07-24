@@ -16,8 +16,8 @@ class User(Base):
     total_xp = Column(Integer, default=0)  # Total XP earned
     
     # User preferences
-    theme_preference = Column(String, default='light')  # 'light', 'dark', 'high-contrast', 'blue', 'green', 'purple'
-    font_size = Column(String, default='medium')  # 'small', 'medium', 'large', 'extra-large'
+    theme_preference = Column(String, nullable=True, default='light')  # 'light', 'dark', 'high-contrast', 'blue', 'green', 'purple'
+    font_size = Column(String, nullable=True, default='medium')  # 'small', 'medium', 'large', 'extra-large'
     
     submissions = relationship("Submission", back_populates="user")
 

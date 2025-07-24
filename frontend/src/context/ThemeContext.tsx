@@ -159,10 +159,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (theme_preference && themes[theme_preference as ThemeMode]) {
         setThemeModeState(theme_preference as ThemeMode);
         localStorage.setItem('theme', theme_preference);
+      } else {
+        // Set default if backend returns null/undefined
+        setThemeModeState('light');
+        localStorage.setItem('theme', 'light');
       }
       if (font_size && fontSizeMap[font_size as FontSize]) {
         setFontSizeState(font_size as FontSize);
         localStorage.setItem('fontSize', font_size);
+      } else {
+        // Set default if backend returns null/undefined
+        setFontSizeState('medium');
+        localStorage.setItem('fontSize', 'medium');
       }
     } catch (error) {
       console.error('Failed to load user preferences:', error);
