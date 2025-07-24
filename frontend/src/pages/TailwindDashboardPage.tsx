@@ -11,8 +11,6 @@ import AchievementBadge from '../components/AchievementBadge';
 import { Achievement } from '../types/achievements';
 import LevelBadge from '../components/LevelBadge';
 import { UserProfileWithLevel } from '../types/levels';
-import LevelBadge from '../components/LevelBadge';
-import { UserProfileWithLevel } from '../types/levels';
 
 interface UserProfile extends UserProfileWithLevel {}
 

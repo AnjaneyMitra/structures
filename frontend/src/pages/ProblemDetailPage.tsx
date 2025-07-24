@@ -1067,15 +1067,7 @@ Good luck! 🚀`);
           </Box>
         </Box>
       </Box>
-    </Box>
-      {/* Level Up Modal */}
-      <LevelUpModal 
-        levelUpInfo={levelUpInfo}
-        open={showLevelUpModal}
-        onClose={closeLevelUpModal}
-      />
-    </Box>
-  );
+
       {/* Level Up Modal */}
       <LevelUpModal 
         levelUpInfo={levelUpInfo}
