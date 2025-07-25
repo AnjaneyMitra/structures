@@ -1,17 +1,51 @@
-admin_details.md 
+# Environment files
 .env
-*.db
-*.sqlite3
-__pycache__/
-*.pyc
-backend_venv/
-node_modules/
-.DS_Store
 .env.local
 .env.*.local
+
+# Database files
+*.db
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+backend_venv/
+.pytest_cache/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.DS_Store
 .vscode/
-.idea/ 
+.idea/
+
+# Temporary documentation (keep important guides)
+FEATURE_*_IMPLEMENTATION*.md
+FEATURE_*_TEST*.md
+DEPLOYMENT_FIX.md
+DEPLOYMENT_READY.md
+KEYBOARD_SHORTCUTS_FEATURE.md
+SIDEBAR_FEATURES.md
 UI_REDESIGN_SUMMARY.md
-*.md
-deploy.md
+XP_SYSTEM.md
+
+# One-time scripts (keep migration fix scripts)
 backend/create_test_data.py
+backend/init_friendship_table.py
+backend/migrate_to_postgresql.py
+backend/deploy_setup.py
+
+# Build directories
+frontend/build/
+frontend/dist/
+
+# Logs
+*.log
