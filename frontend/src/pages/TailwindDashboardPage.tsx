@@ -11,6 +11,7 @@ import { Achievement } from '../types/achievements';
 import LevelBadge from '../components/LevelBadge';
 import { UserProfileWithLevel } from '../types/levels';
 import HorizontalStreakCalendar from '../components/HorizontalStreakCalendar';
+import SuccessRateChart from '../components/SuccessRateChart';
 
 interface UserProfile extends UserProfileWithLevel {}
 
@@ -383,6 +384,65 @@ const TailwindDashboardPage: React.FC = () => {
               </section>
             )}
           </div>
+
+          {/* Success Rate Analytics Section - Full Width */}
+          <section className="col-span-12 mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SuccessRateChart />
+              <div className="bg-card/20 backdrop-blur-sm rounded-xl p-6 border border-border/30">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+                <div className="space-y-3">
+                  <Link 
+                    to="/problems"
+                    className="flex items-center justify-between p-4 bg-card rounded-lg border hover:bg-card/80 transition-colors duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <BoltIcon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">Practice Problems</p>
+                        <p className="text-sm text-muted-foreground">Solve coding challenges</p>
+                      </div>
+                    </div>
+                    <span className="text-muted-foreground">→</span>
+                  </Link>
+                  
+                  <Link 
+                    to="/analytics"
+                    className="flex items-center justify-between p-4 bg-card rounded-lg border hover:bg-card/80 transition-colors duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-accent/10 rounded-lg">
+                        <StarIcon className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">View Analytics</p>
+                        <p className="text-sm text-muted-foreground">Detailed performance insights</p>
+                      </div>
+                    </div>
+                    <span className="text-muted-foreground">→</span>
+                  </Link>
+                  
+                  <Link 
+                    to="/rooms"
+                    className="flex items-center justify-between p-4 bg-card rounded-lg border hover:bg-card/80 transition-colors duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-green-500/10 rounded-lg">
+                        <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">Join Room</p>
+                        <p className="text-sm text-muted-foreground">Collaborate with friends</p>
+                      </div>
+                    </div>
+                    <span className="text-muted-foreground">→</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         {/* Streak Calendar Section - Moved down with proper spacing */}

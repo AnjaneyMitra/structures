@@ -17,6 +17,7 @@ interface Problem {
   view_count: number;
   solve_count: number;
   attempt_count: number;
+  acceptance_rate?: number;
 }
 
 type DifficultyFilter = 'All' | 'Easy' | 'Medium' | 'Hard';
@@ -369,10 +370,18 @@ const TailwindProblemsPage: React.FC = () => {
                 
                 {/* Right Side: View Count + Difficulty */}
                 <div className="flex items-center space-x-6 flex-shrink-0">
-                  {/* View Count */}
+                  {/* Acceptance Rate */}
                   <div className="hidden sm:block text-center min-w-[80px]">
-                    <span className="text-sm text-muted-foreground">
-                      {problem.view_count || 0} view{(problem.view_count || 0) !== 1 ? 's' : ''}
+                    <span className={`text-sm font-medium ${
+                      problem.acceptance_rate !== undefined 
+                        ? problem.acceptance_rate >= 70 
+                          ? 'text-green-600 dark:text-green-400'
+                          : problem.acceptance_rate >= 40
+                          ? 'text-yellow-600 dark:text-yellow-400'
+                          : 'text-red-600 dark:text-red-400'
+                        : 'text-muted-foreground'
+                    }`}>
+                      {problem.acceptance_rate !== undefined ? `${problem.acceptance_rate}%` : 'N/A'}
                     </span>
                   </div>
                   
