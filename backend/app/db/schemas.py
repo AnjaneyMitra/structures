@@ -41,6 +41,7 @@ class ProblemOut(ProblemBase):
     view_count: int = 0
     solve_count: int = 0
     attempt_count: int = 0
+    acceptance_rate: Optional[float] = 0.0
     test_cases: list[TestCaseOut] = []
     class Config:
         from_attributes = True

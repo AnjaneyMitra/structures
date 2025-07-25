@@ -34,6 +34,7 @@ class ProblemCreate(ProblemBase):
 
 class ProblemOut(ProblemBase):
     id: int
+    acceptance_rate: Optional[float] = 0.0
     class Config:
         from_attributes = True
 
