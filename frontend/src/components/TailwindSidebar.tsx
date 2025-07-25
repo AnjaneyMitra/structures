@@ -9,7 +9,8 @@ import {
   TrophyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  StarIcon
+  StarIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 import { ThemeSelector } from './ThemeSelector';
 import { useAuth } from '../context/AuthContext';
@@ -18,6 +19,7 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
+  { label: 'Analytics', path: '/analytics', icon: ChartBarIcon },
   { label: 'Levels', path: '/levels', icon: StarIcon },
   { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
