@@ -22,6 +22,7 @@ import {
   CheckCircle as CheckIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 interface Hint {
   id: number;
@@ -72,14 +73,14 @@ export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId, currentCode, 
 
       // Fetch hints availability
       const availableRes = await axios.get(
-        `https://structures-production.up.railway.app/api/hints/problems/${problemId}/hints/available`,
+        `${API_BASE_URL}/api/hints/problems/${problemId}/hints/available`,
         { headers }
       );
       setHintsAvailable(availableRes.data);
 
       // Fetch revealed hints
       const revealedRes = await axios.get(
-        `https://structures-production.up.railway.app/api/hints/problems/${problemId}/hints/revealed`,
+        `${API_BASE_URL}/api/hints/problems/${problemId}/hints/revealed`,
         { headers }
       );
       setRevealedHints(revealedRes.data);
@@ -99,7 +100,7 @@ export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId, currentCode, 
 
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        `https://structures-production.up.railway.app/api/hints/problems/${problemId}/hints/reveal`,
+        `${API_BASE_URL}/api/hints/problems/${problemId}/hints/reveal`,
         { hint_order: hintOrder },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -140,7 +141,7 @@ export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId, currentCode, 
 
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        `https://structures-production.up.railway.app/api/hints/problems/${problemId}/hints/contextual`,
+        `${API_BASE_URL}/api/hints/problems/${problemId}/hints/contextual`,
         { 
           user_code: currentCode,
           language: currentLanguage
