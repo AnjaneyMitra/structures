@@ -24,16 +24,46 @@ class GeminiHintGenerator:
         self.model = genai.GenerativeModel('gemini-pro')
         self._initialized = True
     
+    def generate_contextual_hint(self, problem_title: str, problem_description: str, user_code: str, language: str, reference_solution: Optional[str] = None) -> str:
+        """
+        Generate a contextual hint for a coding problem based on the user's current code.
+        Returns a single hint tailored to their current approach and progress.
+        """
+        try:
+            # Ensure Gemini is initialized
+            self._ensure_initialized()
+            
+            # Create a contextual prompt for hint generation
+            prompt = self._create_contextual_hint_prompt(problem_title, problem_description, user_code, language, reference_solution)
+            
+            # Generate hint using Gemini
+            response = self.model.generate_content(prompt)
+            
+            # Clean and return the hint
+            hint = response.text.strip()
+            
+            # If the hint is too long, truncate it
+            if len(hint) > 500:
+                hint = hint[:497] + "..."
+            
+            return hint if hint else self._get_fallback_contextual_hint()
+            
+        except Exception as e:
+            logger.error(f"Error generating contextual hint with Gemini: {str(e)}")
+            # Return fallback hint if Gemini fails
+            return self._get_fallback_contextual_hint()
+    
     def generate_hints(self, problem_title: str, problem_description: str, reference_solution: Optional[str] = None) -> List[str]:
         """
-        Generate progressive hints for a coding problem using Gemini AI.
+        Generate static hints for a coding problem (fallback for when no user code is available).
         Returns a list of 3 hints in order of increasing helpfulness.
         """
         try:
             # Ensure Gemini is initialized
             self._ensure_initialized()
+            
             # Create a comprehensive prompt for hint generation
-            prompt = self._create_hint_prompt(problem_title, problem_description, reference_solution)
+            prompt = self._create_static_hint_prompt(problem_title, problem_description, reference_solution)
             
             # Generate hints using Gemini
             response = self.model.generate_content(prompt)
@@ -57,7 +87,59 @@ class GeminiHintGenerator:
             # Return fallback hints if Gemini fails
             return self._get_fallback_hints()
     
-    def _create_hint_prompt(self, title: str, description: str, reference_solution: Optional[str] = None) -> str:
+    def _create_contextual_hint_prompt(self, title: str, description: str, user_code: str, language: str, reference_solution: Optional[str] = None) -> str:
+        """Create a detailed prompt for Gemini to generate a contextual hint based on user's current code."""
+        
+        base_prompt = f"""
+You are an expert coding instructor helping a student solve a programming problem. The student has written some code but may be stuck or making mistakes. Analyze their current code and provide ONE specific, helpful hint to guide them toward the solution.
+
+Problem Title: {title}
+
+Problem Description:
+{description}
+
+Student's Current Code ({language}):
+```{language}
+{user_code}
+```
+
+Instructions for the hint:
+1. Analyze the student's current approach and identify what they're trying to do
+2. If their approach is correct, guide them on the next step or help fix any bugs
+3. If their approach is flawed, gently suggest a better direction without giving away the solution
+4. Be specific and actionable - don't give generic advice
+5. Keep the hint concise (1-3 sentences max)
+6. Don't include actual code in the hint, just guidance
+7. If the code is empty or just a template, suggest how to get started
+8. Focus on the most important issue or next step
+
+Consider these aspects when analyzing their code:
+- Is the overall approach correct?
+- Are there syntax errors or logical bugs?
+- Are they handling edge cases properly?
+- Is their algorithm efficient enough?
+- Are they missing key insights about the problem?
+- What would be the most helpful next step?
+
+"""
+        
+        if reference_solution:
+            base_prompt += f"""
+Reference Solution (for your analysis only - don't reveal this to the student):
+```{language}
+{reference_solution}
+```
+
+Use this to understand the optimal approach and guide the student toward it without giving it away.
+"""
+        
+        base_prompt += """
+Provide your hint now (just the hint, no extra formatting):
+"""
+        
+        return base_prompt
+    
+    def _create_static_hint_prompt(self, title: str, description: str, reference_solution: Optional[str] = None) -> str:
         """Create a detailed prompt for Gemini to generate progressive hints."""
         
         base_prompt = f"""
@@ -130,6 +212,10 @@ Generate the 3 hints now:
             "Consider what data structures or algorithms might be most suitable for this type of problem.",
             "Think about the time and space complexity requirements, and implement step by step."
         ]
+    
+    def _get_fallback_contextual_hint(self) -> str:
+        """Return a generic fallback hint for contextual requests."""
+        return "Review your current approach and consider if there's a more efficient way to solve this problem. Think about edge cases and test your logic step by step."
 
 # Global instance
 gemini_hint_generator = GeminiHintGenerator()

@@ -5,7 +5,7 @@ import logging
 
 from app.core.auth import get_db
 from app.db.models import User, Problem, Hint, UserHint
-from app.schemas import HintOut, HintRevealRequest, HintRevealResponse, HintsAvailableResponse
+from app.schemas import HintOut, HintRevealRequest, HintRevealResponse, HintsAvailableResponse, ContextualHintRequest
 from app.api import deps
 from app.utils.gemini_service import gemini_hint_generator
 
@@ -181,6 +181,74 @@ def get_revealed_hints(
     ).order_by(Hint.order).all()
     
     return [HintOut.from_orm(hint) for hint in revealed_hints]
+
+@router.post("/problems/{problem_id}/hints/contextual", response_model=HintRevealResponse)
+def get_contextual_hint(
+    problem_id: int,
+    request: ContextualHintRequest,
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get a contextual hint based on the user's current code."""
+    
+    # Check if problem exists
+    problem = db.query(Problem).filter(Problem.id == problem_id).first()
+    if not problem:
+        raise HTTPException(status_code=404, detail="Problem not found")
+    
+    try:
+        # Generate contextual hint using Gemini
+        hint_content = gemini_hint_generator.generate_contextual_hint(
+            problem.title,
+            problem.description,
+            request.user_code,
+            request.language,
+            problem.reference_solution
+        )
+        
+        # Apply XP penalty for contextual hint
+        xp_penalty = 3  # Lower penalty for contextual hints since they're more helpful
+        new_xp = max(0, current_user.total_xp - xp_penalty)
+        current_user.total_xp = new_xp
+        
+        # Create a contextual hint record (not stored as a regular hint)
+        contextual_hint = Hint(
+            problem_id=problem_id,
+            content=hint_content,
+            order=0,  # Contextual hints don't have an order
+            xp_penalty=xp_penalty,
+            generated_by_ai=True,
+            is_contextual=True,
+            user_code=request.user_code,
+            language=request.language
+        )
+        
+        # Save the contextual hint for tracking
+        db.add(contextual_hint)
+        
+        # Record that user used this contextual hint
+        user_hint = UserHint(
+            user_id=current_user.id,
+            hint_id=contextual_hint.id
+        )
+        db.add(user_hint)
+        
+        db.commit()
+        db.refresh(contextual_hint)
+        db.refresh(current_user)
+        
+        return HintRevealResponse(
+            hint=HintOut.from_orm(contextual_hint),
+            xp_penalty_applied=xp_penalty,
+            remaining_xp=current_user.total_xp
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to generate contextual hint for problem {problem_id}: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate contextual hint. Please try again later."
+        )
 
 # Admin endpoints for hint management
 @router.post("/hints", response_model=HintOut)

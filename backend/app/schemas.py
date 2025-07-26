@@ -149,11 +149,16 @@ class HintOut(BaseModel):
     order: int
     xp_penalty: int
     generated_by_ai: bool
+    is_contextual: bool = False
     class Config:
         from_attributes = True
 
 class HintRevealRequest(BaseModel):
     hint_order: int
+
+class ContextualHintRequest(BaseModel):
+    user_code: str
+    language: str
 
 class HintRevealResponse(BaseModel):
     hint: HintOut

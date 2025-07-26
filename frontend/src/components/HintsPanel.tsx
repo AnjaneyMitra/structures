@@ -40,9 +40,11 @@ interface HintsAvailable {
 
 interface HintsPanelProps {
   problemId: number;
+  currentCode?: string;
+  currentLanguage?: string;
 }
 
-export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId }) => {
+export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId, currentCode, currentLanguage }) => {
   const [hintsAvailable, setHintsAvailable] = useState<HintsAvailable | null>(null);
   const [revealedHints, setRevealedHints] = useState<Hint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +55,8 @@ export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId }) => {
     hintOrder: number;
     xpPenalty: number;
   }>({ open: false, hintOrder: 0, xpPenalty: 0 });
+  const [contextualHint, setContextualHint] = useState<Hint | null>(null);
+  const [gettingContextualHint, setGettingContextualHint] = useState(false);
 
   useEffect(() => {
     fetchHintsData();
@@ -124,6 +128,36 @@ export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId }) => {
     setConfirmDialog({ open: false, hintOrder: 0, xpPenalty: 0 });
   };
 
+  const handleGetContextualHint = async () => {
+    if (!currentCode || !currentLanguage) {
+      setError("No code available for contextual hint");
+      return;
+    }
+
+    try {
+      setGettingContextualHint(true);
+      setError(null);
+
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `https://structures-production.up.railway.app/api/hints/problems/${problemId}/hints/contextual`,
+        { 
+          user_code: currentCode,
+          language: currentLanguage
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setContextualHint(response.data.hint);
+
+    } catch (err: any) {
+      console.error('Error getting contextual hint:', err);
+      setError(err.response?.data?.detail || 'Failed to get contextual hint');
+    } finally {
+      setGettingContextualHint(false);
+    }
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
@@ -166,6 +200,77 @@ export const HintsPanel: React.FC<HintsPanelProps> = ({ problemId }) => {
           Get progressive hints to help solve this problem. Each hint costs XP.
         </Typography>
       </Box>
+
+      {/* Contextual Hint Section */}
+      {currentCode && currentLanguage && (
+        <Card sx={{ bgcolor: 'var(--color-card)', border: '2px solid var(--color-primary)' }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <HintIcon sx={{ color: 'var(--color-primary)', fontSize: 20, mr: 1 }} />
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                Smart Hint
+              </Typography>
+              <Chip 
+                label="AI Powered" 
+                size="small" 
+                sx={{ 
+                  ml: 1, 
+                  height: 20, 
+                  fontSize: '0.7rem',
+                  bgcolor: 'var(--color-primary)',
+                  color: 'white'
+                }} 
+              />
+            </Box>
+            
+            <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)', mb: 2 }}>
+              Get a personalized hint based on your current code approach.
+            </Typography>
+
+            {contextualHint && (
+              <Card sx={{ 
+                bgcolor: 'var(--color-background)', 
+                border: '1px solid var(--color-primary)',
+                mb: 2
+              }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Typography variant="body2" sx={{ color: 'var(--color-foreground)' }}>
+                    {contextualHint.content}
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
+
+            <Alert 
+              severity="info" 
+              sx={{ 
+                mb: 2,
+                bgcolor: 'rgba(0, 212, 170, 0.1)',
+                border: '1px solid rgba(0, 212, 170, 0.3)',
+                '& .MuiAlert-icon': { color: 'var(--color-primary)' }
+              }}
+            >
+              <Typography variant="body2">
+                Smart hints cost only <strong>3 XP</strong> and are tailored to your current code
+              </Typography>
+            </Alert>
+
+            <Button
+              variant="contained"
+              onClick={handleGetContextualHint}
+              disabled={gettingContextualHint}
+              startIcon={gettingContextualHint ? <CircularProgress size={16} /> : <HintIcon />}
+              sx={{
+                bgcolor: 'var(--color-primary)',
+                color: 'var(--color-primary-foreground)',
+                '&:hover': { bgcolor: 'var(--color-primary-hover)' }
+              }}
+            >
+              {gettingContextualHint ? 'Analyzing Code...' : 'Get Smart Hint'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Revealed Hints */}
       {revealedHints.length > 0 && (

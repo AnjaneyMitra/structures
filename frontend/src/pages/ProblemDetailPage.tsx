@@ -762,7 +762,11 @@ Good luck! 🚀`);
                 
                 {/* Hints Tab */}
                 {activeTab === 2 && (
-                  <HintsPanel problemId={problem.id} />
+                  <HintsPanel 
+                    problemId={problem.id} 
+                    currentCode={code}
+                    currentLanguage={language}
+                  />
                 )}
               </Box>
             </Box>
