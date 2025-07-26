@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 import logging
+import os
 
 from app.core.auth import get_db
 from app.db.models import User, Problem, Hint, UserHint
@@ -344,6 +345,26 @@ def delete_hint(
     db.commit()
     
     return {"message": "Hint deleted successfully"}
+
+@router.get("/health")
+def hints_health_check():
+    """Health check endpoint for hints system."""
+    try:
+        # Test Gemini API key availability
+        api_key = os.getenv("GEMINI_API_KEY")
+        has_api_key = bool(api_key)
+        
+        return {
+            "status": "healthy",
+            "gemini_api_configured": has_api_key,
+            "message": "Hints system is operational"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "message": "Hints system has issues"
+        }
 
 @router.post("/problems/{problem_id}/hints/regenerate")
 def regenerate_hints(
