@@ -11,4 +11,5 @@ authlib
 httpx 
 itsdangerous 
 psycopg2-binary 
-alembic 
+alembic
+google-generativeai 

@@ -24,6 +24,8 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import HistoryIcon from '@mui/icons-material/History';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import HintsPanel from '../components/HintsPanel';
 
 interface TestCase {
   id: number;
@@ -687,6 +689,7 @@ Good luck! 🚀`);
               >
                 <Tab icon={<AssignmentIcon />} label="Description" />
                 <Tab icon={<HistoryIcon />} label="Submissions" />
+                <Tab icon={<LightbulbOutlinedIcon />} label="Hints" />
               </Tabs>
               
               <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
@@ -755,6 +758,11 @@ Good luck! 🚀`);
                       Submit your solution to see your submission history here.
                     </Typography>
                   </Box>
+                )}
+                
+                {/* Hints Tab */}
+                {activeTab === 2 && (
+                  <HintsPanel problemId={problem.id} />
                 )}
               </Box>
             </Box>

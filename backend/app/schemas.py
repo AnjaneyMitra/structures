@@ -141,3 +141,27 @@ class UserProfileOut(UserOut):
     level_progress: UserLevelProgress
     class Config:
         from_attributes = True
+
+# Hint System Schemas
+class HintOut(BaseModel):
+    id: int
+    content: str
+    order: int
+    xp_penalty: int
+    generated_by_ai: bool
+    class Config:
+        from_attributes = True
+
+class HintRevealRequest(BaseModel):
+    hint_order: int
+
+class HintRevealResponse(BaseModel):
+    hint: HintOut
+    xp_penalty_applied: int
+    remaining_xp: int
+
+class HintsAvailableResponse(BaseModel):
+    total_hints: int
+    revealed_hints: int
+    next_hint_order: Optional[int]
+    hints_exhausted: bool
