@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
-import apiClient from '../utils/apiClient';
+import secureApiClient from '../utils/secureApiClient';
 
 type ThemeMode = 'light' | 'dark' | 'soft-pop' | 'blue' | 'green' | 'neo-brutalism';
 type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
@@ -168,9 +168,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const loadUserPreferences = async () => {
     try {
-      const response = await apiClient.get('/api/profile/');
+      const response = await secureApiClient.get('/api/profile/');
       
-      const { theme_preference, font_size } = response.data;
+      const { theme_preference, font_size } = response;
       if (theme_preference && themes[theme_preference as ThemeMode]) {
         setThemeModeState(theme_preference as ThemeMode);
         localStorage.setItem('theme', theme_preference);
@@ -200,7 +200,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (theme) updateData.theme_preference = theme;
       if (font) updateData.font_size = font;
 
-      await apiClient.put('/api/profile/preferences', updateData);
+      await secureApiClient.put('/api/profile/preferences', updateData);
     } catch (error) {
       console.error('Failed to update preferences:', error);
     }

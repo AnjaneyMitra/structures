@@ -10,7 +10,7 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 import LevelBadge from '../components/LevelBadge';
-import apiClient from '../utils/apiClient';
+import secureApiClient from '../utils/secureApiClient';
 
 interface LeaderboardEntry {
   rank: number;
@@ -67,17 +67,17 @@ const LeaderboardPage: React.FC = () => {
       setError(null);
 
       const [globalRes, weeklyRes, monthlyRes, friendsRes] = await Promise.all([
-        apiClient.get('/api/leaderboards/global?limit=50'),
-        apiClient.get('/api/leaderboards/weekly?limit=50'),
-        apiClient.get('/api/leaderboards/monthly?limit=50'),
-        apiClient.get('/api/leaderboards/friends?limit=50').catch(() => ({ data: [] }))
+        secureApiClient.get('/api/leaderboards/global?limit=50'),
+        secureApiClient.get('/api/leaderboards/weekly?limit=50'),
+        secureApiClient.get('/api/leaderboards/monthly?limit=50'),
+        secureApiClient.get('/api/leaderboards/friends?limit=50').catch(() => [])
       ]);
 
       setLeaderboards({
-        global: globalRes.data,
-        weekly: weeklyRes.data,
-        monthly: monthlyRes.data,
-        friends: friendsRes.data
+        global: globalRes,
+        weekly: weeklyRes,
+        monthly: monthlyRes,
+        friends: friendsRes
       });
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load leaderboards');
@@ -88,8 +88,8 @@ const LeaderboardPage: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await apiClient.get('/api/leaderboards/stats');
-      setStats(response.data);
+      const response = await secureApiClient.get('/api/leaderboards/stats');
+      setStats(response);
     } catch (err) {
       console.error('Failed to fetch stats:', err);
     }
