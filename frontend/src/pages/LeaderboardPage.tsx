@@ -10,7 +10,7 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline';
 import LevelBadge from '../components/LevelBadge';
-import { API_BASE_URL } from '../config/api';
+import apiClient from '../utils/apiClient';
 
 interface LeaderboardEntry {
   rank: number;
@@ -66,14 +66,11 @@ const LeaderboardPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       const [globalRes, weeklyRes, monthlyRes, friendsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/api/leaderboards/global?limit=50`, { headers }),
-        axios.get(`${API_BASE_URL}/api/leaderboards/weekly?limit=50`, { headers }),
-        axios.get(`${API_BASE_URL}/api/leaderboards/monthly?limit=50`, { headers }),
-        axios.get(`${API_BASE_URL}/api/leaderboards/friends?limit=50`, { headers }).catch(() => ({ data: [] }))
+        apiClient.get('/api/leaderboards/global?limit=50'),
+        apiClient.get('/api/leaderboards/weekly?limit=50'),
+        apiClient.get('/api/leaderboards/monthly?limit=50'),
+        apiClient.get('/api/leaderboards/friends?limit=50').catch(() => ({ data: [] }))
       ]);
 
       setLeaderboards({
@@ -91,10 +88,7 @@ const LeaderboardPage: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      
-      const response = await axios.get(`${API_BASE_URL}/api/leaderboards/stats`, { headers });
+      const response = await apiClient.get('/api/leaderboards/stats');
       setStats(response.data);
     } catch (err) {
       console.error('Failed to fetch stats:', err);

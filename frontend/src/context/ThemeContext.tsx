@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
+import apiClient from '../utils/apiClient';
 
 type ThemeMode = 'light' | 'dark' | 'soft-pop' | 'blue' | 'green' | 'neo-brutalism';
 type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
@@ -15,8 +16,6 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://structures-production.up.railway.app';
 
 // Font size mappings
 const fontSizeMap = {
@@ -169,9 +168,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const loadUserPreferences = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/profile/`, {
-        headers: getAuthHeaders()
-      });
+      const response = await apiClient.get('/api/profile/');
       
       const { theme_preference, font_size } = response.data;
       if (theme_preference && themes[theme_preference as ThemeMode]) {
@@ -203,9 +200,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (theme) updateData.theme_preference = theme;
       if (font) updateData.font_size = font;
 
-      await axios.put(`${API_BASE_URL}/api/profile/preferences`, updateData, {
-        headers: getAuthHeaders()
-      });
+      await apiClient.put('/api/profile/preferences', updateData);
     } catch (error) {
       console.error('Failed to update preferences:', error);
     }

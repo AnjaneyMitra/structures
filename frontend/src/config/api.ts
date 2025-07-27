@@ -1,19 +1,17 @@
-// API Configuration
-const API_BASE_URL = (() => {
-  // Check if we're in development (localhost)
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+// API Configuration - Simple and foolproof HTTPS enforcement
+export const API_BASE_URL = 'https://structures-production.up.railway.app';
+
+// For development override (if needed)
+export const getApiBaseUrl = () => {
+  // Only use HTTP for localhost in development
+  if (typeof window !== 'undefined' && 
+      window.location.hostname === 'localhost' && 
+      process.env.NODE_ENV === 'development') {
     return 'http://localhost:8000';
   }
   
-  // Check for explicit environment variable
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
-  }
-  
-  // Default to production HTTPS URL
+  // Always use HTTPS for everything else
   return 'https://structures-production.up.railway.app';
-})();
+};
 
-console.log('API_BASE_URL:', API_BASE_URL); // Debug log
-
-export { API_BASE_URL };
+console.log('API_BASE_URL set to:', API_BASE_URL);

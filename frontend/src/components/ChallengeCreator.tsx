@@ -6,6 +6,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import apiClient from '../utils/apiClient';
+import '../utils/verifyHttps'; // Auto-verify HTTPS configuration
 
 interface Friend {
   id: number;

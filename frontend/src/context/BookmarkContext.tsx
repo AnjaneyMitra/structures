@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import apiClient from '../utils/apiClient';
 
 interface Bookmark {
   id: number;
@@ -28,8 +29,6 @@ interface BookmarkContextType {
 
 const BookmarkContext = createContext<BookmarkContextType | undefined>(undefined);
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://structures-production.up.railway.app';
-
 export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [bookmarkedProblemIds, setBookmarkedProblemIds] = useState<Set<number>>(new Set());
@@ -46,9 +45,7 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/bookmarks`, {
-        headers: getAuthHeaders()
-      });
+      const response = await apiClient.get('/api/bookmarks');
       
       setBookmarks(response.data);
       setBookmarkedProblemIds(new Set(response.data.map((b: Bookmark) => b.problem_id)));
@@ -82,13 +79,9 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       if (wasBookmarked) {
-        await axios.delete(`${API_BASE_URL}/api/bookmarks/${problemId}`, {
-          headers: getAuthHeaders()
-        });
+        await apiClient.delete(`/api/bookmarks/${problemId}`);
       } else {
-        await axios.post(`${API_BASE_URL}/api/bookmarks/${problemId}`, {}, {
-          headers: getAuthHeaders()
-        });
+        await apiClient.post(`/api/bookmarks/${problemId}`, {});
         // Refresh to get the full bookmark data with problem details
         await refreshBookmarks();
       }

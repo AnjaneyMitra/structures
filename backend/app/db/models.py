@@ -228,3 +228,51 @@ class UserHint(Base):
     __table_args__ = (
         sa.UniqueConstraint('user_id', 'hint_id', name='unique_user_hint'),
     )
+
+class CodeSnippet(Base):
+    __tablename__ = "code_snippets"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    code = Column(Text, nullable=False)
+    language = Column(String(50), nullable=False)
+    tags = Column(String(500), nullable=True)  # Comma-separated tags
+    is_public = Column(Boolean, default=False)
+    is_featured = Column(Boolean, default=False)
+    view_count = Column(Integer, default=0)
+    like_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", backref="code_snippets")
+
+class SnippetLike(Base):
+    __tablename__ = "snippet_likes"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User")
+    snippet = relationship("CodeSnippet", backref="likes")
+    
+    # Ensure unique user-snippet pairs
+    __table_args__ = (
+        sa.UniqueConstraint('user_id', 'snippet_id', name='unique_user_snippet_like'),
+    )
+
+class SnippetComment(Base):
+    __tablename__ = "snippet_comments"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User")
+    snippet = relationship("CodeSnippet", backref="comments")

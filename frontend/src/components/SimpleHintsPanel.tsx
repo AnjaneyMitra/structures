@@ -14,7 +14,7 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+import apiClient from '../utils/apiClient';
 
 interface SimpleHintsPanelProps {
   problemId: number;
@@ -64,14 +64,12 @@ export const SimpleHintsPanel: React.FC<SimpleHintsPanelProps> = ({
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${API_BASE_URL}/api/hints/problems/${problemId}/hint`,
+      const response = await apiClient.post(
+        `/api/hints/problems/${problemId}/hint`,
         { 
           user_code: currentCode,
           language: currentLanguage
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
 
       // Add the new hint to the history

@@ -1,35 +1,25 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+import { getApiBaseUrl } from '../config/api';
 
-// Ensure HTTPS in production
-const getSecureApiUrl = () => {
-  let apiUrl = API_BASE_URL;
-  
-  // If we're on HTTPS and the API URL is HTTP, force HTTPS
-  if (typeof window !== 'undefined' && 
-      window.location.protocol === 'https:' && 
-      apiUrl.startsWith('http:')) {
-    apiUrl = apiUrl.replace('http:', 'https:');
-  }
-  
-  console.log('Using API URL:', apiUrl);
-  return apiUrl;
-};
+// Get the secure API URL
+const secureApiUrl = getApiBaseUrl();
+console.log('ApiClient initialized with URL:', secureApiUrl);
 
 // Create axios instance with secure base URL
 const apiClient = axios.create({
-  baseURL: getSecureApiUrl(),
+  baseURL: secureApiUrl,
   timeout: 10000, // 10 second timeout
 });
 
-// Add request interceptor to ensure HTTPS
+// Add request interceptor for auth and final HTTPS check
 apiClient.interceptors.request.use(
   (config) => {
-    // Double-check that we're using HTTPS in production
-    if (typeof window !== 'undefined' && 
-        window.location.protocol === 'https:' && 
-        config.baseURL?.startsWith('http:')) {
-      config.baseURL = config.baseURL.replace('http:', 'https:');
+    // Final safety check - force HTTPS if not on localhost
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      if (config.baseURL?.startsWith('http:')) {
+        config.baseURL = config.baseURL.replace('http:', 'https:');
+        console.warn('Forced HTTP to HTTPS for baseURL:', config.baseURL);
+      }
     }
     
     // Add auth token if available
@@ -38,6 +28,7 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    console.log('Making request to:', (config.baseURL || '') + (config.url || ''));
     return config;
   },
   (error) => {
