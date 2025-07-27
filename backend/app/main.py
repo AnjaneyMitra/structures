@@ -2,7 +2,8 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
-from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks, levels, analytics, hints
+from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks, levels, analytics
+from .api.routes import simple_hints as hints
 import socketio
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
@@ -38,49 +39,12 @@ try:
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created successfully")
     
-    # Auto-migration for hints system
-    print("🔧 Checking hints system database schema...")
-    try:
-        from sqlalchemy import text
-        with engine.connect() as conn:
-            # Check if hints table exists and add new columns if needed
-            try:
-                # Test if new columns exist
-                conn.execute(text("SELECT is_contextual FROM hints LIMIT 1"))
-                print("✅ Hints system schema is up to date")
-            except Exception:
-                # Columns don't exist, add them
-                print("🔄 Updating hints table schema...")
-                try:
-                    conn.execute(text("ALTER TABLE hints ADD COLUMN is_contextual BOOLEAN DEFAULT FALSE"))
-                    print("✅ Added is_contextual column")
-                except Exception as e:
-                    print(f"⚠️ is_contextual column may already exist: {e}")
-                
-                try:
-                    conn.execute(text("ALTER TABLE hints ADD COLUMN user_code TEXT"))
-                    print("✅ Added user_code column")
-                except Exception as e:
-                    print(f"⚠️ user_code column may already exist: {e}")
-                
-                try:
-                    conn.execute(text("ALTER TABLE hints ADD COLUMN language VARCHAR"))
-                    print("✅ Added language column")
-                except Exception as e:
-                    print(f"⚠️ language column may already exist: {e}")
-                
-                conn.commit()
-                print("✅ Hints system schema updated successfully")
-                
-        # Check Gemini API configuration
-        gemini_api_key = os.getenv("GEMINI_API_KEY")
-        if gemini_api_key:
-            print("✅ Gemini AI API key configured - contextual hints enabled")
-        else:
-            print("⚠️ Gemini AI API key not found - hints will use fallback responses")
-                
-    except Exception as e:
-        print(f"⚠️ Hints schema update failed (will continue without): {e}")
+    # Check Gemini API configuration for hints
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    if gemini_api_key:
+        print("✅ Gemini AI API key configured - contextual hints enabled")
+    else:
+        print("⚠️ Gemini AI API key not found - hints will use fallback responses")
     
     # Add streak columns manually (safe for production)
     try:
@@ -175,13 +139,6 @@ def system_status():
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
             db_status = "connected"
-            
-            # Check if hints table exists with new columns
-            try:
-                result = conn.execute(text("SELECT is_contextual, user_code, language FROM hints LIMIT 1"))
-                hints_schema = "updated"
-            except Exception:
-                hints_schema = "needs_update"
         
         # Check Gemini API key
         gemini_configured = bool(os.getenv("GEMINI_API_KEY"))
@@ -189,9 +146,8 @@ def system_status():
         return {
             "status": "ok",
             "database": db_status,
-            "hints_schema": hints_schema,
             "gemini_configured": gemini_configured,
-            "hints_system": "operational" if hints_schema == "updated" else "needs_migration"
+            "hints_system": "operational" if gemini_configured else "limited"
         }
     except Exception as e:
         return {

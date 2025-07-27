@@ -25,7 +25,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-import HintsPanel from '../components/HintsPanel';
+import SimpleHintsPanel from '../components/SimpleHintsPanel';
 
 interface TestCase {
   id: number;
@@ -762,7 +762,7 @@ Good luck! 🚀`);
                 
                 {/* Hints Tab */}
                 {activeTab === 2 && (
-                  <HintsPanel 
+                  <SimpleHintsPanel 
                     problemId={problem.id} 
                     currentCode={code}
                     currentLanguage={language}
