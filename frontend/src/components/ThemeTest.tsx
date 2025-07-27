@@ -45,10 +45,10 @@ export const ThemeTest: React.FC = () => {
           />
 
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button variant="contained">
+            <Button variant="contained" sx={{ borderRadius: 3 }}>
               Contained Button
             </Button>
-            <Button variant="outlined">
+            <Button variant="outlined" sx={{ borderRadius: 3 }}>
               Outlined Button
             </Button>
             <Button variant="text">

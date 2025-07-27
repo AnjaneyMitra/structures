@@ -242,6 +242,7 @@ export const SimpleHintsPanel: React.FC<SimpleHintsPanelProps> = ({
             disabled={loading || !canGetHint}
             startIcon={loading ? <CircularProgress size={16} /> : <HintIcon />}
             sx={{
+              borderRadius: 3,
               bgcolor: 'var(--color-primary)',
               color: 'var(--color-primary-foreground)',
               '&:hover': { bgcolor: 'var(--color-primary-hover)' },

@@ -887,6 +887,7 @@ Good luck! 🚀`);
                   disabled={running}
                   size="small"
                   sx={{
+                    borderRadius: 3,
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-muted-foreground)',
                     '&:hover': {
@@ -905,6 +906,7 @@ Good luck! 🚀`);
                   disabled={running}
                   size="small"
                   sx={{
+                    borderRadius: 3,
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-muted-foreground)',
                     '&:hover': {
@@ -923,6 +925,7 @@ Good luck! 🚀`);
                   disabled={submitting}
                   size="small"
                   sx={{
+                    borderRadius: 3,
                     bgcolor: 'var(--color-primary)',
                     '&:hover': { bgcolor: 'var(--color-primary-dark)' },
                     fontWeight: 600

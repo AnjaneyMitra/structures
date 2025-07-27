@@ -135,6 +135,7 @@ const LoginPage: React.FC = () => {
                   borderColor: '#4a5568',
                   color: '#e2e8f0',
                   fontWeight: 600,
+                  borderRadius: 3,
                   '&:hover': {
                     borderColor: '#6b7280',
                     bgcolor: '#2d3748'
@@ -219,7 +220,8 @@ const LoginPage: React.FC = () => {
                               minWidth: 'auto',
                               p: 0.5,
                               color: '#a0aec0',
-                              '&:hover': { color: '#00d4aa' }
+                              '&:hover': { color: '#00d4aa' },
+                              borderRadius: 2
                             }}
                           >
                             {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
@@ -242,7 +244,8 @@ const LoginPage: React.FC = () => {
                       '&:hover': { bgcolor: '#00b894' },
                       '&:disabled': { bgcolor: '#4a5568', color: '#6b7280' },
                       fontWeight: 600,
-                      fontSize: 16
+                      fontSize: 16,
+                      borderRadius: 3
                     }}
                   >
                     {loading ? 'Signing in...' : 'Sign In'}
@@ -269,6 +272,7 @@ const LoginPage: React.FC = () => {
                   sx={{
                     borderColor: '#4a5568',
                     color: 'text.primary',
+                    borderRadius: 3
                   }}
                 >
                   Register

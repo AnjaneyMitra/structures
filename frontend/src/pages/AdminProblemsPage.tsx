@@ -102,8 +102,8 @@ const AdminProblemsPage: React.FC = () => {
           <TextField label="Sample Output" name="sample_output" value={form.sample_output} onChange={handleChange} fullWidth />
           <TextField label="Reference Solution (admin only)" name="reference_solution" value={form.reference_solution} onChange={handleChange} fullWidth multiline minRows={2} />
           <Stack direction="row" spacing={2}>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>{editingId ? 'Update' : 'Create'} Problem</Button>
-            {editingId && <Button variant="outlined" onClick={() => { setEditingId(null); setForm({ title: '', description: '', difficulty: 'Easy', sample_input: '', sample_output: '', reference_solution: '' }); }}>Cancel</Button>}
+            <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ borderRadius: 3 }}>{editingId ? 'Update' : 'Create'} Problem</Button>
+            {editingId && <Button variant="outlined" onClick={() => { setEditingId(null); setForm({ title: '', description: '', difficulty: 'Easy', sample_input: '', sample_output: '', reference_solution: '' }); }} sx={{ borderRadius: 3 }}>Cancel</Button>}
           </Stack>
           {error && <Alert severity="error">{error}</Alert>}
           {success && <Alert severity="success">{success}</Alert>}
@@ -117,7 +117,7 @@ const AdminProblemsPage: React.FC = () => {
             <Paper key={problem.id} variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
               <Typography variant="subtitle1" fontWeight={700}>{problem.title} <Chip label={problem.difficulty} size="small" sx={{ ml: 1, borderRadius: 2 }} /></Typography>
               <Typography variant="body2" color="text.secondary" mb={1}>{problem.description.slice(0, 120)}{problem.description.length > 120 ? '...' : ''}</Typography>
-              <Button variant="outlined" size="small" onClick={() => handleEdit(problem)}>Edit</Button>
+              <Button variant="outlined" size="small" onClick={() => handleEdit(problem)} sx={{ borderRadius: 3 }}>Edit</Button>
             </Paper>
           ))}
         </Stack>

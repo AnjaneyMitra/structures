@@ -202,6 +202,7 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
           variant="contained"
           sx={{
             bgcolor: 'var(--color-primary)',
+            borderRadius: 3,
             color: 'var(--color-primary-foreground)',
             '&:hover': { bgcolor: 'var(--color-primary-dark)' },
             fontWeight: 600

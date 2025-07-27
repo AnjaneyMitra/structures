@@ -888,7 +888,7 @@ Good luck! 🚀`);
               '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
               px: 4,
               py: 1.5,
-              borderRadius: 2
+              borderRadius: 3
             }}
           >
             Back to Rooms
@@ -980,6 +980,7 @@ Good luck! 🚀`);
             startIcon={<ArrowBackIcon />}
             onClick={() => setExitDialogOpen(true)}
             sx={{
+              borderRadius: 3,
               borderColor: 'var(--color-border)',
               color: 'var(--color-muted-foreground)',
               '&:hover': {
@@ -1406,6 +1407,7 @@ Good luck! 🚀`);
                   disabled={running}
                   size="small"
                   sx={{
+                    borderRadius: 3,
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-muted-foreground)',
                     '&:hover': {
@@ -1424,6 +1426,7 @@ Good luck! 🚀`);
                   disabled={running}
                   size="small"
                   sx={{
+                    borderRadius: 3,
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-muted-foreground)',
                     '&:hover': {
@@ -1442,6 +1445,7 @@ Good luck! 🚀`);
                   disabled={submitting}
                   size="small"
                   sx={{
+                    borderRadius: 3,
                     bgcolor: 'var(--color-primary)',
                     '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
                     fontWeight: 600
@@ -1732,6 +1736,7 @@ Good luck! 🚀`);
             variant="contained"
             startIcon={<ExitToAppIcon />}
             sx={{
+              borderRadius: 3,
               bgcolor: 'hsl(0 100% 50%)',
               '&:hover': { bgcolor: 'hsl(0 100% 45%)' },
               fontWeight: 600

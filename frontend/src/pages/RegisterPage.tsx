@@ -222,7 +222,8 @@ const RegisterPage: React.FC = () => {
                             minWidth: 'auto',
                             p: 0.5,
                             color: '#a0aec0',
-                            '&:hover': { color: '#00d4aa' }
+                            '&:hover': { color: '#00d4aa' },
+                            borderRadius: 2
                           }}
                         >
                           {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
@@ -265,7 +266,8 @@ const RegisterPage: React.FC = () => {
                             minWidth: 'auto',
                             p: 0.5,
                             color: '#a0aec0',
-                            '&:hover': { color: '#00d4aa' }
+                            '&:hover': { color: '#00d4aa' },
+                            borderRadius: 2
                           }}
                         >
                           {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
@@ -288,7 +290,8 @@ const RegisterPage: React.FC = () => {
                     '&:hover': { bgcolor: '#00b894' },
                     '&:disabled': { bgcolor: '#4a5568', color: '#6b7280' },
                     fontWeight: 600,
-                    fontSize: 16
+                    fontSize: 16,
+                    borderRadius: 3
                   }}
                 >
                   {loading ? 'Creating Account...' : 'Create Account'}
@@ -315,6 +318,7 @@ const RegisterPage: React.FC = () => {
                 sx={{
                   borderColor: '#4a5568',
                   color: '#a0aec0',
+                  borderRadius: 3,
                   '&:hover': {
                     borderColor: '#00d4aa',
                     color: '#00d4aa',

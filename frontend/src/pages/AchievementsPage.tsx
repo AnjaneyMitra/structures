@@ -240,6 +240,8 @@ const AchievementsPage: React.FC = () => {
                       sx={{
                         bgcolor: 'var(--color-card)',
                         border: '1px solid var(--color-border)',
+                        borderRadius: 3,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                         height: '100%',
                         transition: 'all 0.3s ease',
                         '&:hover': {
@@ -275,7 +277,8 @@ const AchievementsPage: React.FC = () => {
                                 sx={{
                                   bgcolor: 'rgba(255, 215, 0, 0.1)',
                                   color: '#FFD700',
-                                  border: '1px solid #FFD700'
+                                  border: '1px solid #FFD700',
+                                  borderRadius: 2
                                 }}
                               />
                               {achievement.earned && (
@@ -285,7 +288,8 @@ const AchievementsPage: React.FC = () => {
                                   sx={{
                                     bgcolor: 'rgba(76, 175, 80, 0.1)',
                                     color: '#4CAF50',
-                                    border: '1px solid #4CAF50'
+                                    border: '1px solid #4CAF50',
+                                    borderRadius: 2
                                   }}
                                 />
                               )}

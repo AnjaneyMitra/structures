@@ -104,7 +104,7 @@ function Landing() {
                 to="/login"
                 variant="contained"
                 size="large"
-                sx={{ minWidth: 180 }}
+                sx={{ minWidth: 180, borderRadius: 3 }}
               >
                 Start Coding Together
               </Button>
@@ -113,7 +113,7 @@ function Landing() {
                 to="/register"
                 variant="outlined"
                 size="large"
-                sx={{ minWidth: 160 }}
+                sx={{ minWidth: 160, borderRadius: 3 }}
               >
                 Browse Problems →
               </Button>

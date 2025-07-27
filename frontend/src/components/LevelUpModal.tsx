@@ -190,7 +190,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({
             sx={{
               px: 4,
               py: 1.5,
-              borderRadius: 2,
+              borderRadius: 3,
               background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',
               color: 'white',
               fontWeight: 'bold',

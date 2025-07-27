@@ -179,6 +179,7 @@ const AchievementModal: React.FC<AchievementModalProps> = ({
             variant="contained"
             size="large"
             sx={{
+              borderRadius: 3,
               bgcolor: 'var(--color-primary)',
               color: 'var(--color-primary-foreground)',
               '&:hover': { bgcolor: 'var(--color-primary-dark)' },
