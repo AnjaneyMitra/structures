@@ -1,19 +1,34 @@
 import axios from 'axios';
-import { getApiBaseUrl } from '../config/api';
 
-// Get the secure API URL
-const secureApiUrl = getApiBaseUrl();
-console.log('ApiClient initialized with URL:', secureApiUrl);
+// HARDCODED HTTPS URL - FOOLPROOF SOLUTION
+const PRODUCTION_API_URL = 'https://structures-production.up.railway.app';
+const LOCALHOST_API_URL = 'http://localhost:8000';
 
-// Force HTTPS for production - additional safety check
-const finalApiUrl = typeof window !== 'undefined' && 
-  window.location.hostname !== 'localhost' && 
-  secureApiUrl.startsWith('http:') 
-    ? secureApiUrl.replace('http:', 'https:')
-    : secureApiUrl;
+// Determine the correct API URL with absolute certainty
+const getSecureApiUrl = () => {
+  // Only use localhost HTTP in development
+  if (typeof window !== 'undefined' && 
+      window.location.hostname === 'localhost' && 
+      window.location.protocol === 'http:' &&
+      process.env.NODE_ENV === 'development') {
+    console.log('🔧 Using localhost for development');
+    return LOCALHOST_API_URL;
+  }
+  
+  // ALWAYS use HTTPS for production - no exceptions
+  console.log('🔒 Using HTTPS for production');
+  return PRODUCTION_API_URL;
+};
 
-if (finalApiUrl !== secureApiUrl) {
-  console.warn('Forced API URL from HTTP to HTTPS:', finalApiUrl);
+const finalApiUrl = getSecureApiUrl();
+console.log('✅ ApiClient initialized with URL:', finalApiUrl);
+
+// Validate that we're using HTTPS in production
+if (typeof window !== 'undefined' && 
+    window.location.hostname !== 'localhost' && 
+    !finalApiUrl.startsWith('https://')) {
+  console.error('❌ CRITICAL ERROR: Non-HTTPS URL detected in production!');
+  throw new Error('Production must use HTTPS');
 }
 
 // Create axios instance with secure base URL
@@ -22,39 +37,22 @@ const apiClient = axios.create({
   timeout: 10000, // 10 second timeout
 });
 
-// Add request interceptor for auth and final HTTPS check
+// Add request interceptor for auth and ABSOLUTE HTTPS enforcement
 apiClient.interceptors.request.use(
   (config) => {
-    // Final safety check - force HTTPS if not on localhost
-    if (typeof window !== 'undefined') {
-      const isLocalhost = window.location.hostname === 'localhost';
-      const isHttpProtocol = window.location.protocol === 'http:';
-      const isDevelopment = process.env.NODE_ENV === 'development';
+    // ABSOLUTE HTTPS ENFORCEMENT - NO EXCEPTIONS
+    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    // Only allow HTTP for localhost in development
+    if (!isLocalhost || !isDevelopment) {
+      // FORCE HTTPS - HARDCODED PRODUCTION URL
+      config.baseURL = PRODUCTION_API_URL;
       
-      // Only allow HTTP for localhost with http protocol in development
-      const allowHttp = isLocalhost && isHttpProtocol && isDevelopment;
-      
-      if (!allowHttp) {
-        // Force HTTPS for baseURL
-        if (config.baseURL?.startsWith('http:')) {
-          config.baseURL = config.baseURL.replace('http:', 'https:');
-          console.warn('🔒 Forced HTTP to HTTPS for baseURL:', config.baseURL);
-        }
-        
-        // Force HTTPS for individual URL
-        if (config.url?.startsWith('http:')) {
-          config.url = config.url.replace('http:', 'https:');
-          console.warn('🔒 Forced HTTP to HTTPS for URL:', config.url);
-        }
-        
-        // Additional check for full URL construction
-        const fullUrl = (config.baseURL || '') + (config.url || '');
-        if (fullUrl.includes('http://') && !fullUrl.includes('localhost')) {
-          console.error('❌ DETECTED HTTP REQUEST IN PRODUCTION:', fullUrl);
-          // Force the baseURL to HTTPS if we detect any HTTP
-          config.baseURL = 'https://structures-production.up.railway.app';
-          console.warn('🔒 Emergency HTTPS enforcement applied');
-        }
+      // Double-check individual URL
+      if (config.url?.startsWith('http:')) {
+        config.url = config.url.replace('http:', 'https:');
+        console.warn('🔒 Forced URL to HTTPS:', config.url);
       }
     }
     
@@ -67,12 +65,10 @@ apiClient.interceptors.request.use(
     const finalUrl = (config.baseURL || '') + (config.url || '');
     console.log('🌐 Making request to:', finalUrl);
     
-    // Final validation
-    if (typeof window !== 'undefined' && 
-        window.location.hostname !== 'localhost' && 
-        finalUrl.startsWith('http://')) {
-      console.error('❌ CRITICAL: HTTP request detected in production!', finalUrl);
-      throw new Error('HTTP requests are not allowed in production. Please use HTTPS.');
+    // FINAL VALIDATION - THROW ERROR IF HTTP DETECTED IN PRODUCTION
+    if (!isLocalhost && finalUrl.startsWith('http://')) {
+      console.error('❌ CRITICAL: HTTP request blocked in production!', finalUrl);
+      throw new Error(`HTTP requests are not allowed in production. Attempted: ${finalUrl}`);
     }
     
     return config;

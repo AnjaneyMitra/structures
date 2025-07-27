@@ -1,32 +1,47 @@
-// API Configuration - Always use HTTPS for production
-export const API_BASE_URL = 'https://structures-production.up.railway.app';
+// HARDCODED API Configuration - FOOLPROOF HTTPS ENFORCEMENT
+// This eliminates any possibility of HTTP URLs in production
 
-// For development override (if needed)
+// PRODUCTION URL - ALWAYS HTTPS
+const PRODUCTION_API_URL = 'https://structures-production.up.railway.app';
+
+// DEVELOPMENT URL - ONLY FOR LOCALHOST
+const DEVELOPMENT_API_URL = 'http://localhost:8000';
+
+// HARDCODED EXPORT - NO DYNAMIC LOGIC
+export const API_BASE_URL = PRODUCTION_API_URL;
+
+// Simple, foolproof function
 export const getApiBaseUrl = () => {
-  // Only use HTTP for localhost in development AND when explicitly on localhost
-  if (typeof window !== 'undefined' && 
-      window.location.hostname === 'localhost' && 
-      window.location.protocol === 'http:' &&
-      process.env.NODE_ENV === 'development') {
-    console.log('🔧 Development mode: Using HTTP for localhost');
-    return 'http://localhost:8000';
+  // ONLY use HTTP for localhost in development
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  const isHttpProtocol = typeof window !== 'undefined' && window.location.protocol === 'http:';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  if (isLocalhost && isHttpProtocol && isDevelopment) {
+    console.log('🔧 LOCALHOST DEVELOPMENT: Using HTTP');
+    return DEVELOPMENT_API_URL;
   }
   
-  // Always use HTTPS for everything else (production, vercel, etc.)
-  console.log('🔒 Production mode: Enforcing HTTPS');
-  return 'https://structures-production.up.railway.app';
+  // EVERYTHING ELSE USES HTTPS - NO EXCEPTIONS
+  console.log('🔒 PRODUCTION: Using HTTPS');
+  return PRODUCTION_API_URL;
 };
 
-const currentUrl = getApiBaseUrl();
-console.log('🌐 API_BASE_URL set to:', currentUrl);
-console.log('🏠 Current hostname:', typeof window !== 'undefined' ? window.location.hostname : 'server');
-console.log('🔗 Current protocol:', typeof window !== 'undefined' ? window.location.protocol : 'server');
-console.log('⚙️ NODE_ENV:', process.env.NODE_ENV);
+// Log the configuration
+const selectedUrl = getApiBaseUrl();
+console.log('✅ Final API URL:', selectedUrl);
 
-// Additional validation
-if (typeof window !== 'undefined' && 
-    window.location.hostname !== 'localhost' && 
-    currentUrl.startsWith('http://')) {
-  console.error('❌ CRITICAL ERROR: HTTP URL detected in production environment!');
-  console.error('This will cause Mixed Content errors. Please check your configuration.');
+// CRITICAL VALIDATION - FAIL FAST IF HTTP IN PRODUCTION
+if (typeof window !== 'undefined') {
+  const isProduction = window.location.hostname !== 'localhost';
+  const usingHttp = selectedUrl.startsWith('http://');
+  
+  if (isProduction && usingHttp) {
+    console.error('❌ FATAL ERROR: HTTP URL in production will cause Mixed Content errors!');
+    console.error('URL:', selectedUrl);
+    console.error('Hostname:', window.location.hostname);
+    throw new Error('HTTP URLs are not allowed in production');
+  }
+  
+  console.log('✅ HTTPS validation passed');
 }
