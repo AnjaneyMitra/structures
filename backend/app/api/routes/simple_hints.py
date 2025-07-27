@@ -49,13 +49,30 @@ def get_contextual_hint(
         raise HTTPException(status_code=400, detail="No code provided for hint generation")
     
     try:
+        # Add context to encourage varied responses
+        import time
+        import random
+        
+        current_time = time.strftime("%H:%M:%S")
+        hint_strategies = [
+            "Focus on identifying the core algorithmic approach needed",
+            "Look for potential bugs or logical errors in the current implementation", 
+            "Consider edge cases and input validation",
+            "Think about code efficiency and optimization opportunities",
+            "Examine the data structures being used and if they're optimal",
+            "Check if the solution handles all requirements from the problem description"
+        ]
+        
+        strategy = random.choice(hint_strategies)
+        
         # Generate contextual hint using Gemini
         hint_content = gemini_hint_generator.generate_contextual_hint(
             problem.title,
             problem.description,
             request.user_code,
             request.language,
-            problem.reference_solution
+            problem.reference_solution,
+            additional_context=f"Request time: {current_time}. Hint strategy: {strategy}. Provide a unique perspective based on this strategy."
         )
         
         # Apply XP penalty for using hint
