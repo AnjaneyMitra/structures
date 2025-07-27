@@ -21,7 +21,7 @@ class GeminiHintGenerator:
             raise ValueError("GEMINI_API_KEY environment variable is required")
         
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
         self._initialized = True
     
     def generate_contextual_hint(self, problem_title: str, problem_description: str, user_code: str, language: str, reference_solution: Optional[str] = None, additional_context: str = "") -> str:

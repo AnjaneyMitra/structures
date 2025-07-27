@@ -12,4 +12,5 @@ httpx
 itsdangerous 
 psycopg2-binary 
 alembic
-google-generativeai 
+google-generativeai
+python-dotenv 
