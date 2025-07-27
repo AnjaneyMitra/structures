@@ -174,7 +174,7 @@ const StreakPage: React.FC = () => {
             </Grid>
 
             {/* Streak Status */}
-            <Box sx={{ mt: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+            <Box sx={{ mt: 3, p: 2, bgcolor: 'background.paper', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
               <Typography variant="body1" sx={{ mb: 1 }}>
                 <strong>Status:</strong>{' '}
                 <Chip 

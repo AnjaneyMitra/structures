@@ -115,7 +115,7 @@ const AdminProblemsPage: React.FC = () => {
         <Stack spacing={2}>
           {problems.map(problem => (
             <Paper key={problem.id} variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-              <Typography variant="subtitle1" fontWeight={700}>{problem.title} <Chip label={problem.difficulty} size="small" sx={{ ml: 1 }} /></Typography>
+              <Typography variant="subtitle1" fontWeight={700}>{problem.title} <Chip label={problem.difficulty} size="small" sx={{ ml: 1, borderRadius: 2 }} /></Typography>
               <Typography variant="body2" color="text.secondary" mb={1}>{problem.description.slice(0, 120)}{problem.description.length > 120 ? '...' : ''}</Typography>
               <Button variant="outlined" size="small" onClick={() => handleEdit(problem)}>Edit</Button>
             </Paper>

@@ -701,7 +701,12 @@ Good luck! 🚀`);
                     </Typography>
                     
                     {problem.sample_input && problem.sample_output && (
-                      <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+                      <Card sx={{ 
+                        bgcolor: 'var(--color-card)', 
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 3,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }}>
                         <CardContent sx={{ p: 3 }}>
                           <Typography variant="subtitle1" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
                             Example:

@@ -190,7 +190,12 @@ const GlobalLeaderboard: React.FC = () => {
       )}
 
       {/* Main Leaderboard Card */}
-      <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+      <Card sx={{ 
+        bgcolor: 'var(--color-card)', 
+        border: '1px solid var(--color-border)',
+        borderRadius: 3,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      }}>
         {/* Tabs */}
         <Box sx={{ borderBottom: '1px solid var(--color-border)' }}>
           <Tabs 

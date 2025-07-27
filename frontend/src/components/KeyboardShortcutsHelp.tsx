@@ -97,7 +97,7 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
               alignItems: 'center',
               gap: 0.5
             }}>
-              Press <Chip label="?" size="small" sx={{ fontSize: '0.75rem' }} /> to show this help anytime.
+              Press <Chip label="?" size="small" sx={{ fontSize: '0.75rem', borderRadius: 2 }} /> to show this help anytime.
             </Box>
           </Box>
 

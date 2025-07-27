@@ -105,7 +105,12 @@ const AchievementsPage: React.FC = () => {
         {/* Stats Overview */}
         <Grid container spacing={3} sx={{ mb: 6 }}>
           <Grid item xs={12} md={3}>
-            <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+            <Card sx={{ 
+              bgcolor: 'var(--color-card)', 
+              border: '1px solid var(--color-border)',
+              borderRadius: 3,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <EmojiEventsIcon sx={{ color: '#FFD700', fontSize: 32 }} />
@@ -123,7 +128,12 @@ const AchievementsPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+            <Card sx={{ 
+              bgcolor: 'var(--color-card)', 
+              border: '1px solid var(--color-border)',
+              borderRadius: 3,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <TrendingUpIcon sx={{ color: '#4CAF50', fontSize: 32 }} />
@@ -141,7 +151,12 @@ const AchievementsPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+            <Card sx={{ 
+              bgcolor: 'var(--color-card)', 
+              border: '1px solid var(--color-border)',
+              borderRadius: 3,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <StarIcon sx={{ color: '#FF9800', fontSize: 32 }} />
@@ -159,7 +174,12 @@ const AchievementsPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <Card sx={{ bgcolor: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+            <Card sx={{ 
+              bgcolor: 'var(--color-card)', 
+              border: '1px solid var(--color-border)',
+              borderRadius: 3,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
               <CardContent>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)', mb: 1 }}>
