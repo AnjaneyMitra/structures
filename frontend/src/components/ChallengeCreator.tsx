@@ -5,7 +5,7 @@ import {
   PaperAirplaneIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
-import secureApiClient from '../utils/secureApiClient';
+import apiClient from '../utils/apiClient';
 
 interface Friend {
   id: number;
@@ -42,8 +42,8 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
 
   const fetchFriends = async () => {
     try {
-      const response = await secureApiClient.get('/api/friends/');
-      setFriends(response || []);
+      const response = await apiClient.get('/api/friends/');
+      setFriends(response.data || []);
     } catch (err: any) {
       setError('Failed to load friends list');
     }
@@ -68,7 +68,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
         time_limit: timeLimit ? parseInt(timeLimit) : undefined
       };
 
-      await secureApiClient.post('/api/challenges', challengeData);
+      await apiClient.post('/api/challenges', challengeData);
 
       setSuccess('Challenge sent successfully!');
       setSelectedFriend('');

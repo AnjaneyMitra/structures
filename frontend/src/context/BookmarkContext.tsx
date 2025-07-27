@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
-import secureApiClient from '../utils/secureApiClient';
+import apiClient from '../utils/apiClient';
 
 interface Bookmark {
   id: number;
@@ -45,9 +45,9 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setLoading(true);
     try {
-      const response = await secureApiClient.get('/api/bookmarks');
+      const response = await apiClient.get('/api/bookmarks');
       
-      setBookmarks(response);
+      setBookmarks(response.data);
       setBookmarkedProblemIds(new Set(response.data.map((b: Bookmark) => b.problem_id)));
     } catch (error) {
       console.error('Failed to fetch bookmarks:', error);
@@ -79,9 +79,9 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       if (wasBookmarked) {
-        await secureApiClient.delete(`/api/bookmarks/${problemId}`);
+        await apiClient.delete(`/api/bookmarks/${problemId}`);
       } else {
-        await secureApiClient.post(`/api/bookmarks/${problemId}`, {});
+        await apiClient.post(`/api/bookmarks/${problemId}`, {});
         // Refresh to get the full bookmark data with problem details
         await refreshBookmarks();
       }

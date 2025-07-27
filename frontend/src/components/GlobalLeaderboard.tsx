@@ -25,7 +25,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import axios from 'axios';
-import secureApiClient from '../utils/secureApiClient';
+import apiClient from '../utils/apiClient';
 
 interface LeaderboardEntry {
   rank: number;
@@ -85,13 +85,13 @@ const GlobalLeaderboard: React.FC = () => {
       const limit = 20;
       const offset = (page - 1) * limit;
 
-      const response = await secureApiClient.get(
+      const response = await apiClient.get(
         `/api/leaderboards/${type}?limit=${limit}&offset=${offset}`
       );
 
       setLeaderboards(prev => ({
         ...prev,
-        [type]: response
+        [type]: response.data
       }));
 
     } catch (err: any) {
@@ -104,8 +104,8 @@ const GlobalLeaderboard: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await secureApiClient.get('/api/leaderboards/stats');
-      setStats(response);
+      const response = await apiClient.get('/api/leaderboards/stats');
+      setStats(response.data);
     } catch (err) {
       console.error('Error fetching leaderboard stats:', err);
     }

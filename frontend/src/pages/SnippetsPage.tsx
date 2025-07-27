@@ -37,7 +37,7 @@ import {
 } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import secureApiClient from '../utils/secureApiClient';
+import apiClient from '../utils/apiClient';
 import { useAuth } from '../context/AuthContext';
 
 interface CodeSnippet {
@@ -121,9 +121,9 @@ const SnippetsPage: React.FC = () => {
             if (selectedTags) params.append('tags', selectedTags);
 
             const endpoint = currentTab === 1 ? '/api/snippets/my' : '/api/snippets';
-            const response = await secureApiClient.get(`${endpoint}?${params}`);
+            const response = await apiClient.get(`${endpoint}?${params}`);
             
-            setSnippets(response);
+            setSnippets(response.data);
             // For simplicity, assuming 12 items per page
             setTotalPages(Math.ceil(response.data.length / 12) || 1);
         } catch (err: any) {
@@ -139,7 +139,7 @@ const SnippetsPage: React.FC = () => {
 
     const handleCreateSnippet = async () => {
         try {
-            await secureApiClient.post('/api/snippets', formData);
+            await apiClient.post('/api/snippets', formData);
             setCreateDialogOpen(false);
             resetForm();
             fetchSnippets();
@@ -152,7 +152,7 @@ const SnippetsPage: React.FC = () => {
         if (!selectedSnippet) return;
         
         try {
-            await secureApiClient.put(`/api/snippets/${selectedSnippet.id}`, formData);
+            await apiClient.put(`/api/snippets/${selectedSnippet.id}`, formData);
             setEditDialogOpen(false);
             resetForm();
             fetchSnippets();
@@ -165,7 +165,7 @@ const SnippetsPage: React.FC = () => {
         if (!window.confirm('Are you sure you want to delete this snippet?')) return;
         
         try {
-            await secureApiClient.delete(`/api/snippets/${snippetId}`);
+            await apiClient.delete(`/api/snippets/${snippetId}`);
             fetchSnippets();
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to delete snippet');
@@ -174,15 +174,15 @@ const SnippetsPage: React.FC = () => {
 
     const handleToggleLike = async (snippetId: number) => {
         try {
-            const response = await secureApiClient.post(`/api/snippets/${snippetId}/like`);
+            const response = await apiClient.post(`/api/snippets/${snippetId}/like`);
             
             // Update the snippet in the list
             setSnippets(prev => prev.map(snippet => 
                 snippet.id === snippetId 
                     ? { 
                         ...snippet, 
-                        is_liked: response.is_liked,
-                        like_count: response.like_count 
+                        is_liked: response.data.is_liked,
+                        like_count: response.data.like_count 
                     }
                     : snippet
             ));
@@ -193,8 +193,8 @@ const SnippetsPage: React.FC = () => {
 
     const handleViewSnippet = async (snippet: CodeSnippet) => {
         try {
-            const response = await secureApiClient.get(`/api/snippets/${snippet.id}`);
-            setSelectedSnippet(response);
+            const response = await apiClient.get(`/api/snippets/${snippet.id}`);
+            setSelectedSnippet(response.data);
             setViewDialogOpen(true);
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to load snippet');

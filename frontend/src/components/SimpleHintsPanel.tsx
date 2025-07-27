@@ -14,7 +14,7 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import axios from 'axios';
-import secureApiClient from '../utils/secureApiClient';
+import apiClient from '../utils/apiClient';
 
 interface SimpleHintsPanelProps {
   problemId: number;
@@ -64,7 +64,7 @@ export const SimpleHintsPanel: React.FC<SimpleHintsPanelProps> = ({
       setLoading(true);
       setError(null);
 
-      const response = await secureApiClient.post(
+      const response = await apiClient.post(
         `/api/hints/problems/${problemId}/hint`,
         { 
           user_code: currentCode,
@@ -75,14 +75,14 @@ export const SimpleHintsPanel: React.FC<SimpleHintsPanelProps> = ({
       // Add the new hint to the history
       const newHint: HintEntry = {
         id: Date.now(),
-        content: response.hint,
+        content: response.data.hint,
         timestamp: new Date(),
-        xpCost: response.xp_penalty_applied,
+        xpCost: response.data.xp_penalty_applied,
         codeSnapshot: currentCode.substring(0, 100) + (currentCode.length > 100 ? '...' : '') // Store first 100 chars
       };
 
       setHints(prev => [newHint, ...prev]); // Add to beginning of array (newest first)
-      setTotalXpSpent(prev => prev + response.xp_penalty_applied);
+      setTotalXpSpent(prev => prev + response.data.xp_penalty_applied);
       setLastRequestTime(now);
 
     } catch (err: any) {
