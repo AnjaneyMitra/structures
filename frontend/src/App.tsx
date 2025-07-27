@@ -11,6 +11,7 @@ import TailwindFriendsPage from './pages/TailwindFriendsPage';
 import AchievementsPage from './pages/AchievementsPage';
 import LevelsPage from './pages/LevelsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
@@ -341,6 +342,7 @@ function AppRoutes() {
         <Route path="/achievements" element={<AppLayout><AchievementsPage /></AppLayout>} />
         <Route path="/levels" element={<AppLayout><LevelsPage /></AppLayout>} />
         <Route path="/analytics" element={<AppLayout><AnalyticsPage /></AppLayout>} />
+        <Route path="/leaderboards" element={<AppLayout><LeaderboardPage /></AppLayout>} />
       </Route>
       
       {/* Fallback route */}

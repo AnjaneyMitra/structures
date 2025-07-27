@@ -24,6 +24,11 @@ class User(Base):
     longest_streak = Column(Integer, default=0)
     last_solve_date = Column(DateTime, nullable=True)
     
+    # Leaderboard ranks (cached for performance)
+    global_rank = Column(Integer, nullable=True)
+    weekly_rank = Column(Integer, nullable=True)
+    monthly_rank = Column(Integer, nullable=True)
+    
     submissions = relationship("Submission", back_populates="user")
 
 class Problem(Base):
@@ -148,6 +153,25 @@ class UserAchievement(Base):
     # Ensure unique user-achievement pairs
     __table_args__ = (
         sa.UniqueConstraint('user_id', 'achievement_id', name='unique_user_achievement'),
+    )
+
+class LeaderboardEntry(Base):
+    __tablename__ = "leaderboard_entries"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    leaderboard_type = Column(String, nullable=False)  # "global", "weekly", "monthly"
+    score = Column(Integer, nullable=False)  # XP score for this period
+    rank = Column(Integer, nullable=False)
+    period_start = Column(DateTime, nullable=True)  # For time-based boards
+    period_end = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")
+    
+    # Indexes for efficient queries
+    __table_args__ = (
+        sa.Index('ix_leaderboard_type_rank', 'leaderboard_type', 'rank'),
+        sa.Index('ix_user_leaderboard_type', 'user_id', 'leaderboard_type'),
     )
 
 class Hint(Base):

@@ -22,6 +22,7 @@ const navItems = [
   { label: 'Analytics', path: '/analytics', icon: ChartBarIcon },
   { label: 'Levels', path: '/levels', icon: StarIcon },
   { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
+  { label: 'Leaderboards', path: '/leaderboards', icon: TrophyIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
 ];
