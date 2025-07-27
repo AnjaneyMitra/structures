@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
   UserGroupIcon,
   ClockIcon,
   PaperAirplaneIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
-import { API_BASE_URL } from '../config/api';
+import apiClient from '../utils/apiClient';
 
 interface Friend {
   id: number;
@@ -43,10 +42,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
 
   const fetchFriends = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-      const response = await axios.get(`${API_BASE_URL}/api/friends/`, { headers });
+      const response = await apiClient.get('/api/friends/');
       setFriends(response.data || []);
     } catch (err: any) {
       setError('Failed to load friends list');
@@ -65,9 +61,6 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       const challengeData = {
         challenged_username: selectedFriend,
         problem_id: problemId,
@@ -75,7 +68,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
         time_limit: timeLimit ? parseInt(timeLimit) : undefined
       };
 
-      await axios.post(`${API_BASE_URL}/api/challenges`, challengeData, { headers });
+      await apiClient.post('/api/challenges', challengeData);
 
       setSuccess('Challenge sent successfully!');
       setSelectedFriend('');

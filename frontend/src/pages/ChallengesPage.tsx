@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
   TrophyIcon, 
   UserGroupIcon,
@@ -9,7 +8,7 @@ import {
   PlusIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
-import { API_BASE_URL } from '../config/api';
+import apiClient from '../utils/apiClient';
 
 interface Challenge {
   id: number;
@@ -58,12 +57,9 @@ const ChallengesPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       const [receivedRes, sentRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/api/challenges/received`, { headers }),
-        axios.get(`${API_BASE_URL}/api/challenges/sent`, { headers })
+        apiClient.get('/api/challenges/received'),
+        apiClient.get('/api/challenges/sent')
       ]);
 
       setReceivedChallenges(receivedRes.data);
@@ -77,10 +73,7 @@ const ChallengesPage: React.FC = () => {
 
   const handleAcceptChallenge = async (challengeId: number) => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-      await axios.post(`${API_BASE_URL}/api/challenges/${challengeId}/accept`, {}, { headers });
+      await apiClient.post(`/api/challenges/${challengeId}/accept`, {});
       
       setSuccess('Challenge accepted! You can now solve the problem.');
       fetchChallenges(); // Refresh the list
@@ -91,10 +84,7 @@ const ChallengesPage: React.FC = () => {
 
   const handleDeclineChallenge = async (challengeId: number) => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-      await axios.post(`${API_BASE_URL}/api/challenges/${challengeId}/decline`, {}, { headers });
+      await apiClient.post(`/api/challenges/${challengeId}/decline`, {});
       
       setSuccess('Challenge declined.');
       fetchChallenges(); // Refresh the list
