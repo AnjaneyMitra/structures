@@ -1,98 +1,87 @@
-// SECURE API CLIENT - COMPLETELY ISOLATED FROM EXISTING SYSTEM
-// This client is specifically designed to prevent Mixed Content errors
+// SECURE API CLIENT - AXIOS-BASED WITH ABSOLUTE HTTPS ENFORCEMENT
+// This client uses axios but with hardcoded HTTPS URLs to prevent Mixed Content errors
+
+import axios, { AxiosInstance } from 'axios';
 
 // HARDCODED HTTPS URL - NO VARIABLES, NO FUNCTIONS, NO LOGIC
 const SECURE_API_BASE = 'https://structures-production.up.railway.app';
 
-// Create a completely new fetch-based client (not axios)
 class SecureApiClient {
-  private baseURL: string;
+  private client: AxiosInstance;
 
   constructor() {
-    // HARDCODE THE URL - NO DYNAMIC LOGIC
-    this.baseURL = SECURE_API_BASE;
-    console.log('🔒 SecureApiClient initialized with:', this.baseURL);
-  }
-
-  private async makeRequest(endpoint: string, options: RequestInit = {}): Promise<any> {
-    // FORCE HTTPS - ABSOLUTE GUARANTEE
-    const url = this.baseURL + endpoint;
+    console.log('🔒 SecureApiClient initialized with:', SECURE_API_BASE);
     
-    // CRITICAL CHECK - THROW ERROR IF NOT HTTPS
-    if (!url.startsWith('https://')) {
-      console.error('❌ CRITICAL: Non-HTTPS URL detected:', url);
-      throw new Error(`Only HTTPS URLs are allowed. Attempted: ${url}`);
-    }
+    // Create axios instance with HARDCODED HTTPS URL
+    this.client = axios.create({
+      baseURL: SECURE_API_BASE,
+      timeout: 10000,
+    });
 
-    // Get auth token
-    const token = localStorage.getItem('token');
-    
-    // Prepare headers
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+    // Add request interceptor with ABSOLUTE HTTPS enforcement
+    this.client.interceptors.request.use(
+      (config) => {
+        // FORCE HTTPS - NO EXCEPTIONS
+        config.baseURL = SECURE_API_BASE;
+        
+        // CRITICAL CHECK - THROW ERROR IF NOT HTTPS
+        const fullUrl = (config.baseURL || '') + (config.url || '');
+        if (!fullUrl.startsWith('https://')) {
+          console.error('❌ CRITICAL: Non-HTTPS URL detected:', fullUrl);
+          throw new Error(`Only HTTPS URLs are allowed. Attempted: ${fullUrl}`);
+        }
 
-    // Add existing headers
-    if (options.headers) {
-      Object.assign(headers, options.headers);
-    }
+        // Add auth token
+        const token = localStorage.getItem('token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    console.log('🔒 SecureApiClient making request to:', url);
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
-
-      if (response.status === 401) {
-        // Handle unauthorized
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-        window.location.href = '/login';
-        throw new Error('Unauthorized');
+        console.log('🔒 SecureApiClient making request to:', fullUrl);
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
       }
+    );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `HTTP ${response.status}`);
+    // Add response interceptor for error handling
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          // Handle unauthorized
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
       }
-
-      return await response.json();
-    } catch (error) {
-      console.error('🔒 SecureApiClient request failed:', error);
-      throw error;
-    }
+    );
   }
 
   // GET request
   async get(endpoint: string): Promise<any> {
-    return this.makeRequest(endpoint, { method: 'GET' });
+    const response = await this.client.get(endpoint);
+    return response.data;
   }
 
   // POST request
   async post(endpoint: string, data?: any): Promise<any> {
-    return this.makeRequest(endpoint, {
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+    const response = await this.client.post(endpoint, data);
+    return response.data;
   }
 
   // PUT request
   async put(endpoint: string, data?: any): Promise<any> {
-    return this.makeRequest(endpoint, {
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+    const response = await this.client.put(endpoint, data);
+    return response.data;
   }
 
   // DELETE request
   async delete(endpoint: string): Promise<any> {
-    return this.makeRequest(endpoint, { method: 'DELETE' });
+    const response = await this.client.delete(endpoint);
+    return response.data;
   }
 }
 
