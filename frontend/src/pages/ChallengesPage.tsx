@@ -8,7 +8,7 @@ import {
   PlusIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
-import apiClient from '../utils/apiClient';
+import secureApiClient from '../utils/secureApiClient';
 
 interface Challenge {
   id: number;
@@ -58,12 +58,12 @@ const ChallengesPage: React.FC = () => {
       setError(null);
 
       const [receivedRes, sentRes] = await Promise.all([
-        apiClient.get('/api/challenges/received'),
-        apiClient.get('/api/challenges/sent')
+        secureApiClient.get('/api/challenges/received'),
+        secureApiClient.get('/api/challenges/sent')
       ]);
 
-      setReceivedChallenges(receivedRes.data);
-      setSentChallenges(sentRes.data);
+      setReceivedChallenges(receivedRes);
+      setSentChallenges(sentRes);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load challenges');
     } finally {
@@ -73,7 +73,7 @@ const ChallengesPage: React.FC = () => {
 
   const handleAcceptChallenge = async (challengeId: number) => {
     try {
-      await apiClient.post(`/api/challenges/${challengeId}/accept`, {});
+      await secureApiClient.post(`/api/challenges/${challengeId}/accept`, {});
       
       setSuccess('Challenge accepted! You can now solve the problem.');
       fetchChallenges(); // Refresh the list
@@ -84,7 +84,7 @@ const ChallengesPage: React.FC = () => {
 
   const handleDeclineChallenge = async (challengeId: number) => {
     try {
-      await apiClient.post(`/api/challenges/${challengeId}/decline`, {});
+      await secureApiClient.post(`/api/challenges/${challengeId}/decline`, {});
       
       setSuccess('Challenge declined.');
       fetchChallenges(); // Refresh the list
