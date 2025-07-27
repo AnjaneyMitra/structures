@@ -46,8 +46,8 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-      const response = await axios.get(`${API_BASE_URL}/api/friends`, { headers });
-      setFriends(response.data.friends || []);
+      const response = await axios.get(`${API_BASE_URL}/api/friends/`, { headers });
+      setFriends(response.data || []);
     } catch (err: any) {
       setError('Failed to load friends list');
     }
