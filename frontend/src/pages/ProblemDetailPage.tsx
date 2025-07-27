@@ -26,6 +26,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import SimpleHintsPanel from '../components/SimpleHintsPanel';
+import ChallengeCreator from '../components/ChallengeCreator';
 
 interface TestCase {
   id: number;
@@ -620,6 +621,13 @@ Good luck! 🚀`);
             }}
           />
           <BookmarkButton problemId={problem.id} />
+          <ChallengeCreator 
+            problemId={problem.id} 
+            problemTitle={problem.title}
+            onChallengeCreated={() => {
+              // Optional: Show success message or refresh something
+            }}
+          />
           <Box sx={{ flexGrow: 1 }} />
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <Select

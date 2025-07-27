@@ -148,12 +148,37 @@ class UserAchievement(Base):
     progress = Column(Integer, default=0)  # Current progress towards achievement
     
     user = relationship("User", backref="earned_achievements")
-    achievement = relationship("Achievement")
+
+class Challenge(Base):
+    __tablename__ = "challenges"
+    id = Column(Integer, primary_key=True, index=True)
+    challenger_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    challenged_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    problem_id = Column(Integer, ForeignKey("problems.id"), nullable=False)
+    status = Column(String, default="pending")  # pending, accepted, completed, expired, declined
+    message = Column(Text, nullable=True)
+    time_limit = Column(Integer, nullable=True)  # Minutes
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    expires_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
     
-    # Ensure unique user-achievement pairs
-    __table_args__ = (
-        sa.UniqueConstraint('user_id', 'achievement_id', name='unique_user_achievement'),
-    )
+    challenger = relationship("User", foreign_keys=[challenger_id], backref="sent_challenges")
+    challenged = relationship("User", foreign_keys=[challenged_id], backref="received_challenges")
+    problem = relationship("Problem", backref="challenges")
+
+class ChallengeResult(Base):
+    __tablename__ = "challenge_results"
+    id = Column(Integer, primary_key=True, index=True)
+    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    submission_id = Column(Integer, ForeignKey("submissions.id"), nullable=True)
+    completion_time = Column(Integer, nullable=True)  # Seconds
+    status = Column(String, nullable=False)  # completed, failed, timeout
+    completed_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    challenge = relationship("Challenge", backref="results")
+    user = relationship("User")
+    submission = relationship("Submission")
 
 class LeaderboardEntry(Base):
     __tablename__ = "leaderboard_entries"
