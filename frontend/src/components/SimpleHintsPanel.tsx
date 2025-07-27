@@ -22,6 +22,7 @@ interface SimpleHintsPanelProps {
   currentLanguage?: string;
 }
 
+// Simplified hints system - v2.0 - No database storage needed!
 export const SimpleHintsPanel: React.FC<SimpleHintsPanelProps> = ({ 
   problemId, 
   currentCode, 
