@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Paper, Typography, Stack, Button, Grid } from '@mui/material';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
+import './utils/globalHttpsEnforcer'; // GLOBAL HTTPS ENFORCEMENT
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TailwindDashboardPage from './pages/TailwindDashboardPage';
