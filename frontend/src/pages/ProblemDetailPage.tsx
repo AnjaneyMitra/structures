@@ -575,12 +575,11 @@ Good luck! 🚀`);
 
   return (
     <Box sx={{ 
-      height: '100vh', 
+      minHeight: '100vh', 
       bgcolor: 'var(--color-background)', 
       color: 'var(--color-foreground)',
       display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
+      flexDirection: 'column'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -693,7 +692,7 @@ Good luck! 🚀`);
       <Box sx={{ 
         display: 'flex', 
         flex: 1, 
-        overflow: 'hidden',
+        minHeight: 'calc(100vh - 88px)',
         flexDirection: { xs: 'column', lg: 'row' }
       }}>
         {/* Left Panel - Problem Description */}
@@ -707,7 +706,7 @@ Good luck! 🚀`);
           borderRight: { lg: '1px solid var(--color-border)' },
           borderBottom: { xs: '1px solid var(--color-border)', lg: 'none' },
           bgcolor: 'var(--color-card)',
-          overflow: 'hidden',
+          overflow: 'auto',
           willChange: 'width, height'
         }}>
           {sidebarOpen && (
@@ -818,7 +817,7 @@ Good luck! 🚀`);
         </Box>
 
         {/* Main Coding Area */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           {/* Code Editor Header */}
           <Box sx={{ 
             borderBottom: '1px solid var(--color-border)',
@@ -901,7 +900,8 @@ Good luck! 🚀`);
 
           {/* Console/Output Area */}
           <Box sx={{ 
-            height: 250,
+            minHeight: 250,
+            maxHeight: '40vh',
             borderTop: '1px solid var(--color-border)',
             bgcolor: 'var(--color-card)',
             display: 'flex',
