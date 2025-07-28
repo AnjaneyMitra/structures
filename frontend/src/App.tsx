@@ -353,7 +353,7 @@ function AppRoutes() {
       <Route element={<RouteGuard requireAuth={true} />}>
         <Route path="/dashboard" element={<AppLayout><TailwindDashboardPage /></AppLayout>} />
         <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
-        <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
+        <Route path="/problems/:id" element={<ProblemDetailPage />} />
         <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
         <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
         <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />

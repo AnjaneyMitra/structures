@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Box, Typography, CircularProgress, Alert, Chip, Stack, Button, 
-  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab
+  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab,
+  IconButton
 } from '@mui/material';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { useTheme } from '../context/ThemeContext';
@@ -12,7 +13,7 @@ import { useLevelUp } from '../hooks/useLevelUp';
 import LevelUpModal from '../components/LevelUpModal';
 import { useChallengeCompletion } from '../hooks/useChallengeCompletion';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -26,6 +27,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SimpleHintsPanel from '../components/SimpleHintsPanel';
 import ChallengeCreator from '../components/ChallengeCreator';
 
@@ -208,6 +210,7 @@ function getJSReturnType(problemData: any): string {
 
 const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { fontSize, themeMode } = useTheme();
   const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
   const { showAchievements } = useAchievements();
@@ -238,7 +241,7 @@ const ProblemDetailPage: React.FC = () => {
   const [runResult, setRunResult] = useState<TestCaseResult | null>(null);
   const [running, setRunning] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Start with description closed for LeetCode feel
   const [consoleOutput, setConsoleOutput] = useState<string>('');
 
   useEffect(() => {
@@ -589,6 +592,18 @@ Good luck! 🚀`);
         bgcolor: 'var(--color-card)'
       }}>
         <Stack direction="row" alignItems="center" spacing={3}>
+          <IconButton
+            onClick={() => navigate('/problems')}
+            sx={{ 
+              color: 'var(--color-muted-foreground)',
+              '&:hover': { 
+                color: 'var(--color-primary)',
+                bgcolor: 'var(--color-primary-hover)'
+              }
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
           <CodeIcon sx={{ color: 'var(--color-primary)', fontSize: 28 }} />
           <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-card-foreground)' }}>
             {problem.id}. {problem.title}
@@ -611,19 +626,19 @@ Good luck! 🚀`);
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between">
                     <span>Run code</span>
-                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Enter</kbd>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Submit solution</span>
-                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Shift+Enter</kbd>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Reset code</span>
                     <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+R</kbd>
                   </div>
                   <div className="flex justify-between">
-                    <span>Toggle theme</span>
-                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+D</kbd>
+                    <span>Submit solution</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+S</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Test run</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Shift+T</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Toggle description</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Tab</kbd>
                   </div>
                 </div>
               </div>
@@ -688,29 +703,24 @@ Good luck! 🚀`);
         </Stack>
       </Box>
 
-      {/* Main Content */}
+      {/* Main Content - LeetCode Style Layout */}
       <Box sx={{ 
         display: 'flex', 
         flex: 1, 
-        minHeight: 'calc(100vh - 88px)',
-        flexDirection: { xs: 'column', lg: 'row' }
+        minHeight: 'calc(100vh - 88px)'
       }}>
         {/* Left Panel - Problem Description */}
         <Box sx={{ 
-          width: { 
-            xs: '100%',
-            lg: sidebarOpen ? 450 : 0
-          },
-          height: { xs: sidebarOpen ? '40vh' : 0, lg: '100%' },
-          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          borderRight: { lg: '1px solid var(--color-border)' },
-          borderBottom: { xs: '1px solid var(--color-border)', lg: 'none' },
+          width: sidebarOpen ? '50%' : '0%',
+          transition: 'width 0.3s ease-in-out',
+          borderRight: '1px solid var(--color-border)',
           bgcolor: 'var(--color-card)',
-          overflow: 'auto',
-          willChange: 'width, height'
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
         }}>
           {sidebarOpen && (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <>
               <Tabs 
                 value={activeTab} 
                 onChange={(_, newValue) => setActiveTab(newValue)}
@@ -812,12 +822,17 @@ Good luck! 🚀`);
                   />
                 )}
               </Box>
-            </Box>
+            </>
           )}
         </Box>
 
-        {/* Main Coding Area */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {/* Right Panel - Code Editor */}
+        <Box sx={{ 
+          flex: 1,
+          display: 'flex', 
+          flexDirection: 'column',
+          minHeight: 0
+        }}>
           {/* Code Editor Header */}
           <Box sx={{ 
             borderBottom: '1px solid var(--color-border)',
@@ -900,8 +915,8 @@ Good luck! 🚀`);
 
           {/* Console/Output Area */}
           <Box sx={{ 
-            minHeight: 250,
-            maxHeight: '40vh',
+            minHeight: 300,
+            maxHeight: '45vh',
             borderTop: '1px solid var(--color-border)',
             bgcolor: 'var(--color-card)',
             display: 'flex',
