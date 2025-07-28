@@ -10,7 +10,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   StarIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  FireIcon
 } from '@heroicons/react/24/outline';
 import { ThemeSelector } from './ThemeSelector';
 import { useAuth } from '../context/AuthContext';
@@ -24,6 +25,7 @@ const navItems = [
   { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
   { label: 'Leaderboards', path: '/leaderboards', icon: TrophyIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
+  { label: 'Challenges', path: '/challenges', icon: FireIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
 ];
 

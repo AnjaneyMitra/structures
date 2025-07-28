@@ -8,6 +8,7 @@ import TailwindProblemsPage from './pages/TailwindProblemsPage';
 import TailwindRoomsPage from './pages/TailwindRoomsPage';
 import TailwindProfilePage from './pages/TailwindProfilePage';
 import TailwindFriendsPage from './pages/TailwindFriendsPage';
+import ChallengesPage from './pages/ChallengesPage';
 import AchievementsPage from './pages/AchievementsPage';
 import LevelsPage from './pages/LevelsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
@@ -340,6 +341,7 @@ function AppRoutes() {
         <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
         <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
         <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
+        <Route path="/challenges" element={<AppLayout><ChallengesPage /></AppLayout>} />
 
         <Route path="/achievements" element={<AppLayout><AchievementsPage /></AppLayout>} />
         <Route path="/levels" element={<AppLayout><LevelsPage /></AppLayout>} />
