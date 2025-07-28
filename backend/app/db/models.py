@@ -149,7 +149,37 @@ class UserAchievement(Base):
     
     user = relationship("User", backref="earned_achievements")
 
-# Temporarily removed Challenge and ChallengeResult models to isolate Mixed Content issue
+
+class Challenge(Base):
+    __tablename__ = "challenges"
+    id = Column(Integer, primary_key=True, index=True)
+    challenger_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    challenged_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    problem_id = Column(Integer, ForeignKey("problems.id"), nullable=False)
+    status = Column(String, default="pending")  # pending, accepted, completed, expired, declined
+    message = Column(Text, nullable=True)
+    time_limit = Column(Integer, nullable=True)  # Minutes
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    expires_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+    
+    challenger = relationship("User", foreign_keys=[challenger_id])
+    challenged = relationship("User", foreign_keys=[challenged_id])
+    problem = relationship("Problem")
+
+class ChallengeResult(Base):
+    __tablename__ = "challenge_results"
+    id = Column(Integer, primary_key=True, index=True)
+    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    submission_id = Column(Integer, ForeignKey("submissions.id"), nullable=True)
+    completion_time = Column(Integer, nullable=True)  # Seconds
+    status = Column(String, nullable=False)  # completed, failed, timeout
+    completed_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    challenge = relationship("Challenge")
+    user = relationship("User")
+    submission = relationship("Submission")
 
 class LeaderboardEntry(Base):
     __tablename__ = "leaderboard_entries"
