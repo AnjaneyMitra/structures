@@ -49,8 +49,6 @@ frontend/dist/
 
 # Logs
 *.log
-DEPLOYMENT_CHECKLIST.md
-ENHANCED_HINTS_PROMPTS.md
 
 # Markdown documentation directory
 markdowns/
