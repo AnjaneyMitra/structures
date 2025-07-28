@@ -238,17 +238,31 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Auto-collapse sidebar on specific pages for better focus
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Auto-collapse sidebar on mobile and specific pages
   useEffect(() => {
     const isProblemPage = location.pathname.includes('/problems/');
     const isRoomPage = location.pathname.includes('/room/');
     
-    // Only auto-collapse if user hasn't manually interacted with sidebar
-    if ((isProblemPage || isRoomPage) && !hasUserInteracted) {
+    // Always collapse on mobile, or auto-collapse on specific pages for desktop
+    if (isMobile || ((isProblemPage || isRoomPage) && !hasUserInteracted)) {
       setSidebarOpen(false);
+    } else if (!isMobile && !hasUserInteracted) {
+      setSidebarOpen(true);
     }
-  }, [location.pathname, hasUserInteracted]);
+  }, [location.pathname, hasUserInteracted, isMobile]);
 
   // Track when user manually toggles sidebar
   const handleSidebarToggle = (newState: boolean | ((prev: boolean) => boolean)) => {
@@ -261,14 +275,17 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <TailwindSidebar 
         open={sidebarOpen} 
         onToggle={handleSidebarToggle}
+        isMobile={isMobile}
       />
+      
       <main 
-        className={`flex-grow min-h-screen bg-background relative ${
-          sidebarOpen ? 'ml-[280px]' : 'ml-[72px]'
+        className={`flex-grow min-h-screen bg-background relative transition-all duration-300 ease-in-out ${
+          isMobile 
+            ? (sidebarOpen ? 'ml-0' : 'ml-0') // On mobile, sidebar is overlay
+            : (sidebarOpen ? 'ml-[280px]' : 'ml-[72px]') // On desktop, sidebar pushes content
         }`}
         style={{ 
           zIndex: 1,
-          transition: 'margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           willChange: 'margin-left'
         }}
       >
