@@ -6,6 +6,11 @@ const LOCALHOST_API_URL = 'http://localhost:8000';
 
 // Determine the correct API URL with absolute certainty
 const getSecureApiUrl = () => {
+  console.log('🔍 ApiClient Debug Info:');
+  console.log('  - Window hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
+  console.log('  - Window protocol:', typeof window !== 'undefined' ? window.location.protocol : 'undefined');
+  console.log('  - NODE_ENV:', process.env.NODE_ENV);
+  
   // Only use localhost HTTP in development
   if (typeof window !== 'undefined' && 
       window.location.hostname === 'localhost' && 
@@ -43,6 +48,12 @@ apiClient.interceptors.request.use(
     // ABSOLUTE HTTPS ENFORCEMENT - NO EXCEPTIONS
     const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
     const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    console.log('🌐 Request Debug Info:');
+    console.log('  - Original baseURL:', config.baseURL);
+    console.log('  - Original URL:', config.url);
+    console.log('  - Is localhost:', isLocalhost);
+    console.log('  - Is development:', isDevelopment);
     
     // Only allow HTTP for localhost in development
     if (!isLocalhost || !isDevelopment) {

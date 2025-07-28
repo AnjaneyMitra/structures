@@ -17,6 +17,14 @@ export const getApiBaseUrl = () => {
   const isHttpProtocol = typeof window !== 'undefined' && window.location.protocol === 'http:';
   const isDevelopment = process.env.NODE_ENV === 'development';
   
+  console.log('🔍 API URL Debug Info:');
+  console.log('  - Window hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
+  console.log('  - Window protocol:', typeof window !== 'undefined' ? window.location.protocol : 'undefined');
+  console.log('  - NODE_ENV:', process.env.NODE_ENV);
+  console.log('  - Is localhost:', isLocalhost);
+  console.log('  - Is HTTP protocol:', isHttpProtocol);
+  console.log('  - Is development:', isDevelopment);
+  
   if (isLocalhost && isHttpProtocol && isDevelopment) {
     console.log('🔧 LOCALHOST DEVELOPMENT: Using HTTP');
     return DEVELOPMENT_API_URL;
