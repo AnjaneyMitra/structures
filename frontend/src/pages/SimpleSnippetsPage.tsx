@@ -158,7 +158,7 @@ const SimpleSnippetsPage: React.FC = () => {
         {success && (
           <div className="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
             {success}
-            <button 
+            <button
               onClick={() => setSuccess(null)}
               className="float-right text-green-600 hover:text-green-800"
             >
@@ -169,7 +169,7 @@ const SimpleSnippetsPage: React.FC = () => {
         {error && (
           <div className="mb-6 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
             {error}
-            <button 
+            <button
               onClick={() => setError(null)}
               className="float-right text-destructive hover:text-destructive/80"
             >
@@ -191,11 +191,10 @@ const SimpleSnippetsPage: React.FC = () => {
                       setActiveTab(index);
                       setViewingSnippet(null);
                     }}
-                    className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${
-                      activeTab === index
+                    className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${activeTab === index
                         ? 'border-primary text-primary'
                         : 'border-transparent text-muted-foreground hover:text-card-foreground'
-                    }`}
+                      }`}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{tab.label}</span>
@@ -213,7 +212,7 @@ const SimpleSnippetsPage: React.FC = () => {
                   <h3 className="text-lg font-semibold">Public Snippets</h3>
                   <p className="text-sm text-muted-foreground">Browse code snippets shared by the community</p>
                 </div>
-                
+
                 {snippets.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <CodeBracketIcon className="h-16 w-16 mx-auto mb-4 opacity-50" />
@@ -223,9 +222,9 @@ const SimpleSnippetsPage: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {snippets.map((snippet) => (
-                      <SnippetCard 
-                        key={snippet.id} 
-                        snippet={snippet} 
+                      <SnippetCard
+                        key={snippet.id}
+                        snippet={snippet}
                         onView={handleViewSnippet}
                         onDelete={handleDeleteSnippet}
                         showActions={false}
@@ -252,7 +251,7 @@ const SimpleSnippetsPage: React.FC = () => {
                     <span>Create Snippet</span>
                   </button>
                 </div>
-                
+
                 {snippets.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <CodeBracketIcon className="h-16 w-16 mx-auto mb-4 opacity-50" />
@@ -262,9 +261,9 @@ const SimpleSnippetsPage: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {snippets.map((snippet) => (
-                      <SnippetCard 
-                        key={snippet.id} 
-                        snippet={snippet} 
+                      <SnippetCard
+                        key={snippet.id}
+                        snippet={snippet}
                         onView={handleViewSnippet}
                         onDelete={handleDeleteSnippet}
                         showActions={true}
@@ -277,7 +276,7 @@ const SimpleSnippetsPage: React.FC = () => {
 
             {/* Create Snippet Tab */}
             {activeTab === 2 && (
-              <CreateSnippetForm 
+              <CreateSnippetForm
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={handleCreateSnippet}
@@ -292,9 +291,9 @@ const SimpleSnippetsPage: React.FC = () => {
 
         {/* View Snippet Modal */}
         {viewingSnippet && (
-          <ViewSnippetModal 
-            snippet={viewingSnippet} 
-            onClose={() => setViewingSnippet(null)} 
+          <ViewSnippetModal
+            snippet={viewingSnippet}
+            onClose={() => setViewingSnippet(null)}
           />
         )}
       </div>

@@ -8,7 +8,6 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
 from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks, levels, analytics, leaderboards
-from .api.routes import simple_challenges, simple_snippets
 from .api.routes import simple_hints as hints
 import socketio
 from starlette.middleware.sessions import SessionMiddleware
@@ -127,8 +126,7 @@ app.include_router(levels.router, prefix="/api/levels", tags=["levels"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 app.include_router(hints.router, prefix="/api/hints", tags=["hints"])
 app.include_router(leaderboards.router, prefix="/api/leaderboards", tags=["leaderboards"])
-app.include_router(simple_challenges.router, prefix="/api/challenges", tags=["challenges"])
-app.include_router(simple_snippets.router, prefix="/api/snippets", tags=["snippets"])
+
 
 @app.get("/")
 def read_root():

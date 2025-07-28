@@ -399,141 +399,33 @@ const ChallengesPage: React.FC = () => {
 
             {/* Create Challenge Tab */}
             {activeTab === 2 && (
-              <CreateChallengeForm onChallengeCreated={fetchChallenges} />
+              <div>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Create New Challenge</h3>
+                  <p className="text-sm text-muted-foreground">Challenge a friend to solve a specific problem</p>
+                </div>
+                
+                <div className="max-w-md">
+                  <p className="text-muted-foreground">
+                    To create a challenge, go to any problem page and click the "Challenge Friend" button.
+                    You can challenge friends from the problem detail page after selecting a specific problem.
+                  </p>
+                  
+                  <div className="mt-4">
+                    <a
+                      href="/problems"
+                      className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                    >
+                      <PlusIcon className="h-4 w-4 mr-2" />
+                      Browse Problems
+                    </a>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// Create Challenge Form Component
-interface CreateChallengeFormProps {
-  onChallengeCreated: () => void;
-}
-
-const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({ onChallengeCreated }) => {
-  const [formData, setFormData] = useState({
-    challenged_username: '',
-    problem_id: 1,
-    message: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.challenged_username.trim()) {
-      setError('Please enter a username to challenge');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await apiClient.post('/api/challenges', {
-        challenged_username: formData.challenged_username.trim(),
-        problem_id: formData.problem_id,
-        message: formData.message.trim() || undefined
-      });
-
-      setSuccess(`Challenge sent to ${formData.challenged_username}!`);
-      setFormData({ challenged_username: '', problem_id: 1, message: '' });
-      onChallengeCreated();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to create challenge');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div>
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Create New Challenge</h3>
-        <p className="text-sm text-muted-foreground">Challenge a friend to solve a specific problem</p>
-      </div>
-
-      {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-          {success}
-          <button 
-            onClick={() => setSuccess(null)}
-            className="float-right text-green-600 hover:text-green-800"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
-          {error}
-          <button 
-            onClick={() => setError(null)}
-            className="float-right text-destructive hover:text-destructive/80"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-card-foreground mb-2">
-            Challenge Username
-          </label>
-          <input
-            type="text"
-            value={formData.challenged_username}
-            onChange={(e) => setFormData(prev => ({ ...prev, challenged_username: e.target.value }))}
-            placeholder="Enter username to challenge"
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-card-foreground mb-2">
-            Problem ID
-          </label>
-          <input
-            type="number"
-            value={formData.problem_id}
-            onChange={(e) => setFormData(prev => ({ ...prev, problem_id: parseInt(e.target.value) || 1 }))}
-            min="1"
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            required
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Enter the ID of the problem you want to challenge them with
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-card-foreground mb-2">
-            Message (Optional)
-          </label>
-          <textarea
-            value={formData.message}
-            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-            placeholder="Add a personal message..."
-            rows={3}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Sending Challenge...' : 'Send Challenge'}
-        </button>
-      </form>
     </div>
   );
 };
