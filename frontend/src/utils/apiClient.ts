@@ -1,31 +1,8 @@
 import axios from 'axios';
+import { getApiBaseUrl } from '../config/api';
 
-// HARDCODED HTTPS URL - FOOLPROOF SOLUTION
-const PRODUCTION_API_URL = 'https://structures-production.up.railway.app';
-const LOCALHOST_API_URL = 'http://localhost:8000';
-
-// Determine the correct API URL with absolute certainty
-const getSecureApiUrl = () => {
-  console.log('🔍 ApiClient Debug Info:');
-  console.log('  - Window hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
-  console.log('  - Window protocol:', typeof window !== 'undefined' ? window.location.protocol : 'undefined');
-  console.log('  - NODE_ENV:', process.env.NODE_ENV);
-  
-  // Only use localhost HTTP in development
-  if (typeof window !== 'undefined' && 
-      window.location.hostname === 'localhost' && 
-      window.location.protocol === 'http:' &&
-      process.env.NODE_ENV === 'development') {
-    console.log('🔧 Using localhost for development');
-    return LOCALHOST_API_URL;
-  }
-  
-  // ALWAYS use HTTPS for production - no exceptions
-  console.log('🔒 Using HTTPS for production');
-  return PRODUCTION_API_URL;
-};
-
-const finalApiUrl = getSecureApiUrl();
+// Get the secure API URL from the centralized config
+const finalApiUrl = getApiBaseUrl();
 console.log('✅ ApiClient initialized with URL:', finalApiUrl);
 
 // Validate that we're using HTTPS in production
@@ -57,8 +34,8 @@ apiClient.interceptors.request.use(
     
     // Only allow HTTP for localhost in development
     if (!isLocalhost || !isDevelopment) {
-      // FORCE HTTPS - HARDCODED PRODUCTION URL
-      config.baseURL = PRODUCTION_API_URL;
+      // FORCE HTTPS - Use the centralized config
+      config.baseURL = getApiBaseUrl();
       
       // Double-check individual URL
       if (config.url?.startsWith('http:')) {
