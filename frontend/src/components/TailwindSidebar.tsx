@@ -33,12 +33,14 @@ interface SidebarProps {
   open?: boolean;
   onClose?: () => void;
   onToggle?: (open: boolean) => void;
+  isMobile?: boolean;
 }
 
 export const TailwindSidebar: React.FC<SidebarProps> = ({ 
   open = true, 
   onClose, 
-  onToggle 
+  onToggle,
+  isMobile = false
 }) => {
   const location = useLocation();
   const { username, logout } = useAuth();
@@ -59,13 +61,23 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
+      {/* Mobile overlay */}
+      {isMobile && sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[49]"
+          onClick={() => onToggle && onToggle(false)}
+        />
+      )}
+      
       <div 
         className={`fixed top-0 left-0 h-full z-50 bg-card border-r border-border flex flex-col ${
           sidebarOpen ? 'w-72' : 'w-20'
+        } ${
+          isMobile && !sidebarOpen ? '-translate-x-full' : 'translate-x-0'
         }`}
         style={{
-          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          willChange: 'width'
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out',
+          willChange: 'width, transform'
         }}
       >
         {/* Header */}

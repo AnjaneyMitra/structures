@@ -690,15 +690,25 @@ Good luck! 🚀`);
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flex: 1, 
+        overflow: 'hidden',
+        flexDirection: { xs: 'column', lg: 'row' }
+      }}>
         {/* Left Panel - Problem Description */}
         <Box sx={{ 
-          width: sidebarOpen ? 450 : 0,
-          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          borderRight: '1px solid var(--color-border)',
+          width: { 
+            xs: '100%',
+            lg: sidebarOpen ? 450 : 0
+          },
+          height: { xs: sidebarOpen ? '40vh' : 0, lg: '100%' },
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          borderRight: { lg: '1px solid var(--color-border)' },
+          borderBottom: { xs: '1px solid var(--color-border)', lg: 'none' },
           bgcolor: 'var(--color-card)',
           overflow: 'hidden',
-          willChange: 'width'
+          willChange: 'width, height'
         }}>
           {sidebarOpen && (
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>

@@ -157,16 +157,16 @@ const TailwindDashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Main Container with 12-column grid system */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-12 gap-6">
+      {/* Main Container with responsive grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="grid grid-cols-12 gap-4 lg:gap-6">
           
           {/* Welcome Header - Full Width */}
           <section className="col-span-12">
-            <div className="bg-card/30 backdrop-blur-sm rounded-xl p-8 border border-border/50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground mb-3">
+            <div className="bg-card/30 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-border/50">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="text-center lg:text-left">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2 lg:mb-3">
                     {getGreeting()}, {user?.username ? formatUsername(user.username) : ''}
                   </h2>
                   <p className="text-muted-foreground text-lg">
@@ -268,36 +268,36 @@ const TailwindDashboardPage: React.FC = () => {
               </div>
             </section>
 
-            {/* Stats Cards Section - Right Side Fixed */}
+            {/* Stats Cards Section - Responsive */}
             {stats && (
-              <section className="lg:col-span-1">
-                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-8 border border-border/30 h-fit">
-                  <h2 className="text-xl font-semibold text-foreground mb-6">Your Progress</h2>
-                  <div className="grid grid-cols-2 gap-4 h-fit">
-                    <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+              <section className="col-span-12 lg:col-span-1">
+                <div className="bg-card/20 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-border/30 h-fit">
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6 text-center lg:text-left">Your Progress</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 sm:gap-4 h-fit">
+                    <div className="bg-card rounded-xl border p-3 sm:p-4 lg:p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-2.5 bg-primary/10 rounded-lg mb-2.5">
-                          <CheckCircleIcon className="h-7 w-7 text-primary" />
+                        <div className="p-2 sm:p-2.5 bg-primary/10 rounded-lg mb-2 sm:mb-2.5">
+                          <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-primary" />
                         </div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Problems Solved</p>
-                        <p className="text-xl font-bold text-primary">{stats.problems_solved}</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1 sm:mb-1.5">Problems Solved</p>
+                        <p className="text-lg sm:text-xl font-bold text-primary">{stats.problems_solved}</p>
                       </div>
                     </div>
                     
-                    <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="bg-card rounded-xl border p-3 sm:p-4 lg:p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-2.5 bg-accent/10 rounded-lg mb-2.5">
-                          <BoltIcon className="h-7 w-7 text-accent" />
+                        <div className="p-2 sm:p-2.5 bg-accent/10 rounded-lg mb-2 sm:mb-2.5">
+                          <BoltIcon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-accent" />
                         </div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Total Submissions</p>
-                        <p className="text-xl font-bold text-accent">{stats.total_submissions}</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1 sm:mb-1.5">Total Submissions</p>
+                        <p className="text-lg sm:text-xl font-bold text-accent">{stats.total_submissions}</p>
                       </div>
                     </div>
 
-                    <div className="bg-card rounded-xl border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="bg-card rounded-xl border p-3 sm:p-4 lg:p-5 shadow-sm hover:shadow-md transition-all duration-200">
                       <div className="flex flex-col items-center text-center">
-                        <div className="p-2.5 bg-yellow-500/10 rounded-lg mb-2.5">
-                          <StarIcon className="h-7 w-7 text-yellow-500" />
+                        <div className="p-2 sm:p-2.5 bg-yellow-500/10 rounded-lg mb-2 sm:mb-2.5">
+                          <StarIcon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-yellow-500" />
                         </div>
                         <p className="text-xs font-medium text-muted-foreground mb-1.5">Total XP</p>
                         <p className="text-xl font-bold text-yellow-600">{stats.total_xp || 0}</p>

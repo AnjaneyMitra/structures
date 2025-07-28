@@ -24,6 +24,26 @@ body {
   font-size: var(--base-font-size);
   letter-spacing: var(--tracking-normal);
   font-family: var(--font-sans);
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Responsive Typography */
+@media (max-width: 640px) {
+  h1 { font-size: calc(var(--base-font-size) * 1.875); }
+  h2 { font-size: calc(var(--base-font-size) * 1.5); }
+  h3 { font-size: calc(var(--base-font-size) * 1.25); }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  h1 { font-size: calc(var(--base-font-size) * 2); }
+  h2 { font-size: calc(var(--base-font-size) * 1.625); }
+  h3 { font-size: calc(var(--base-font-size) * 1.375); }
+}
+
+@media (min-width: 1025px) {
+  h1 { font-size: calc(var(--base-font-size) * 2.25); }
+  h2 { font-size: calc(var(--base-font-size) * 1.875); }
+  h3 { font-size: calc(var(--base-font-size) * 1.5); }
 }
 
 /* Global font and spacing variables for soft-pop theme */
@@ -44,10 +64,56 @@ body {
   --shadow-2xl: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.13);
 }
 
-/* Scale other text elements proportionally */
-h1 { font-size: calc(var(--base-font-size) * 2.25); }
-h2 { font-size: calc(var(--base-font-size) * 1.875); }
-h3 { font-size: calc(var(--base-font-size) * 1.5); }
+/* Responsive Utility Classes */
+@layer utilities {
+  .container-responsive {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .text-responsive {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  .heading-responsive {
+    @apply text-xl sm:text-2xl lg:text-3xl xl:text-4xl;
+  }
+  
+  .card-responsive {
+    @apply p-3 sm:p-4 lg:p-6;
+  }
+  
+  .grid-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+  
+  .gap-responsive {
+    @apply gap-3 sm:gap-4 lg:gap-6;
+  }
+  
+  .button-responsive {
+    @apply px-3 py-1.5 sm:px-4 sm:py-2 lg:px-6 lg:py-3;
+  }
+  
+  .hidden-mobile {
+    @apply hidden sm:block;
+  }
+  
+  .hidden-desktop {
+    @apply block sm:hidden;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:bg-card:hover {
+    background-color: hsl(var(--card));
+  }
+  
+  button, .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
 h4 { font-size: calc(var(--base-font-size) * 1.25); }
 h5 { font-size: calc(var(--base-font-size) * 1.125); }
 h6 { font-size: var(--base-font-size); }
