@@ -52,6 +52,5 @@ frontend/dist/
 DEPLOYMENT_CHECKLIST.md
 ENHANCED_HINTS_PROMPTS.md
 
-# Database migration guide (internal reference)
-DATABASE_MIGRATION_GUIDE.md
-frontend/FRIEND_CHALLENGES_README.md
+# Markdown documentation directory
+markdowns/
