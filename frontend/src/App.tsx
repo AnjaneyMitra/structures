@@ -13,7 +13,7 @@ import LevelsPage from './pages/LevelsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ChallengesPage from './pages/ChallengesPage';
-import SnippetsPage from './pages/SnippetsPage';
+import SimpleSnippetsPage from './pages/SimpleSnippetsPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
@@ -342,7 +342,7 @@ function AppRoutes() {
         <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
         <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
         <Route path="/challenges" element={<AppLayout><ChallengesPage /></AppLayout>} />
-        <Route path="/snippets" element={<AppLayout><SnippetsPage /></AppLayout>} />
+        <Route path="/snippets" element={<AppLayout><SimpleSnippetsPage /></AppLayout>} />
         <Route path="/achievements" element={<AppLayout><AchievementsPage /></AppLayout>} />
         <Route path="/levels" element={<AppLayout><LevelsPage /></AppLayout>} />
         <Route path="/analytics" element={<AppLayout><AnalyticsPage /></AppLayout>} />

@@ -149,36 +149,7 @@ class UserAchievement(Base):
     
     user = relationship("User", backref="earned_achievements")
 
-class Challenge(Base):
-    __tablename__ = "challenges"
-    id = Column(Integer, primary_key=True, index=True)
-    challenger_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    challenged_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    problem_id = Column(Integer, ForeignKey("problems.id"), nullable=False)
-    status = Column(String, default="pending")  # pending, accepted, completed, expired, declined
-    message = Column(Text, nullable=True)
-    time_limit = Column(Integer, nullable=True)  # Minutes
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    expires_at = Column(DateTime, nullable=True)
-    completed_at = Column(DateTime, nullable=True)
-    
-    challenger = relationship("User", foreign_keys=[challenger_id], backref="sent_challenges")
-    challenged = relationship("User", foreign_keys=[challenged_id], backref="received_challenges")
-    problem = relationship("Problem", backref="challenges")
-
-class ChallengeResult(Base):
-    __tablename__ = "challenge_results"
-    id = Column(Integer, primary_key=True, index=True)
-    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    submission_id = Column(Integer, ForeignKey("submissions.id"), nullable=True)
-    completion_time = Column(Integer, nullable=True)  # Seconds
-    status = Column(String, nullable=False)  # completed, failed, timeout
-    completed_at = Column(DateTime, default=datetime.datetime.utcnow)
-    
-    challenge = relationship("Challenge", backref="results")
-    user = relationship("User")
-    submission = relationship("Submission")
+# Temporarily removed Challenge and ChallengeResult models to isolate Mixed Content issue
 
 class LeaderboardEntry(Base):
     __tablename__ = "leaderboard_entries"
@@ -229,50 +200,4 @@ class UserHint(Base):
         sa.UniqueConstraint('user_id', 'hint_id', name='unique_user_hint'),
     )
 
-class CodeSnippet(Base):
-    __tablename__ = "code_snippets"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    title = Column(String(255), nullable=False)
-    description = Column(Text, nullable=True)
-    code = Column(Text, nullable=False)
-    language = Column(String(50), nullable=False)
-    tags = Column(String(500), nullable=True)  # Comma-separated tags
-    is_public = Column(Boolean, default=False)
-    is_featured = Column(Boolean, default=False)
-    view_count = Column(Integer, default=0)
-    like_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    
-    # Relationships
-    user = relationship("User", backref="code_snippets")
-
-class SnippetLike(Base):
-    __tablename__ = "snippet_likes"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    
-    # Relationships
-    user = relationship("User")
-    snippet = relationship("CodeSnippet", backref="likes")
-    
-    # Ensure unique user-snippet pairs
-    __table_args__ = (
-        sa.UniqueConstraint('user_id', 'snippet_id', name='unique_user_snippet_like'),
-    )
-
-class SnippetComment(Base):
-    __tablename__ = "snippet_comments"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
-    content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    
-    # Relationships
-    user = relationship("User")
-    snippet = relationship("CodeSnippet", backref="comments")
+# Temporarily removed CodeSnippet, SnippetLike, and SnippetComment models to isolate Mixed Content issue

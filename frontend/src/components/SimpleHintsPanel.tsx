@@ -13,7 +13,7 @@ import {
   LightbulbOutlined as HintIcon,
   Warning as WarningIcon
 } from '@mui/icons-material';
-import axios from 'axios';
+// import axios from 'axios';
 import apiClient from '../utils/apiClient';
 
 interface SimpleHintsPanelProps {
