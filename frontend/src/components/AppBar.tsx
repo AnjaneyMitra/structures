@@ -9,6 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Drawer from '@mui/material/Drawer';
 import { Link, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
+import ChallengeNotifications from './ChallengeNotifications';
 
 const navLinks = [
   { label: 'Dashboard', to: '/dashboard', icon: <DashboardIcon sx={{ mr: 1 }} /> },
@@ -113,6 +114,7 @@ const AppBar: React.FC = () => {
           </Box>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={2}>
+          <ChallengeNotifications />
           <ThemeToggle />
           <Tooltip title="Account">
             <IconButton

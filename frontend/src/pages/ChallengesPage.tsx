@@ -6,23 +6,13 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   PlusIcon,
-  FireIcon
+  FireIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import apiClient from '../utils/apiClient';
-
-interface Challenge {
-  id: number;
-  challenger_username: string;
-  challenged_username: string;
-  problem_id: number;
-  problem_title: string;
-  status: string;
-  message?: string;
-  time_limit?: number;
-  created_at: string;
-  expires_at?: string;
-  completed_at?: string;
-}
+import { Challenge, CHALLENGE_STATUS_CONFIG } from '../types/challenges';
+import ChallengeResults from '../components/ChallengeResults';
+import ChallengeTimer from '../components/ChallengeTimer';
 
 
 
@@ -33,6 +23,8 @@ const ChallengesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
   const tabs = [
     { key: 'received', label: 'Received', icon: UserGroupIcon, color: 'text-blue-500' },
@@ -85,26 +77,13 @@ const ChallengesPage: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'accepted': return 'text-blue-600 bg-blue-100';
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'declined': return 'text-red-600 bg-red-100';
-      case 'expired': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
+  const getStatusConfig = (status: string) => {
+    return CHALLENGE_STATUS_CONFIG[status as keyof typeof CHALLENGE_STATUS_CONFIG] || CHALLENGE_STATUS_CONFIG.pending;
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending': return <ClockIcon className="h-4 w-4" />;
-      case 'accepted': return <CheckCircleIcon className="h-4 w-4" />;
-      case 'completed': return <TrophyIcon className="h-4 w-4" />;
-      case 'declined': return <XCircleIcon className="h-4 w-4" />;
-      case 'expired': return <XCircleIcon className="h-4 w-4" />;
-      default: return <ClockIcon className="h-4 w-4" />;
-    }
+  const handleViewResults = (challenge: Challenge) => {
+    setSelectedChallenge(challenge);
+    setShowResults(true);
   };
 
   const formatTimeLimit = (minutes?: number) => {
@@ -271,9 +250,9 @@ const ChallengesPage: React.FC = () => {
                               <h4 className="font-semibold text-card-foreground">
                                 {challenge.problem_title}
                               </h4>
-                              <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(challenge.status)}`}>
-                                {getStatusIcon(challenge.status)}
-                                <span className="capitalize">{challenge.status}</span>
+                              <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusConfig(challenge.status).color}`}>
+                                <span>{getStatusConfig(challenge.status).icon}</span>
+                                <span>{getStatusConfig(challenge.status).label}</span>
                               </span>
                             </div>
                             
@@ -289,7 +268,14 @@ const ChallengesPage: React.FC = () => {
                             
                             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                               <span>Created: {formatDate(challenge.created_at)}</span>
-                              {challenge.time_limit && (
+                              {challenge.time_limit && challenge.status === 'accepted' && (
+                                <ChallengeTimer
+                                  timeLimit={challenge.time_limit}
+                                  startTime={challenge.created_at}
+                                  className="ml-2"
+                                />
+                              )}
+                              {challenge.time_limit && challenge.status !== 'accepted' && (
                                 <span className="flex items-center space-x-1">
                                   <ClockIcon className="h-3 w-3" />
                                   <span>{formatTimeLimit(challenge.time_limit)}</span>
@@ -298,33 +284,43 @@ const ChallengesPage: React.FC = () => {
                             </div>
                           </div>
                           
-                          {challenge.status === 'pending' && (
-                            <div className="flex space-x-2 ml-4">
-                              <button
-                                onClick={() => handleAcceptChallenge(challenge.id)}
-                                className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 transition-colors"
-                              >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() => handleDeclineChallenge(challenge.id)}
-                                className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition-colors"
-                              >
-                                Decline
-                              </button>
-                            </div>
-                          )}
-                          
-                          {challenge.status === 'accepted' && (
-                            <div className="ml-4">
+                          <div className="flex flex-col space-y-2 ml-4">
+                            {challenge.status === 'pending' && (
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => handleAcceptChallenge(challenge.id)}
+                                  className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 transition-colors"
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={() => handleDeclineChallenge(challenge.id)}
+                                  className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition-colors"
+                                >
+                                  Decline
+                                </button>
+                              </div>
+                            )}
+                            
+                            {challenge.status === 'accepted' && (
                               <a
                                 href={`/problems/${challenge.problem_id}`}
-                                className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors"
+                                className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors text-center"
                               >
                                 Solve Now
                               </a>
-                            </div>
-                          )}
+                            )}
+                            
+                            {challenge.status === 'completed' && (
+                              <button
+                                onClick={() => handleViewResults(challenge)}
+                                className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors flex items-center space-x-1"
+                              >
+                                <EyeIcon className="h-3 w-3" />
+                                <span>View Results</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -360,9 +356,9 @@ const ChallengesPage: React.FC = () => {
                               <h4 className="font-semibold text-card-foreground">
                                 {challenge.problem_title}
                               </h4>
-                              <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(challenge.status)}`}>
-                                {getStatusIcon(challenge.status)}
-                                <span className="capitalize">{challenge.status}</span>
+                              <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusConfig(challenge.status).color}`}>
+                                <span>{getStatusConfig(challenge.status).icon}</span>
+                                <span>{getStatusConfig(challenge.status).label}</span>
                               </span>
                             </div>
                             
@@ -389,6 +385,18 @@ const ChallengesPage: React.FC = () => {
                               )}
                             </div>
                           </div>
+                          
+                          {challenge.status === 'completed' && (
+                            <div className="ml-4">
+                              <button
+                                onClick={() => handleViewResults(challenge)}
+                                className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors flex items-center space-x-1"
+                              >
+                                <EyeIcon className="h-3 w-3" />
+                                <span>View Results</span>
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -425,6 +433,31 @@ const ChallengesPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Challenge Results Modal */}
+        {showResults && selectedChallenge && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => {
+                setShowResults(false);
+                setSelectedChallenge(null);
+              }}
+            />
+            
+            {/* Modal Content */}
+            <div className="relative z-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <ChallengeResults
+                challenge={selectedChallenge}
+                onClose={() => {
+                  setShowResults(false);
+                  setSelectedChallenge(null);
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

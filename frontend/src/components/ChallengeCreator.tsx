@@ -6,13 +6,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import apiClient from '../utils/apiClient';
-
-interface Friend {
-  id: number;
-  username: string;
-  total_xp: number;
-  level: number;
-}
+import { Friend, ChallengeCreate } from '../types/challenges';
 
 interface ChallengeCreatorProps {
   problemId: number;
@@ -61,7 +55,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
       setLoading(true);
       setError(null);
 
-      const challengeData = {
+      const challengeData: ChallengeCreate = {
         challenged_username: selectedFriend,
         problem_id: problemId,
         message: message.trim() || undefined,

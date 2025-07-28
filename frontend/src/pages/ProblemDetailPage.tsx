@@ -10,6 +10,7 @@ import { useAchievements } from '../contexts/AchievementsContext';
 import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
 import { useLevelUp } from '../hooks/useLevelUp';
 import LevelUpModal from '../components/LevelUpModal';
+import { useChallengeCompletion } from '../hooks/useChallengeCompletion';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
@@ -211,6 +212,7 @@ const ProblemDetailPage: React.FC = () => {
   const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
   const { showAchievements } = useAchievements();
   const { levelUpInfo, showLevelUpModal, handleLevelUp, closeLevelUpModal } = useLevelUp();
+  const { completeChallenge, checkActiveChallenge } = useChallengeCompletion();
   const [problem, setProblem] = useState<Problem | null>(null);
 
   // Font size mapping for Monaco Editor
@@ -344,6 +346,25 @@ Good luck! 🚀`);
           } else if (streakInfo.message) {
             summaryMessage += `\n🔥 ${streakInfo.message}`;
           }
+        }
+
+        // Check and complete any active challenges
+        try {
+          const activeChallenge = await checkActiveChallenge(problem?.id || 0);
+          if (activeChallenge && res.data.id) {
+            const challengeResult = await completeChallenge(activeChallenge.id, res.data.id);
+            if (challengeResult) {
+              summaryMessage += `\n🏆 Challenge completed! You ${challengeResult.status === 'completed' ? 'won' : 'attempted'} the challenge against ${activeChallenge.challenger_username || activeChallenge.challenged_username}!`;
+              if (challengeResult.completion_time) {
+                const minutes = Math.floor(challengeResult.completion_time / 60);
+                const seconds = challengeResult.completion_time % 60;
+                summaryMessage += `\n⏱️ Completion time: ${minutes > 0 ? `${minutes}m ` : ''}${seconds}s`;
+              }
+            }
+          }
+        } catch (challengeError) {
+          console.error('Challenge completion error:', challengeError);
+          // Don't show error to user, just log it
         }
       } else if (passedCount > 0) {
         summaryMessage += `\n⚠️ Some tests failed. Check the results below.`;
