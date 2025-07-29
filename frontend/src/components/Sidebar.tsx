@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open = true, onClose }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const user = { name: localStorage.getItem('username') || 'User', avatar: '' };
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

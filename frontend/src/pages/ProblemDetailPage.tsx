@@ -637,11 +637,11 @@ Good luck! 🚀`);
       {/* Header */}
       <Box sx={{
         borderBottom: '1px solid var(--color-border)',
-        px: 4,
+        px: { xs: 2, sm: 3, md: 4 },
         py: 2,
         bgcolor: 'var(--color-card)'
       }}>
-        <Stack direction="row" alignItems="center" spacing={3}>
+        <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ flexWrap: 'wrap' }}>
           <IconButton
             onClick={() => {
               console.log('Navigating back to problems page');
@@ -657,11 +657,15 @@ Good luck! 🚀`);
           >
             <ArrowBackIcon />
           </IconButton>
-          <CodeIcon sx={{ color: 'var(--color-primary)', fontSize: 28 }} />
-          <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-card-foreground)' }}>
+          <CodeIcon sx={{ color: 'var(--color-primary)', fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="h5" fontWeight={700} sx={{ 
+            color: 'var(--color-card-foreground)',
+            fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
+            flexGrow: { xs: 1, sm: 0 }
+          }}>
             {problem.id}. {problem.title}
           </Typography>
-          <div className="group relative ml-2">
+          <div className="group relative ml-2" style={{ display: window.innerWidth < 600 ? 'none' : 'block' }}>
             <Typography
               variant="caption"
               sx={{
@@ -705,19 +709,22 @@ Good luck! 🚀`);
               color: diffConfig.color,
               border: `1px solid ${diffConfig.color}`,
               fontWeight: 600,
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
               '& .MuiChip-icon': { color: diffConfig.color }
             }}
           />
-          <BookmarkButton problemId={problem.id} />
-          <ChallengeCreator
-            problemId={problem.id}
-            problemTitle={problem.title}
-            onChallengeCreated={() => {
-              // Optional: Show success message or refresh something
-            }}
-          />
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
+            <BookmarkButton problemId={problem.id} />
+            <ChallengeCreator
+              problemId={problem.id}
+              problemTitle={problem.title}
+              onChallengeCreated={() => {
+                // Optional: Show success message or refresh something
+              }}
+            />
+          </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <FormControl size="small" sx={{ minWidth: 120 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: 100, sm: 120 } }}>
             <Select
               value={language}
               onChange={e => {
@@ -756,17 +763,20 @@ Good luck! 🚀`);
         </Stack>
       </Box>
 
-      {/* Main Content - Full Width Editor Layout */}
+      {/* Main Content - Responsive Layout */}
       <Box sx={{
         display: 'flex',
         flex: 1,
         height: 'calc(100vh - 88px)',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        flexDirection: { xs: 'column', lg: 'row' }
       }}>
         {/* Left Panel - Problem Description */}
         <Box sx={{
-          width: '40%',
-          borderRight: '1px solid var(--color-border)',
+          width: { xs: '100%', lg: '40%' },
+          height: { xs: '40%', lg: '100%' },
+          borderRight: { lg: '1px solid var(--color-border)' },
+          borderBottom: { xs: '1px solid var(--color-border)', lg: 'none' },
           bgcolor: 'var(--color-card)',
           overflow: 'hidden',
           display: 'flex',
@@ -775,12 +785,15 @@ Good luck! 🚀`);
             <Tabs
               value={activeTab}
               onChange={(_, newValue) => setActiveTab(newValue)}
+              variant="scrollable"
+              scrollButtons="auto"
               sx={{
                 borderBottom: '1px solid var(--color-border)',
                 '& .MuiTab-root': {
                   color: 'var(--color-muted-foreground)',
                   fontWeight: 600,
-                  minHeight: 48
+                  minHeight: { xs: 40, sm: 48 },
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
                 },
                 '& .Mui-selected': { color: 'var(--color-primary)' },
                 '& .MuiTabs-indicator': { backgroundColor: 'var(--color-primary)' }
@@ -795,7 +808,7 @@ Good luck! 🚀`);
             <Box sx={{
               flex: 1,
               overflow: 'auto',
-              p: 3,
+              p: { xs: 2, sm: 3 },
             }}>
                 {/* Description Tab */}
                 {activeTab === 0 && (
@@ -1026,6 +1039,8 @@ Good luck! 🚀`);
         {/* Right Panel - Code Editor */}
         <Box sx={{
           flex: 1,
+          width: { xs: '100%', lg: '60%' },
+          height: { xs: '60%', lg: '100%' },
           display: 'flex',
           flexDirection: 'column',
           minHeight: 0
@@ -1033,15 +1048,20 @@ Good luck! 🚀`);
           {/* Code Editor Header - Simplified */}
           <Box sx={{
             borderBottom: '1px solid var(--color-border)',
-            px: 3,
+            px: { xs: 2, sm: 3 },
             py: 1.5,
             bgcolor: 'var(--color-card)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 1
           }}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-foreground)' }}>
+            <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }}>
+              <Typography variant="body2" fontWeight={600} sx={{ 
+                color: 'var(--color-foreground)',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}>
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
             </Stack>
@@ -1056,7 +1076,8 @@ Good luck! 🚀`);
               size="small"
               sx={{
                 color: 'var(--color-accent)',
-                '&:hover': { bgcolor: 'var(--color-accent-hover)' }
+                '&:hover': { bgcolor: 'var(--color-accent-hover)' },
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
               }}
             >
               Reset Template
@@ -1175,17 +1196,22 @@ Good luck! 🚀`);
               }}
             />
             <Box sx={{
-              px: 3,
+              px: { xs: 2, sm: 3 },
               py: 1.5,
               borderBottom: '1px solid var(--color-border)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 1
             }}>
-              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-muted-foreground)' }}>
+              <Typography variant="body2" fontWeight={600} sx={{ 
+                color: 'var(--color-muted-foreground)',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}>
                 Console
               </Typography>
-              <Stack direction="row" spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2 }} sx={{ flexWrap: 'wrap' }}>
                 <Button
                   variant="outlined"
                   startIcon={<PlayArrowIcon />}
@@ -1196,6 +1222,7 @@ Good luck! 🚀`);
                     borderRadius: 3,
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-muted-foreground)',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     '&:hover': {
                       borderColor: 'var(--color-accent)',
                       color: 'var(--color-accent)',
@@ -1203,7 +1230,7 @@ Good luck! 🚀`);
                     }
                   }}
                 >
-                  {running ? 'Testing...' : 'Test Run (Ctrl+Shift+T)'}
+                  {running ? 'Testing...' : window.innerWidth < 600 ? 'Test' : 'Test Run (Ctrl+Shift+T)'}
                 </Button>
                 <Button
                   variant="outlined"
@@ -1215,6 +1242,7 @@ Good luck! 🚀`);
                     borderRadius: 3,
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-muted-foreground)',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     '&:hover': {
                       borderColor: 'var(--color-primary)',
                       color: 'var(--color-primary)',
@@ -1222,7 +1250,7 @@ Good luck! 🚀`);
                     }
                   }}
                 >
-                  {running ? 'Running...' : 'Run Sample (Ctrl+R)'}
+                  {running ? 'Running...' : window.innerWidth < 600 ? 'Run' : 'Run Sample (Ctrl+R)'}
                 </Button>
                 <Button
                   variant="contained"
@@ -1233,16 +1261,17 @@ Good luck! 🚀`);
                   sx={{
                     borderRadius: 3,
                     bgcolor: 'var(--color-primary)',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     '&:hover': { bgcolor: 'var(--color-primary-dark)' },
                     fontWeight: 600
                   }}
                 >
-                  {submitting ? 'Submitting...' : 'Submit (Ctrl+S)'}
+                  {submitting ? 'Submitting...' : window.innerWidth < 600 ? 'Submit' : 'Submit (Ctrl+S)'}
                 </Button>
               </Stack>
             </Box>
 
-            <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+            <Box sx={{ flex: 1, overflow: 'auto', p: { xs: 1, sm: 2 } }}>
               {/* Console Output */}
               {consoleOutput && (
                 <Card sx={{
