@@ -73,11 +73,20 @@ const CodeTemplatesPage: React.FC = () => {
     try {
       const response = await fetch('/api/snippets/languages/popular');
       if (response.ok) {
-        const data = await response.json();
-        setLanguages(data.map((item: any) => item.language));
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setLanguages(data.map((item: any) => item.language));
+        } else {
+          console.warn('Languages API returned non-JSON response');
+        }
+      } else {
+        console.warn('Languages API not available:', response.status);
       }
     } catch (err) {
       console.error('Failed to fetch languages:', err);
+      // Fallback to common languages if API fails
+      setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
     }
   };
 

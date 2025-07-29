@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import BackendStatusBanner from '../components/BackendStatusBanner';
 import { 
   CodeBracketIcon,
   PlusIcon,
@@ -94,11 +95,20 @@ const CodeSnippetsPage: React.FC = () => {
     try {
       const response = await fetch('/api/snippets/languages/popular');
       if (response.ok) {
-        const data = await response.json();
-        setLanguages(data.map((item: any) => item.language));
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setLanguages(data.map((item: any) => item.language));
+        } else {
+          console.warn('Languages API returned non-JSON response');
+        }
+      } else {
+        console.warn('Languages API not available:', response.status);
       }
     } catch (err) {
       console.error('Failed to fetch languages:', err);
+      // Fallback to common languages if API fails
+      setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
     }
   };
 
@@ -106,11 +116,20 @@ const CodeSnippetsPage: React.FC = () => {
     try {
       const response = await fetch('/api/snippets/categories');
       if (response.ok) {
-        const data = await response.json();
-        setCategories(data.map((item: any) => item.category));
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setCategories(data.map((item: any) => item.category));
+        } else {
+          console.warn('Categories API returned non-JSON response');
+        }
+      } else {
+        console.warn('Categories API not available:', response.status);
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);
+      // Fallback to common categories if API fails
+      setCategories(['template', 'utility', 'algorithm']);
     }
   };
 
@@ -212,6 +231,7 @@ const CodeSnippetsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <BackendStatusBanner />
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
