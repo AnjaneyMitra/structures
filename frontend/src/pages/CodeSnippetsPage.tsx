@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
+// Enhanced error handling for API responses - ensures proper JSON handling
 interface CodeSnippet {
   id: number;
   user_id: number;

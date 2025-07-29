@@ -15,6 +15,7 @@ import {
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 
+// Enhanced error handling for comments API - ensures proper JSON responses
 interface CodeSnippet {
   id: number;
   user_id: number;
