@@ -3,14 +3,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeftIcon,
   PlusIcon,
-  EyeIcon,
   ChatBubbleLeftIcon,
   ClockIcon,
   UserIcon,
   ChevronUpIcon,
   ChevronDownIcon
 } from '@heroicons/react/24/outline';
-import { PinIcon, LockClosedIcon } from '@heroicons/react/24/solid';
+import { MapPinIcon, LockClosedIcon } from '@heroicons/react/24/solid';
 
 interface ForumThread {
   id: number;
@@ -220,7 +219,7 @@ const ForumCategoryPage: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     {thread.is_pinned && (
-                      <PinIcon className="h-4 w-4 text-primary" />
+                      <MapPinIcon className="h-4 w-4 text-primary" />
                     )}
                     {thread.is_locked && (
                       <LockClosedIcon className="h-4 w-4 text-muted-foreground" />

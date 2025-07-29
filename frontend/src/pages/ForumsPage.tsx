@@ -3,12 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   ChatBubbleLeftRightIcon, 
   PlusIcon, 
-  EyeIcon, 
   ChatBubbleLeftIcon,
   ClockIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
-import { PinIcon } from '@heroicons/react/24/solid';
 
 interface ForumCategory {
   id: number;

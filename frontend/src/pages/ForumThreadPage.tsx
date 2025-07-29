@@ -2,16 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeftIcon,
-  ChatBubbleLeftIcon,
-  UserIcon,
-  ClockIcon,
   HandThumbUpIcon,
   HandThumbDownIcon,
-  CheckCircleIcon,
-  PencilIcon,
-  TrashIcon
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { PinIcon, LockClosedIcon } from '@heroicons/react/24/solid';
+import { MapPinIcon, LockClosedIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 
 interface ForumThread {
@@ -79,7 +74,7 @@ const ForumThreadPage: React.FC = () => {
   const [submittingReply, setSubmittingReply] = useState(false);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { username } = useAuth();
 
   useEffect(() => {
     if (threadId) {
@@ -231,7 +226,7 @@ const ForumThreadPage: React.FC = () => {
     );
   }
 
-  const isThreadAuthor = user?.username === data.thread.author.username;
+  const isThreadAuthor = username === data.thread.author.username;
 
   return (
     <div className="min-h-screen bg-background">
@@ -247,7 +242,7 @@ const ForumThreadPage: React.FC = () => {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               {data.thread.is_pinned && (
-                <PinIcon className="h-5 w-5 text-primary" />
+                <MapPinIcon className="h-5 w-5 text-primary" />
               )}
               {data.thread.is_locked && (
                 <LockClosedIcon className="h-5 w-5 text-muted-foreground" />

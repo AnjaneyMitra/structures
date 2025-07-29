@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeftIcon,
   ClipboardDocumentIcon,
@@ -52,7 +52,7 @@ const SnippetDetailPage: React.FC = () => {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { username: currentUsername } = useAuth();
 
   useEffect(() => {
     if (snippetId) {
@@ -176,7 +176,7 @@ const SnippetDetailPage: React.FC = () => {
   };
 
   const deleteSnippet = async () => {
-    if (!snippet || !confirm('Are you sure you want to delete this snippet?')) return;
+    if (!snippet || !window.confirm('Are you sure you want to delete this snippet?')) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -253,7 +253,7 @@ const SnippetDetailPage: React.FC = () => {
     );
   }
 
-  const isOwner = user?.username === snippet.username;
+  const isOwner = currentUsername === snippet.username;
 
   return (
     <div className="min-h-screen bg-background">

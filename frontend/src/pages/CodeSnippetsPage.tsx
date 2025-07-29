@@ -8,8 +8,6 @@ import {
   HeartIcon,
   TagIcon,
   UserIcon,
-  ClockIcon,
-  FunnelIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';

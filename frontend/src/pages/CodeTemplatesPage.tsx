@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   DocumentDuplicateIcon,
-  MagnifyingGlassIcon,
   EyeIcon,
   ClipboardDocumentIcon,
   UserIcon,
@@ -37,7 +36,6 @@ const CodeTemplatesPage: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<number | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTemplates();
