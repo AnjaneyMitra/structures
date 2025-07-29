@@ -231,4 +231,65 @@ class UserHint(Base):
         sa.UniqueConstraint('user_id', 'hint_id', name='unique_user_hint'),
     )
 
+# Forum Models
+class ForumCategory(Base):
+    __tablename__ = "forum_categories"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    order = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class ForumThread(Base):
+    __tablename__ = "forum_threads"
+    id = Column(Integer, primary_key=True, index=True)
+    category_id = Column(Integer, ForeignKey("forum_categories.id"), nullable=False)
+    problem_id = Column(Integer, ForeignKey("problems.id"), nullable=True)  # Optional problem link
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    is_pinned = Column(Boolean, default=False)
+    is_locked = Column(Boolean, default=False)
+    view_count = Column(Integer, default=0)
+    reply_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    category = relationship("ForumCategory")
+    author = relationship("User")
+    problem = relationship("Problem")
+
+class ForumReply(Base):
+    __tablename__ = "forum_replies"
+    id = Column(Integer, primary_key=True, index=True)
+    thread_id = Column(Integer, ForeignKey("forum_threads.id"), nullable=False)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    parent_id = Column(Integer, ForeignKey("forum_replies.id"), nullable=True)  # For threading
+    is_solution = Column(Boolean, default=False)  # Mark as solution
+    upvotes = Column(Integer, default=0)
+    downvotes = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    thread = relationship("ForumThread", backref="replies")
+    author = relationship("User")
+    parent = relationship("ForumReply", remote_side=[id])
+
+class ForumVote(Base):
+    __tablename__ = "forum_votes"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    reply_id = Column(Integer, ForeignKey("forum_replies.id"), nullable=False)
+    vote_type = Column(String, nullable=False)  # "up" or "down"
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")
+    reply = relationship("ForumReply")
+    
+    # Ensure unique vote pairs
+    __table_args__ = (
+        sa.UniqueConstraint('user_id', 'reply_id', name='unique_forum_vote'),
+    )
+
 # Temporarily removed CodeSnippet, SnippetLike, and SnippetComment models to isolate Mixed Content issue
