@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box, LinearProgress, Typography, Tooltip } from '@mui/material';
 import { UserLevelProgress, LEVEL_COLORS } from '../types/levels';
 import LevelBadge from './LevelBadge';
 

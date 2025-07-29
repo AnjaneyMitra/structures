@@ -1,5 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import apiClient from '../utils/apiClient';
 
@@ -35,12 +34,7 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [loading, setLoading] = useState(false);
   const { isAuthenticated } = useAuth();
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
-  const refreshBookmarks = async () => {
+  const refreshBookmarks = useCallback(async () => {
     if (!isAuthenticated) return;
     
     setLoading(true);
@@ -54,7 +48,7 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   const isBookmarked = (problemId: number): boolean => {
     return bookmarkedProblemIds.has(problemId);
@@ -108,7 +102,7 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setBookmarks([]);
       setBookmarkedProblemIds(new Set());
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, refreshBookmarks]);
 
   return (
     <BookmarkContext.Provider value={{

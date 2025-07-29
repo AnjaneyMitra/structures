@@ -3,8 +3,6 @@ import {
   TrophyIcon, 
   UserGroupIcon,
   ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon,
   PlusIcon,
   FireIcon,
   EyeIcon
