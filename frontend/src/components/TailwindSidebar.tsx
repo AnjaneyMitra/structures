@@ -87,7 +87,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
             {sidebarOpen ? (
               <>
                 <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                  <CodeBracketIcon className="h-6 w-6 text-white" />
+                  <CodeBracketIcon className="h-[21.6px] w-[21.6px] text-white" />
                 </div>
                 <div className={`transition-opacity whitespace-nowrap flex-1 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
                   style={{
@@ -104,7 +104,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                   className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-300 flex-shrink-0"
                   title="Collapse sidebar"
                 >
-                  <ChevronLeftIcon className="h-4 w-4" />
+                  <ChevronLeftIcon className="h-[14.4px] w-[14.4px]" />
                 </button>
               </>
             ) : (
@@ -113,8 +113,8 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg group relative overflow-hidden"
                 title="Expand sidebar"
               >
-                <CodeBracketIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform group-hover:-translate-x-10 group-hover:opacity-0" />
-                <ChevronRightIcon className="h-6 w-6 text-white absolute transition-all duration-300 ease-in-out transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
+                <CodeBracketIcon className="h-[21.6px] w-[21.6px] text-white absolute transition-all duration-300 ease-in-out transform group-hover:-translate-x-10 group-hover:opacity-0" />
+                <ChevronRightIcon className="h-[21.6px] w-[21.6px] text-white absolute transition-all duration-300 ease-in-out transform translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100" />
               </button>
             )}
           </div>
@@ -140,7 +140,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                   title={!sidebarOpen ? item.label : undefined}
                 >
                   <div className="flex items-center justify-center w-[56px] h-[52px] flex-shrink-0">
-                    <IconComponent className={`h-6 w-6 ${
+                    <IconComponent className={`h-[21.6px] w-[21.6px] ${
                       isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-card-foreground'
                     }`} 
                     style={{
@@ -191,7 +191,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 }}
                 title="Logout"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[18px] h-[18px]">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                 </svg>
               </button>
@@ -206,7 +206,7 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 }}
                 title="Logout"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[18px] h-[18px]">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                 </svg>
               </button>
