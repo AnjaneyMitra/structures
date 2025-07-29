@@ -68,7 +68,17 @@ const CodeSnippetsPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch snippets');
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to fetch snippets';
+        
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } else {
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();

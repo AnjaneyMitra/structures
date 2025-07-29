@@ -71,7 +71,13 @@ const SnippetDetailPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch snippet');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Failed to fetch snippet');
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       }
 
       const data = await response.json();
@@ -95,6 +101,14 @@ const SnippetDetailPage: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setComments(data);
+      } else {
+        console.error('Comments API error:', response.status, response.statusText);
+        // Only try to parse as JSON if it's actually JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          console.error('Error details:', errorData);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch comments:', err);

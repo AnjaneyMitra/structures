@@ -43,7 +43,17 @@ const ForumsPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch categories');
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to fetch categories';
+        
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } else {
+          errorMessage = `HTTP ${response.status}: ${response.statusText}. Make sure the backend server is running.`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();

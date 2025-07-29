@@ -21,6 +21,7 @@ import CodeTemplatesPage from './pages/CodeTemplatesPage';
 import SnippetDetailPage from './pages/SnippetDetailPage';
 
 import { TailwindSidebar } from './components/TailwindSidebar';
+import ApiHealthCheck from './components/ApiHealthCheck';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
 import ChallengeProblemPage from './pages/ChallengeProblemPage';
@@ -302,6 +303,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="relative z-0 page-slide-in">
           {children}
         </div>
+        <ApiHealthCheck />
       </main>
     </div>
   );
