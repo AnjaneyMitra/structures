@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, Typography, Card, CardContent, LinearProgress, Tooltip } from '@mui/material';
 import { TrophyIcon, StarIcon } from '@heroicons/react/24/outline';
 import { LevelInfo, UserLevelProgress, LEVEL_COLORS, LEVEL_ICONS } from '../types/levels';
-import LevelBadge from '../components/LevelBadge';
 import LevelProgressBar from '../components/LevelProgressBar';
 
 const LevelsPage: React.FC = () => {

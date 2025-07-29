@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, Box, Typography, Button } from '@mui/material';
-import { LevelUpInfo, LEVEL_COLORS, LEVEL_ICONS } from '../types/levels';
+import { Dialog, DialogContent, Box, Typography, Button } from '@mui/material';
+import { LevelUpInfo } from '../types/levels';
 import LevelBadge from './LevelBadge';
 
 interface LevelUpModalProps {
@@ -27,9 +27,6 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({
   }, [open, levelUpInfo]);
 
   if (!levelUpInfo) return null;
-
-  const newLevelColors = LEVEL_COLORS[levelUpInfo.new_level as keyof typeof LEVEL_COLORS] || LEVEL_COLORS[1];
-  const newLevelIcon = LEVEL_ICONS[levelUpInfo.new_level as keyof typeof LEVEL_ICONS] || LEVEL_ICONS[1];
 
   return (
     <Dialog 

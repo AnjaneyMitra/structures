@@ -782,31 +782,43 @@ Good luck! 🚀`);
           bgcolor: 'var(--color-card)',
           overflow: 'hidden',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          opacity: sidebarOpen ? 1 : 0,
+          visibility: sidebarOpen ? 'visible' : 'hidden'
         }}>
-          {sidebarOpen && (
-            <>
-              <Tabs 
-                value={activeTab} 
-                onChange={(_, newValue) => setActiveTab(newValue)}
-                sx={{ 
-                  borderBottom: '1px solid var(--color-border)',
-                  '& .MuiTab-root': { 
-                    color: 'var(--color-muted-foreground)',
-                    fontWeight: 600,
-                    minHeight: 48
-                  },
-                  '& .Mui-selected': { color: 'var(--color-primary)' },
-                  '& .MuiTabs-indicator': { backgroundColor: 'var(--color-primary)' }
-                }}
-              >
-                <Tab icon={<AssignmentIcon />} label="Description" />
-                <Tab icon={<HistoryIcon />} label="Submissions" />
-                <Tab icon={<LightbulbOutlinedIcon />} label="Hints" />
-                <Tab icon={<ChatIcon />} label="Discussion" />
-              </Tabs>
-              
-              <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+          {/* Always render content, but hide with opacity/visibility */}
+          <>
+            <Tabs 
+              value={activeTab} 
+              onChange={(_, newValue) => setActiveTab(newValue)}
+              sx={{ 
+                borderBottom: '1px solid var(--color-border)',
+                opacity: sidebarOpen ? 1 : 0,
+                visibility: sidebarOpen ? 'visible' : 'hidden',
+                transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+                '& .MuiTab-root': { 
+                  color: 'var(--color-muted-foreground)',
+                  fontWeight: 600,
+                  minHeight: 48
+                },
+                '& .Mui-selected': { color: 'var(--color-primary)' },
+                '& .MuiTabs-indicator': { backgroundColor: 'var(--color-primary)' }
+              }}
+            >
+              <Tab icon={<AssignmentIcon />} label="Description" />
+              <Tab icon={<HistoryIcon />} label="Submissions" />
+              <Tab icon={<LightbulbOutlinedIcon />} label="Hints" />
+              <Tab icon={<ChatIcon />} label="Discussion" />
+            </Tabs>
+            
+            <Box sx={{ 
+              flex: 1, 
+              overflow: 'auto', 
+              p: 3,
+              opacity: sidebarOpen ? 1 : 0,
+              visibility: sidebarOpen ? 'visible' : 'hidden',
+              transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out'
+            }}>
                 {/* Description Tab */}
                 {activeTab === 0 && (
                   <Stack spacing={3}>
@@ -1032,7 +1044,6 @@ Good luck! 🚀`);
                 )}
               </Box>
             </>
-          )}
         </Box>
 
         {/* Right Panel - Code Editor */}
@@ -1055,23 +1066,32 @@ Good luck! 🚀`);
             <Stack direction="row" alignItems="center" spacing={2}>
               <Button
                 variant="text"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
+                onClick={() => {
+                  console.log('Toggle button clicked, current state:', sidebarOpen);
+                  setSidebarOpen(!sidebarOpen);
+                  console.log('New state will be:', !sidebarOpen);
+                }}
                 sx={{ 
-                  color: 'var(--color-muted-foreground)',
+                  color: sidebarOpen ? 'var(--color-primary)' : 'var(--color-muted-foreground)',
                   minWidth: 'auto',
-                  p: 1,
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: sidebarOpen ? '1px solid var(--color-primary)' : '1px solid transparent',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
                     color: 'var(--color-primary)',
-                    bgcolor: 'var(--color-primary-hover)'
+                    bgcolor: 'var(--color-primary-hover)',
+                    borderColor: 'var(--color-primary)',
+                    transform: 'scale(1.05)'
                   },
                   '& .MuiSvgIcon-root': {
-                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transform: sidebarOpen ? 'rotate(0deg)' : 'rotate(180deg)'
                   }
                 }}
                 title={sidebarOpen ? 'Hide problem description' : 'Show problem description'}
               >
-                {sidebarOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                {sidebarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </Button>
               <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-foreground)' }}>
                 Solution.{language === 'python' ? 'py' : 'js'}
