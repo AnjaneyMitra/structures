@@ -13,6 +13,16 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Custom dependency for public endpoints that don't require authentication
+def get_db_public():
+    """Database dependency for public endpoints that don't require authentication"""
+    from ...db.base import SessionLocal
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 # Pydantic models
 class SnippetCreate(BaseModel):
     title: str
@@ -876,7 +886,7 @@ async def search_snippets(
         )
 
 @router.get("/categories")
-async def get_snippet_categories(db: Session = Depends(get_db)):
+async def get_snippet_categories(db: Session = Depends(get_db_public)):
     """Get available snippet categories with counts"""
     try:
         categories = db.query(
@@ -916,7 +926,7 @@ async def get_snippet_categories(db: Session = Depends(get_db)):
 @router.get("/languages/popular")
 async def get_popular_languages(
     limit: int = Query(10, ge=1, le=50),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db_public)
 ):
     """Get most popular programming languages"""
     try:
