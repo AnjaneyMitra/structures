@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Create a separate public router for endpoints that don't require authentication
+public_router = APIRouter()
+
 # Custom dependency for public endpoints that don't require authentication
 def get_db_public():
     """Database dependency for public endpoints that don't require authentication"""
@@ -885,41 +888,34 @@ async def search_snippets(
             detail="Failed to search snippets"
         )
 
-@router.get("/categories")
-async def get_snippet_categories():
+@public_router.get("/categories")
+async def get_snippet_categories(db: Session = Depends(get_db_public)):
     """Get available snippet categories with counts - public endpoint"""
     try:
-        # Create a new database session directly
-        from ...db.base import SessionLocal
-        db = SessionLocal()
-        try:
-            categories = db.query(
-                CodeSnippet.category,
-                func.count(CodeSnippet.id).label('count')
-            ).filter(
-                CodeSnippet.is_public == True,
-                CodeSnippet.category.isnot(None)
-            ).group_by(
-                CodeSnippet.category
-            ).order_by(
-                desc('count')
-            ).all()
-            
-            # If no categories found, return default categories
-            if not categories:
-                return [
-                    {"category": "template", "count": 0},
-                    {"category": "utility", "count": 0},
-                    {"category": "algorithm", "count": 0}
-                ]
-            
+        categories = db.query(
+            CodeSnippet.category,
+            func.count(CodeSnippet.id).label('count')
+        ).filter(
+            CodeSnippet.is_public == True,
+            CodeSnippet.category.isnot(None)
+        ).group_by(
+            CodeSnippet.category
+        ).order_by(
+            desc('count')
+        ).all()
+        
+        # If no categories found, return default categories
+        if not categories:
             return [
-                {"category": cat, "count": count}
-                for cat, count in categories
+                {"category": "template", "count": 0},
+                {"category": "utility", "count": 0},
+                {"category": "algorithm", "count": 0}
             ]
-        finally:
-            db.close()
-            
+        
+        return [
+            {"category": cat, "count": count}
+            for cat, count in categories
+        ]
     except Exception as e:
         logger.error(f"Error fetching categories: {str(e)}")
         # Return default categories on error
@@ -929,42 +925,35 @@ async def get_snippet_categories():
             {"category": "algorithm", "count": 0}
         ]
 
-@router.get("/languages/popular")
-async def get_popular_languages(limit: int = Query(10, ge=1, le=50)):
+@public_router.get("/languages/popular")
+async def get_popular_languages(limit: int = Query(10, ge=1, le=50), db: Session = Depends(get_db_public)):
     """Get most popular programming languages - public endpoint"""
     try:
-        # Create a new database session directly
-        from ...db.base import SessionLocal
-        db = SessionLocal()
-        try:
-            languages = db.query(
-                CodeSnippet.language,
-                func.count(CodeSnippet.id).label('count')
-            ).filter(
-                CodeSnippet.is_public == True
-            ).group_by(
-                CodeSnippet.language
-            ).order_by(
-                desc('count')
-            ).limit(limit).all()
-            
-            # If no languages found, return default languages
-            if not languages:
-                return [
-                    {"language": "python", "count": 0},
-                    {"language": "javascript", "count": 0},
-                    {"language": "java", "count": 0},
-                    {"language": "cpp", "count": 0},
-                    {"language": "typescript", "count": 0}
-                ]
-            
+        languages = db.query(
+            CodeSnippet.language,
+            func.count(CodeSnippet.id).label('count')
+        ).filter(
+            CodeSnippet.is_public == True
+        ).group_by(
+            CodeSnippet.language
+        ).order_by(
+            desc('count')
+        ).limit(limit).all()
+        
+        # If no languages found, return default languages
+        if not languages:
             return [
-                {"language": lang, "count": count}
-                for lang, count in languages
+                {"language": "python", "count": 0},
+                {"language": "javascript", "count": 0},
+                {"language": "java", "count": 0},
+                {"language": "cpp", "count": 0},
+                {"language": "typescript", "count": 0}
             ]
-        finally:
-            db.close()
-            
+        
+        return [
+            {"language": lang, "count": count}
+            for lang, count in languages
+        ]
     except Exception as e:
         logger.error(f"Error fetching popular languages: {str(e)}")
         # Return default languages on error
