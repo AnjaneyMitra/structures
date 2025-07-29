@@ -146,7 +146,6 @@ app.include_router(leaderboards.router, prefix="/api/leaderboards", tags=["leade
 app.include_router(challenges.router, prefix="/api/challenges", tags=["challenges"])
 app.include_router(forums.router, prefix="/api/forums", tags=["forums"])
 app.include_router(snippets.router, prefix="/api/snippets", tags=["snippets"])
-app.include_router(snippets.public_router, prefix="/api/snippets", tags=["snippets-public"])
 
 # Add public snippet endpoints directly to main app to bypass authentication
 @app.get("/api/snippets/categories")

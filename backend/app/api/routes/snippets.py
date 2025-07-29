@@ -128,6 +128,85 @@ async def create_snippet(
             detail="Failed to create snippet"
         )
 
+@router.get("/categories")
+async def get_snippet_categories(db: Session = Depends(get_db_public)):
+    """Get available snippet categories with counts - public endpoint"""
+    try:
+        categories = db.query(
+            CodeSnippet.category,
+            func.count(CodeSnippet.id).label('count')
+        ).filter(
+            CodeSnippet.is_public == True,
+            CodeSnippet.category.isnot(None)
+        ).group_by(
+            CodeSnippet.category
+        ).order_by(
+            desc('count')
+        ).all()
+        
+        # If no categories found, return default categories
+        if not categories:
+            return [
+                {"category": "template", "count": 0},
+                {"category": "utility", "count": 0},
+                {"category": "algorithm", "count": 0}
+            ]
+        
+        return [
+            {"category": cat, "count": count}
+            for cat, count in categories
+        ]
+        
+    except Exception as e:
+        logger.error(f"Error fetching categories: {str(e)}")
+        # Return default categories on error
+        return [
+            {"category": "template", "count": 0},
+            {"category": "utility", "count": 0},
+            {"category": "algorithm", "count": 0}
+        ]
+
+@router.get("/languages/popular")
+async def get_popular_languages(limit: int = Query(10, ge=1, le=50), db: Session = Depends(get_db_public)):
+    """Get most popular programming languages - public endpoint"""
+    try:
+        languages = db.query(
+            CodeSnippet.language,
+            func.count(CodeSnippet.id).label('count')
+        ).filter(
+            CodeSnippet.is_public == True
+        ).group_by(
+            CodeSnippet.language
+        ).order_by(
+            desc('count')
+        ).limit(limit).all()
+        
+        # If no languages found, return default languages
+        if not languages:
+            return [
+                {"language": "python", "count": 0},
+                {"language": "javascript", "count": 0},
+                {"language": "java", "count": 0},
+                {"language": "cpp", "count": 0},
+                {"language": "typescript", "count": 0}
+            ]
+        
+        return [
+            {"language": lang, "count": count}
+            for lang, count in languages
+        ]
+        
+    except Exception as e:
+        logger.error(f"Error fetching popular languages: {str(e)}")
+        # Return default languages on error
+        return [
+            {"language": "python", "count": 0},
+            {"language": "javascript", "count": 0},
+            {"language": "java", "count": 0},
+            {"language": "cpp", "count": 0},
+            {"language": "typescript", "count": 0}
+        ]
+
 @router.get("/", response_model=List[SnippetResponse])
 async def get_snippets(
     skip: int = Query(0, ge=0),
@@ -887,80 +966,3 @@ async def search_snippets(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to search snippets"
         )
-
-@public_router.get("/categories")
-async def get_snippet_categories(db: Session = Depends(get_db_public)):
-    """Get available snippet categories with counts - public endpoint"""
-    try:
-        categories = db.query(
-            CodeSnippet.category,
-            func.count(CodeSnippet.id).label('count')
-        ).filter(
-            CodeSnippet.is_public == True,
-            CodeSnippet.category.isnot(None)
-        ).group_by(
-            CodeSnippet.category
-        ).order_by(
-            desc('count')
-        ).all()
-        
-        # If no categories found, return default categories
-        if not categories:
-            return [
-                {"category": "template", "count": 0},
-                {"category": "utility", "count": 0},
-                {"category": "algorithm", "count": 0}
-            ]
-        
-        return [
-            {"category": cat, "count": count}
-            for cat, count in categories
-        ]
-    except Exception as e:
-        logger.error(f"Error fetching categories: {str(e)}")
-        # Return default categories on error
-        return [
-            {"category": "template", "count": 0},
-            {"category": "utility", "count": 0},
-            {"category": "algorithm", "count": 0}
-        ]
-
-@public_router.get("/languages/popular")
-async def get_popular_languages(limit: int = Query(10, ge=1, le=50), db: Session = Depends(get_db_public)):
-    """Get most popular programming languages - public endpoint"""
-    try:
-        languages = db.query(
-            CodeSnippet.language,
-            func.count(CodeSnippet.id).label('count')
-        ).filter(
-            CodeSnippet.is_public == True
-        ).group_by(
-            CodeSnippet.language
-        ).order_by(
-            desc('count')
-        ).limit(limit).all()
-        
-        # If no languages found, return default languages
-        if not languages:
-            return [
-                {"language": "python", "count": 0},
-                {"language": "javascript", "count": 0},
-                {"language": "java", "count": 0},
-                {"language": "cpp", "count": 0},
-                {"language": "typescript", "count": 0}
-            ]
-        
-        return [
-            {"language": lang, "count": count}
-            for lang, count in languages
-        ]
-    except Exception as e:
-        logger.error(f"Error fetching popular languages: {str(e)}")
-        # Return default languages on error
-        return [
-            {"language": "python", "count": 0},
-            {"language": "javascript", "count": 0},
-            {"language": "java", "count": 0},
-            {"language": "cpp", "count": 0},
-            {"language": "typescript", "count": 0}
-        ]
