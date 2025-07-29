@@ -13,6 +13,12 @@ import AchievementsPage from './pages/AchievementsPage';
 import LevelsPage from './pages/LevelsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import ForumsPage from './pages/ForumsPage';
+import ForumCategoryPage from './pages/ForumCategoryPage';
+import ForumThreadPage from './pages/ForumThreadPage';
+import CodeSnippetsPage from './pages/CodeSnippetsPage';
+import CodeTemplatesPage from './pages/CodeTemplatesPage';
+import SnippetDetailPage from './pages/SnippetDetailPage';
 
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
@@ -349,6 +355,16 @@ function AppRoutes() {
         <Route path="/levels" element={<AppLayout><LevelsPage /></AppLayout>} />
         <Route path="/analytics" element={<AppLayout><AnalyticsPage /></AppLayout>} />
         <Route path="/leaderboards" element={<AppLayout><LeaderboardPage /></AppLayout>} />
+        
+        {/* Forum Routes */}
+        <Route path="/forums" element={<AppLayout><ForumsPage /></AppLayout>} />
+        <Route path="/forums/category/:categoryId" element={<AppLayout><ForumCategoryPage /></AppLayout>} />
+        <Route path="/forums/thread/:threadId" element={<AppLayout><ForumThreadPage /></AppLayout>} />
+        
+        {/* Snippets Routes */}
+        <Route path="/snippets" element={<AppLayout><CodeSnippetsPage /></AppLayout>} />
+        <Route path="/snippets/:snippetId" element={<AppLayout><SnippetDetailPage /></AppLayout>} />
+        <Route path="/templates" element={<AppLayout><CodeTemplatesPage /></AppLayout>} />
       </Route>
       
       {/* Fallback route */}
