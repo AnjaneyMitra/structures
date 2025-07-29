@@ -244,7 +244,7 @@ const ProblemDetailPage: React.FC = () => {
   const [runResult, setRunResult] = useState<TestCaseResult | null>(null);
   const [running, setRunning] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Start with description open for better UX
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Start collapsed by default
   const [consoleOutput, setConsoleOutput] = useState<string>('');
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
