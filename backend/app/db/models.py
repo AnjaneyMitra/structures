@@ -292,4 +292,60 @@ class ForumVote(Base):
         sa.UniqueConstraint('user_id', 'reply_id', name='unique_forum_vote'),
     )
 
-# Temporarily removed CodeSnippet, SnippetLike, and SnippetComment models to isolate Mixed Content issue
+# Code Snippets Models
+class CodeSnippet(Base):
+    __tablename__ = "code_snippets"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    code = Column(Text, nullable=False)
+    language = Column(String, nullable=False)
+    category = Column(String, nullable=True)  # "template", "utility", "algorithm"
+    is_public = Column(Boolean, default=False)
+    tags = Column(JSON, nullable=True)  # Array of tags
+    usage_count = Column(Integer, default=0)
+    view_count = Column(Integer, default=0)  # For compatibility with existing routes
+    like_count = Column(Integer, default=0)  # For compatibility with existing routes
+    is_featured = Column(Boolean, default=False)  # For compatibility with existing routes
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")
+
+class SnippetUsage(Base):
+    __tablename__ = "snippet_usage"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
+    used_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")
+    snippet = relationship("CodeSnippet")
+
+class SnippetLike(Base):
+    __tablename__ = "snippet_likes"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")
+    snippet = relationship("CodeSnippet")
+    
+    # Ensure unique like pairs
+    __table_args__ = (
+        sa.UniqueConstraint('user_id', 'snippet_id', name='unique_snippet_like'),
+    )
+
+class SnippetComment(Base):
+    __tablename__ = "snippet_comments"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    snippet_id = Column(Integer, ForeignKey("code_snippets.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")
+    snippet = relationship("CodeSnippet")
