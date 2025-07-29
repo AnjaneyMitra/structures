@@ -250,6 +250,8 @@ const ProblemDetailPage: React.FC = () => {
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [chatInput, setChatInput] = useState('');
+  const [consoleHeight, setConsoleHeight] = useState(300);
+  const [isResizing, setIsResizing] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -635,11 +637,13 @@ Good luck! 🚀`);
 
   return (
     <Box sx={{ 
-      minHeight: '100vh', 
+      width: '100vw',
+      height: '100vh', 
       bgcolor: 'var(--color-background)', 
       color: 'var(--color-foreground)',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -763,13 +767,14 @@ Good luck! 🚀`);
         </Stack>
       </Box>
 
-      {/* Main Content - LeetCode Style Layout */}
+      {/* Main Content - Full Width Editor Layout */}
       <Box sx={{ 
         display: 'flex', 
         flex: 1, 
-        minHeight: 'calc(100vh - 88px)'
+        height: 'calc(100vh - 88px)',
+        overflow: 'hidden'
       }}>
-        {/* Left Panel - Problem Description */}
+        {/* Left Panel - Problem Description (Collapsible) */}
         <Box sx={{ 
           width: sidebarOpen ? '40%' : '0%',
           transition: 'width 0.3s ease-in-out',
@@ -1037,7 +1042,7 @@ Good luck! 🚀`);
           flexDirection: 'column',
           minHeight: 0
         }}>
-          {/* Code Editor Header */}
+          {/* Code Editor Header - Simplified */}
           <Box sx={{ 
             borderBottom: '1px solid var(--color-border)',
             px: 3,
@@ -1068,7 +1073,7 @@ Good luck! 🚀`);
               >
                 {sidebarOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
               </Button>
-              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-muted-foreground)' }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-foreground)' }}>
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
               {!sidebarOpen && (
@@ -1095,8 +1100,13 @@ Good luck! 🚀`);
             </Button>
           </Box>
 
-          {/* Monaco Editor */}
-          <Box sx={{ flex: 1, position: 'relative' }}>
+          {/* Monaco Editor - Dynamic Height */}
+          <Box sx={{ 
+            height: `calc(100vh - 150px - ${consoleHeight}px)`,
+            position: 'relative',
+            overflow: 'hidden',
+            minHeight: 200
+          }}>
             <MonacoEditor
               height="100%"
               language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
@@ -1123,15 +1133,84 @@ Good luck! 🚀`);
             />
           </Box>
 
-          {/* Console/Output Area */}
-          <Box sx={{ 
-            minHeight: 300,
-            maxHeight: '45vh',
-            borderTop: '1px solid var(--color-border)',
+          {/* Resizable Console/Output Area */}
+          <Box sx={{
+            height: consoleHeight,
+            borderTop: '2px solid var(--color-border)',
             bgcolor: 'var(--color-card)',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            position: 'relative',
+            minHeight: 200,
+            maxHeight: '60vh',
+            opacity: isResizing ? 0.9 : 1,
+            transition: isResizing ? 'none' : 'opacity 0.2s ease'
           }}>
+            {/* Resize Handle */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -3,
+                left: 0,
+                right: 0,
+                height: 6,
+                cursor: 'ns-resize',
+                bgcolor: 'transparent',
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                  bgcolor: 'var(--color-primary)',
+                  opacity: 0.7,
+                  '&::after': {
+                    content: '""',
+                    width: 30,
+                    height: 3,
+                    bgcolor: 'white',
+                    borderRadius: 1,
+                    opacity: 0.8
+                  }
+                },
+                '&:hover::before': {
+                  content: '"Drag to resize"',
+                  position: 'absolute',
+                  top: -25,
+                  fontSize: 11,
+                  color: 'var(--color-foreground)',
+                  bgcolor: 'var(--color-card)',
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 1,
+                  border: '1px solid var(--color-border)'
+                }
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setIsResizing(true);
+                const startY = e.clientY;
+                const startHeight = consoleHeight;
+                
+                const handleMouseMove = (moveEvent: MouseEvent) => {
+                  const deltaY = startY - moveEvent.clientY;
+                  const newHeight = Math.max(200, Math.min(window.innerHeight * 0.6, startHeight + deltaY));
+                  setConsoleHeight(newHeight);
+                };
+                
+                const handleMouseUp = () => {
+                  setIsResizing(false);
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                  document.body.style.cursor = '';
+                  document.body.style.userSelect = '';
+                };
+                
+                document.body.style.cursor = 'ns-resize';
+                document.body.style.userSelect = 'none';
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+              }}
+            />
             <Box sx={{ 
               px: 3,
               py: 1.5,
