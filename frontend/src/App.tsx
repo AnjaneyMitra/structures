@@ -237,7 +237,7 @@ function Landing() {
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   // Auto-collapse sidebar on specific pages for better focus
