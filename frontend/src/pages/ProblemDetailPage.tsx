@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, Typography, CircularProgress, Alert, Chip, Stack, Button, 
-  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab,
-  IconButton
+import {
+  Box, Typography, Stack, CircularProgress, Alert, IconButton, Chip,
+  MenuItem, Select, FormControl, Card, CardContent, Button, Tabs, Tab, TextField
 } from '@mui/material';
-import { BookmarkButton } from '../components/BookmarkButton';
-import { useTheme } from '../context/ThemeContext';
-import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
-import { useAchievements } from '../contexts/AchievementsContext';
-import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
-import { useLevelUp } from '../hooks/useLevelUp';
-import LevelUpModal from '../components/LevelUpModal';
-import { useChallengeCompletion } from '../hooks/useChallengeCompletion';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import CodeIcon from '@mui/icons-material/Code';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -21,18 +11,24 @@ import MonacoEditor from '@monaco-editor/react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import TimerIcon from '@mui/icons-material/Timer';
-import CodeIcon from '@mui/icons-material/Code';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import HistoryIcon from '@mui/icons-material/History';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ChatIcon from '@mui/icons-material/Chat';
 import SendIcon from '@mui/icons-material/Send';
-import { TextField } from '@mui/material';
 import SimpleHintsPanel from '../components/SimpleHintsPanel';
+import { BookmarkButton } from '../components/BookmarkButton';
 import ChallengeCreator from '../components/ChallengeCreator';
+import { useChallengeCompletion } from '../hooks/useChallengeCompletion';
+import { useTheme } from '../context/ThemeContext';
+import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
+import { useAchievements } from '../contexts/AchievementsContext';
+import { ShortcutConfig } from '../hooks/useKeyboardShortcuts';
+import { useLevelUp } from '../hooks/useLevelUp';
+import LevelUpModal from '../components/LevelUpModal';
+import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 
 interface TestCase {
   id: number;
@@ -69,43 +65,43 @@ interface SubmissionResult {
 }
 
 const difficultyConfig: Record<string, any> = {
-  Easy: { 
-    color: '#00d4aa', 
-    bgcolor: 'rgba(0, 212, 170, 0.1)', 
-    icon: <CheckCircleIcon fontSize="small" /> 
+  Easy: {
+    color: '#00d4aa',
+    bgcolor: 'rgba(0, 212, 170, 0.1)',
+    icon: <CheckCircleIcon fontSize="small" />
   },
-  Medium: { 
-    color: '#ffa726', 
-    bgcolor: 'rgba(255, 167, 38, 0.1)', 
-    icon: <AssignmentTurnedInIcon fontSize="small" /> 
+  Medium: {
+    color: '#ffa726',
+    bgcolor: 'rgba(255, 167, 38, 0.1)',
+    icon: <AssignmentTurnedInIcon fontSize="small" />
   },
-  Hard: { 
-    color: '#ff6b6b', 
-    bgcolor: 'rgba(255, 107, 107, 0.1)', 
-    icon: <EmojiEventsIcon fontSize="small" /> 
+  Hard: {
+    color: '#ff6b6b',
+    bgcolor: 'rgba(255, 107, 107, 0.1)',
+    icon: <EmojiEventsIcon fontSize="small" />
   },
 };
 
 const languageOptions = [
-  { 
-    label: 'Python', 
-    value: 'python', 
-    monaco: 'python', 
+  {
+    label: 'Python',
+    value: 'python',
+    monaco: 'python',
     defaultCode: `def solution():
     # Write your solution here
     # Make sure to return the result
     pass
-` 
+`
   },
-  { 
-    label: 'JavaScript', 
-    value: 'javascript', 
-    monaco: 'javascript', 
+  {
+    label: 'JavaScript',
+    value: 'javascript',
+    monaco: 'javascript',
     defaultCode: `function solution() {
     // Write your solution here
     // Make sure to return the result
 }
-` 
+`
   },
 ];
 
@@ -117,7 +113,7 @@ function generateProblemTemplate(problemData: any, language: string): string {
   // Analyze problem title and description for better parameter naming
   const title = problemData.title?.toLowerCase() || '';
   const description = problemData.description?.toLowerCase() || '';
-  
+
   let paramName = 'nums';
   if (title.includes('array') || title.includes('list') || description.includes('array') || description.includes('list')) {
     paramName = 'nums';
@@ -152,7 +148,7 @@ function generateProblemTemplate(problemData: any, language: string): string {
     template += `    \n`;
     template += `    # TODO: Implement your solution\n`;
     template += `    pass\n`;
-    
+
     return template;
   } else if (language === 'javascript') {
     let template = `/**\n`;
@@ -172,10 +168,10 @@ function generateProblemTemplate(problemData: any, language: string): string {
     template += `    \n`;
     template += `    // TODO: Implement your solution\n`;
     template += `}\n`;
-    
+
     return template;
   }
-  
+
   return languageOptions.find(l => l.value === language)?.defaultCode || '';
 }
 
@@ -259,11 +255,11 @@ const ProblemDetailPage: React.FC = () => {
       try {
         const res = await axios.get(`https://structures-production.up.railway.app/api/problems/${id}`);
         setProblem(res.data);
-        
+
         // Initialize code with problem-specific template
         const template = generateProblemTemplate(res.data, language);
         setCode(template);
-        
+
         // Show helpful message in console
         setConsoleOutput(`Welcome to the problem editor! 
 
@@ -335,39 +331,39 @@ Good luck! 🚀`);
         }
       );
       setResults(res.data);
-      
+
       // Show achievements if any were earned
       if (res.data.newly_earned_achievements && res.data.newly_earned_achievements.length > 0) {
         showAchievements(res.data.newly_earned_achievements);
       }
-      
+
       // Show level up notification if user leveled up
       if (res.data.level_up_info) {
         handleLevelUp(res.data.level_up_info);
       }
-      
+
       // Show submission summary in console
       const testResults = res.data.test_case_results || [];
       const passedCount = testResults.filter((r: any) => r.passed).length;
       const totalCount = testResults.length;
       const overallStatus = res.data.overall_status || 'unknown';
-      
+
       let summaryMessage = `Submission Complete!\n`;
       summaryMessage += `Status: ${overallStatus.toUpperCase()}\n`;
       summaryMessage += `Passed: ${passedCount}/${totalCount} test cases\n`;
       summaryMessage += `Execution Time: ${res.data.execution_time?.toFixed(3) || '0.000'}s`;
-      
+
       if (overallStatus === 'pass') {
         summaryMessage += `\n🎉 All tests passed! Great job!`;
         if (res.data.xp_awarded && res.data.xp_awarded > 0) {
           summaryMessage += `\n⭐ +${res.data.xp_awarded} XP earned!`;
         }
-        
+
         // Show level up message if user leveled up
         if (res.data.level_up_info && res.data.level_up_info.leveled_up) {
           summaryMessage += `\n🎊 LEVEL UP! You are now a ${res.data.level_up_info.new_title} (Level ${res.data.level_up_info.new_level})!`;
         }
-        
+
         // Show streak information if available
         if (res.data.streak_info) {
           const streakInfo = res.data.streak_info;
@@ -404,9 +400,9 @@ Good luck! 🚀`);
       } else {
         summaryMessage += `\n❌ All tests failed. Review your solution.`;
       }
-      
+
       setConsoleOutput(summaryMessage);
-      
+
       // Refresh submissions if we're on the submissions tab
       if (activeTab === 1) {
         try {
@@ -447,7 +443,7 @@ Good luck! 🚀`);
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       // Handle simple execution result
       if (res.data.simple_execution) {
         if (res.data.success) {
@@ -486,7 +482,7 @@ Good luck! 🚀`);
       // Get the first test case result
       if (res.data.test_case_results && res.data.test_case_results.length > 0) {
         setRunResult(res.data.test_case_results[0]);
-        
+
         // Set console output from the execution result
         const result = res.data.test_case_results[0];
         if (result) {
@@ -585,10 +581,10 @@ Good luck! 🚀`);
   }, [registerShortcuts, unregisterShortcuts, handleRun, handleSubmit, handleTestRun, running, submitting, setActiveTab]);
 
   if (loading) return (
-    <Box sx={{ 
-      height: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
+    <Box sx={{
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'center',
       bgcolor: 'var(--color-background)',
       color: 'var(--color-foreground)'
@@ -601,18 +597,18 @@ Good luck! 🚀`);
   );
 
   if (error) return (
-    <Box sx={{ 
-      height: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
+    <Box sx={{
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'center',
       bgcolor: 'var(--color-background)',
       color: 'var(--color-foreground)',
       p: 4
     }}>
-      <Alert 
-        severity="error" 
-        sx={{ 
+      <Alert
+        severity="error"
+        sx={{
           bgcolor: 'rgba(255, 107, 107, 0.1)',
           border: '1px solid #ff6b6b',
           color: '#ff6b6b',
@@ -629,17 +625,17 @@ Good luck! 🚀`);
   const diffConfig = difficultyConfig[problem.difficulty] || difficultyConfig.Easy;
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       width: '100vw',
-      height: '100vh', 
-      bgcolor: 'var(--color-background)', 
+      height: '100vh',
+      bgcolor: 'var(--color-background)',
       color: 'var(--color-foreground)',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
       {/* Header */}
-      <Box sx={{ 
+      <Box sx={{
         borderBottom: '1px solid var(--color-border)',
         px: 4,
         py: 2,
@@ -651,9 +647,9 @@ Good luck! 🚀`);
               console.log('Navigating back to problems page');
               navigate('/problems');
             }}
-            sx={{ 
+            sx={{
               color: 'var(--color-muted-foreground)',
-              '&:hover': { 
+              '&:hover': {
                 color: 'var(--color-primary)',
                 bgcolor: 'var(--color-primary-hover)'
               }
@@ -666,10 +662,10 @@ Good luck! 🚀`);
             {problem.id}. {problem.title}
           </Typography>
           <div className="group relative ml-2">
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                color: 'var(--color-muted-foreground)', 
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'var(--color-muted-foreground)',
                 cursor: 'pointer',
                 '&:hover': { color: 'var(--color-card-foreground)' }
               }}
@@ -713,8 +709,8 @@ Good luck! 🚀`);
             }}
           />
           <BookmarkButton problemId={problem.id} />
-          <ChallengeCreator 
-            problemId={problem.id} 
+          <ChallengeCreator
+            problemId={problem.id}
             problemTitle={problem.title}
             onChallengeCreated={() => {
               // Optional: Show success message or refresh something
@@ -742,11 +738,11 @@ Good luck! 🚀`);
               }}
             >
               {languageOptions.map(lang => (
-                <MenuItem 
-                  key={lang.value} 
+                <MenuItem
+                  key={lang.value}
                   value={lang.value}
-                  sx={{ 
-                    bgcolor: '#2d3748', 
+                  sx={{
+                    bgcolor: '#2d3748',
                     color: 'white',
                     '&:hover': { bgcolor: '#374151' },
                     '&.Mui-selected': { bgcolor: '#00d4aa', '&:hover': { bgcolor: '#00b894' } }
@@ -761,21 +757,281 @@ Good luck! 🚀`);
       </Box>
 
       {/* Main Content - Full Width Editor Layout */}
-      <Box sx={{ 
-        display: 'flex', 
-        flex: 1, 
+      <Box sx={{
+        display: 'flex',
+        flex: 1,
         height: 'calc(100vh - 88px)',
         overflow: 'hidden'
       }}>
+        {/* Left Panel - Problem Description */}
+        <Box sx={{
+          width: '40%',
+          borderRight: '1px solid var(--color-border)',
+          bgcolor: 'var(--color-card)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+            <Tabs
+              value={activeTab}
+              onChange={(_, newValue) => setActiveTab(newValue)}
+              sx={{
+                borderBottom: '1px solid var(--color-border)',
+                '& .MuiTab-root': {
+                  color: 'var(--color-muted-foreground)',
+                  fontWeight: 600,
+                  minHeight: 48
+                },
+                '& .Mui-selected': { color: 'var(--color-primary)' },
+                '& .MuiTabs-indicator': { backgroundColor: 'var(--color-primary)' }
+              }}
+            >
+              <Tab icon={<AssignmentIcon />} label="Description" />
+              <Tab icon={<HistoryIcon />} label="Submissions" />
+              <Tab icon={<LightbulbOutlinedIcon />} label="Hints" />
+              <Tab icon={<ChatIcon />} label="Discussion" />
+            </Tabs>
+
+            <Box sx={{
+              flex: 1,
+              overflow: 'auto',
+              p: 3,
+            }}>
+                {/* Description Tab */}
+                {activeTab === 0 && (
+                  <Stack spacing={3}>
+                    <Typography variant="body1" sx={{ color: 'var(--color-foreground)', lineHeight: 1.7 }}>
+                      {problem.description}
+                    </Typography>
+
+                    {problem.sample_input && problem.sample_output && (
+                      <Card sx={{
+                        bgcolor: 'var(--color-card)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 3,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }}>
+                        <CardContent sx={{ p: 3 }}>
+                          <Typography variant="subtitle1" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                            Example:
+                          </Typography>
+                          <Stack spacing={2}>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
+                                Input:
+                              </Typography>
+                              <Box sx={{
+                                p: 2, 
+                                mt: 1,
+                                bgcolor: 'var(--color-background)', 
+                                border: '1px solid var(--color-border)',
+                                borderRadius: 1,
+                                fontFamily: 'JetBrains Mono, monospace',
+                                fontSize: 14,
+                                color: 'var(--color-foreground)'
+                              }}>
+                                {problem.sample_input}
+                              </Box>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
+                                Output:
+                              </Typography>
+                              <Box sx={{
+                                p: 2, 
+                                mt: 1,
+                                bgcolor: 'var(--color-background)', 
+                                border: '1px solid var(--color-border)',
+                                borderRadius: 1,
+                                fontFamily: 'JetBrains Mono, monospace',
+                                fontSize: 14,
+                                color: 'var(--color-foreground)'
+                              }}>
+                                {problem.sample_output}
+                              </Box>
+                            </Box>
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </Stack>
+                )}
+
+                {/* Submissions Tab */}
+                {activeTab === 1 && (
+                  <Box>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                      Your Submissions
+                    </Typography>
+                    {loadingSubmissions ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                        <CircularProgress size={24} sx={{ color: 'var(--color-primary)' }} />
+                      </Box>
+                    ) : submissions.length > 0 ? (
+                      <Stack spacing={2}>
+                        {submissions.slice(0, 10).map((submission, index) => (
+                          <Card key={submission.id} sx={{
+                            bgcolor: 'var(--color-card)',
+                            border: `1px solid ${submission.overall_status === 'pass' ? 'var(--color-success)' : 'var(--color-destructive)'}`,
+                            borderRadius: 2
+                          }}>
+                            <CardContent sx={{ p: 2 }}>
+                              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {submission.overall_status === 'pass' ?
+                                    <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 18 }} /> :
+                                    <CancelIcon sx={{ color: 'var(--color-destructive)', fontSize: 18 }} />
+                                  }
+                                  <Typography variant="body2" fontWeight={600} sx={{
+                                    color: submission.overall_status === 'pass' ? 'var(--color-success)' : 'var(--color-destructive)'
+                                  }}>
+                                    {submission.overall_status === 'pass' ? 'Accepted' : 'Failed'}
+                                  </Typography>
+                                </Stack>
+                                <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)' }}>
+                                  {new Date(submission.submitted_at).toLocaleString()}
+                                </Typography>
+                              </Stack>
+                              <Stack direction="row" alignItems="center" spacing={2}>
+                                <Chip
+                                  label={submission.language}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: 'var(--color-muted)',
+                                    color: 'var(--color-muted-foreground)',
+                                    fontSize: 11
+                                  }}
+                                />
+                                <Chip
+                                  label={`${submission.execution_time?.toFixed(3) || '0.000'}s`}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: 'var(--color-muted)',
+                                    color: 'var(--color-muted-foreground)',
+                                    fontSize: 11
+                                  }}
+                                />
+                                {submission.test_case_results && (
+                                  <Chip
+                                    label={`${submission.test_case_results.filter((r: any) => r.passed).length}/${submission.test_case_results.length} tests`}
+                                    size="small"
+                                    sx={{
+                                      bgcolor: 'var(--color-muted)',
+                                      color: 'var(--color-muted-foreground)',
+                                      fontSize: 11
+                                    }}
+                                  />
+                                )}
+                              </Stack>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)' }}>
+                        Submit your solution to see your submission history here.
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+
+                {/* Hints Tab */}
+                {activeTab === 2 && (
+                  <SimpleHintsPanel
+                    problemId={problem.id}
+                    currentCode={code}
+                    currentLanguage={language}
+                  />
+                )}
+
+                {/* Discussion Tab */}
+                {activeTab === 3 && (
+                  <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                      Problem Discussion
+                    </Typography>
+                    <Box sx={{
+                      flex: 1,
+                      overflowY: 'auto',
+                      mb: 2,
+                      bgcolor: 'var(--color-background)',
+                      borderRadius: 2,
+                      p: 2,
+                      border: '1px solid var(--color-border)',
+                      minHeight: 200
+                    }}>
+                      {chatMessages.length === 0 ? (
+                        <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)', textAlign: 'center', mt: 4 }}>
+                          No discussions yet. Start the conversation!
+                        </Typography>
+                      ) : (
+                        chatMessages.map((msg, idx) => (
+                          <Box key={idx} sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{
+                              color: 'var(--color-foreground)',
+                              wordBreak: 'break-word'
+                            }}>
+                              {msg}
+                            </Typography>
+                          </Box>
+                        ))
+                      )}
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        placeholder="Share your thoughts about this problem..."
+                        value={chatInput}
+                        onChange={e => setChatInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && chatInput.trim()) {
+                            setChatMessages(prev => [...prev, `You: ${chatInput.trim()}`]);
+                            setChatInput('');
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'var(--color-background)',
+                            color: 'var(--color-foreground)',
+                            '& fieldset': { borderColor: 'var(--color-border)' },
+                            '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                            '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' }
+                          }
+                        }}
+                      />
+                      <IconButton
+                        onClick={() => {
+                          if (chatInput.trim()) {
+                            setChatMessages(prev => [...prev, `You: ${chatInput.trim()}`]);
+                            setChatInput('');
+                          }
+                        }}
+                        disabled={!chatInput.trim()}
+                        sx={{
+                          bgcolor: 'var(--color-primary)',
+                          color: 'white',
+                          '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
+                          '&:disabled': { bgcolor: 'var(--color-muted)', color: 'var(--color-muted-foreground)' }
+                        }}
+                      >
+                        <SendIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Box>
+                )}
+              </Box>
+        </Box>
+
         {/* Right Panel - Code Editor */}
-        <Box sx={{ 
+        <Box sx={{
           flex: 1,
-          display: 'flex', 
+          display: 'flex',
           flexDirection: 'column',
           minHeight: 0
         }}>
           {/* Code Editor Header - Simplified */}
-          <Box sx={{ 
+          <Box sx={{
             borderBottom: '1px solid var(--color-border)',
             px: 3,
             py: 1.5,
@@ -789,7 +1045,7 @@ Good luck! 🚀`);
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
             </Stack>
-            
+
             <Button
               onClick={() => {
                 if (problem) {
@@ -808,7 +1064,7 @@ Good luck! 🚀`);
           </Box>
 
           {/* Monaco Editor - Dynamic Height */}
-          <Box sx={{ 
+          <Box sx={{
             height: `calc(100vh - 150px - ${consoleHeight}px)`,
             position: 'relative',
             overflow: 'hidden',
@@ -897,13 +1153,13 @@ Good luck! 🚀`);
                 setIsResizing(true);
                 const startY = e.clientY;
                 const startHeight = consoleHeight;
-                
+
                 const handleMouseMove = (moveEvent: MouseEvent) => {
                   const deltaY = startY - moveEvent.clientY;
                   const newHeight = Math.max(200, Math.min(window.innerHeight * 0.6, startHeight + deltaY));
                   setConsoleHeight(newHeight);
                 };
-                
+
                 const handleMouseUp = () => {
                   setIsResizing(false);
                   document.removeEventListener('mousemove', handleMouseMove);
@@ -911,14 +1167,14 @@ Good luck! 🚀`);
                   document.body.style.cursor = '';
                   document.body.style.userSelect = '';
                 };
-                
+
                 document.body.style.cursor = 'ns-resize';
                 document.body.style.userSelect = 'none';
                 document.addEventListener('mousemove', handleMouseMove);
                 document.addEventListener('mouseup', handleMouseUp);
               }}
             />
-            <Box sx={{ 
+            <Box sx={{
               px: 3,
               py: 1.5,
               borderBottom: '1px solid var(--color-border)',
@@ -985,7 +1241,7 @@ Good luck! 🚀`);
                 </Button>
               </Stack>
             </Box>
-            
+
             <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
               {/* Console Output */}
               {consoleOutput && (
@@ -1012,34 +1268,34 @@ Good luck! 🚀`);
                   </CardContent>
                 </Card>
               )}
-            
+
               {/* Run Result */}
               {runResult && (
-                <Card sx={{ 
+                <Card sx={{
                   mb: 2,
                   bgcolor: runResult.passed ? 'var(--color-success-bg)' : 'var(--color-destructive-bg)',
                   border: `1px solid ${runResult.passed ? 'var(--color-success)' : 'var(--color-destructive)'}`
                 }}>
                   <CardContent sx={{ p: 2 }}>
                     <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                      {runResult.passed ? 
-                        <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 20 }} /> : 
+                      {runResult.passed ?
+                        <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 20 }} /> :
                         <CancelIcon sx={{ color: 'var(--color-destructive)', fontSize: 20 }} />
                       }
-                      <Typography variant="subtitle2" fontWeight={700} sx={{ 
-                        color: runResult.passed ? 'var(--color-success)' : 'var(--color-destructive)' 
+                      <Typography variant="subtitle2" fontWeight={700} sx={{
+                        color: runResult.passed ? 'var(--color-success)' : 'var(--color-destructive)'
                       }}>
                         {runResult.passed ? 'Test Passed' : 'Test Failed'}
                       </Typography>
-                      <Chip 
+                      <Chip
                         icon={<TimerIcon />}
-                        label={`${runResult.execution_time}ms`} 
-                        size="small" 
-                        sx={{ 
-                          bgcolor: 'var(--color-card)', 
+                        label={`${runResult.execution_time}ms`}
+                        size="small"
+                        sx={{
+                          bgcolor: 'var(--color-card)',
                           color: 'var(--color-muted-foreground)',
                           fontSize: 11
-                        }} 
+                        }}
                       />
                     </Stack>
                     <Stack spacing={1}>
@@ -1047,7 +1303,7 @@ Good luck! 🚀`);
                         <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                           Input:
                         </Typography>
-                        <Typography variant="body2" sx={{ 
+                        <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
                           color: 'var(--color-foreground)',
                           bgcolor: 'var(--color-card)',
@@ -1062,7 +1318,7 @@ Good luck! 🚀`);
                         <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                           Expected:
                         </Typography>
-                        <Typography variant="body2" sx={{ 
+                        <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
                           color: 'var(--color-foreground)',
                           bgcolor: 'var(--color-card)',
@@ -1077,7 +1333,7 @@ Good luck! 🚀`);
                         <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
                           Output:
                         </Typography>
-                        <Typography variant="body2" sx={{ 
+                        <Typography variant="body2" sx={{
                           fontFamily: 'JetBrains Mono, monospace',
                           color: runResult.passed ? 'var(--color-success)' : 'var(--color-destructive)',
                           bgcolor: 'var(--color-card)',
@@ -1101,35 +1357,35 @@ Good luck! 🚀`);
                   </Typography>
                   <Stack spacing={2}>
                     {results.test_case_results.map((result, i) => (
-                      <Card key={i} sx={{ 
+                      <Card key={i} sx={{
                         bgcolor: result.passed ? 'var(--color-success-bg)' : 'var(--color-destructive-bg)',
                         border: `1px solid ${result.passed ? 'var(--color-success)' : 'var(--color-destructive)'}`
                       }}>
                         <CardContent sx={{ p: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                            {result.passed ? 
-                              <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 18 }} /> : 
+                            {result.passed ?
+                              <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 18 }} /> :
                               <CancelIcon sx={{ color: 'var(--color-destructive)', fontSize: 18 }} />
                             }
-                            <Typography variant="body2" fontWeight={600} sx={{ 
-                              color: result.passed ? 'var(--color-success)' : 'var(--color-destructive)' 
+                            <Typography variant="body2" fontWeight={600} sx={{
+                              color: result.passed ? 'var(--color-success)' : 'var(--color-destructive)'
                             }}>
                               Test Case {i + 1}
                             </Typography>
-                            <Chip 
+                            <Chip
                               icon={<TimerIcon />}
-                              label={`${result.execution_time}ms`} 
-                              size="small" 
-                              sx={{ 
-                                bgcolor: 'var(--color-card)', 
+                              label={`${result.execution_time}ms`}
+                              size="small"
+                              sx={{
+                                bgcolor: 'var(--color-card)',
                                 color: 'var(--color-muted-foreground)',
                                 fontSize: 10,
                                 height: 20
-                              }} 
+                              }}
                             />
                           </Stack>
                           {!result.passed && (
-                            <Typography variant="caption" sx={{ 
+                            <Typography variant="caption" sx={{
                               color: 'var(--color-foreground)',
                               fontFamily: 'JetBrains Mono, monospace',
                               display: 'block',
@@ -1149,9 +1405,9 @@ Good luck! 🚀`);
 
               {/* Error Messages */}
               {submitError && (
-                <Alert 
-                  severity="error" 
-                  sx={{ 
+                <Alert
+                  severity="error"
+                  sx={{
                     bgcolor: 'rgba(255, 107, 107, 0.1)',
                     border: '1px solid #ff6b6b',
                     color: '#ff6b6b',
@@ -1167,7 +1423,7 @@ Good luck! 🚀`);
       </Box>
 
       {/* Level Up Modal */}
-      <LevelUpModal 
+      <LevelUpModal
         levelUpInfo={levelUpInfo}
         open={showLevelUpModal}
         onClose={closeLevelUpModal}
@@ -1176,4 +1432,4 @@ Good luck! 🚀`);
   );
 };
 
-export default ProblemDetailPage; 
+export default ProblemDetailPage;
