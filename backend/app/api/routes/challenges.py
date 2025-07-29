@@ -296,6 +296,55 @@ async def decline_challenge(
             detail="Failed to decline challenge"
         )
 
+@router.get("/{challenge_id}", response_model=ChallengeResponse)
+async def get_challenge(
+    challenge_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get challenge details by ID"""
+    try:
+        challenge = db.query(Challenge).filter(Challenge.id == challenge_id).first()
+        if not challenge:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Challenge not found"
+            )
+        
+        # Check if user is involved in this challenge
+        if challenge.challenger_id != current_user.id and challenge.challenged_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not involved in this challenge"
+            )
+        
+        challenger = db.query(User).filter(User.id == challenge.challenger_id).first()
+        challenged = db.query(User).filter(User.id == challenge.challenged_id).first()
+        problem = db.query(Problem).filter(Problem.id == challenge.problem_id).first()
+        
+        return ChallengeResponse(
+            id=challenge.id,
+            challenger_username=challenger.username if challenger else "Unknown",
+            challenged_username=challenged.username if challenged else "Unknown",
+            problem_id=challenge.problem_id,
+            problem_title=problem.title if problem else "Unknown Problem",
+            status=challenge.status,
+            message=challenge.message,
+            time_limit=challenge.time_limit,
+            created_at=challenge.created_at,
+            expires_at=challenge.expires_at,
+            completed_at=challenge.completed_at
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching challenge: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch challenge"
+        )
+
 @router.get("/{challenge_id}/status", response_model=ChallengeResponse)
 async def get_challenge_status(
     challenge_id: int,

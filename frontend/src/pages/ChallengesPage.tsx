@@ -304,7 +304,7 @@ const ChallengesPage: React.FC = () => {
                             
                             {challenge.status === 'accepted' && (
                               <a
-                                href={`/problems/${challenge.problem_id}`}
+                                href={`/challenges/${challenge.id}/solve`}
                                 className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90 transition-colors text-center"
                               >
                                 Solve Now

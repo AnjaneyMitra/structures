@@ -17,6 +17,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
+import ChallengeProblemPage from './pages/ChallengeProblemPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { BookmarkProvider } from './context/BookmarkContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -337,6 +338,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<AppLayout><TailwindDashboardPage /></AppLayout>} />
         <Route path="/problems" element={<AppLayout><TailwindProblemsPage /></AppLayout>} />
         <Route path="/problems/:id" element={<AppLayout><ProblemDetailPage /></AppLayout>} />
+        <Route path="/challenges/:challengeId/solve" element={<AppLayout><ChallengeProblemPage /></AppLayout>} />
         <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
         <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
         <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
