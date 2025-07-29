@@ -48,18 +48,36 @@ const ForumsPage: React.FC = () => {
         let errorMessage = 'Failed to fetch categories';
         
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorMessage;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorMessage;
+          } catch (parseError) {
+            console.error('Failed to parse error response as JSON:', parseError);
+            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          }
         } else {
+          console.warn('Forums categories API returned non-JSON response');
           errorMessage = `HTTP ${response.status}: ${response.statusText}. Make sure the backend server is running.`;
         }
         
         throw new Error(errorMessage);
       }
 
-      const data = await response.json();
-      setCategories(data);
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setCategories(data);
+        } else {
+          console.warn('Forums categories API returned empty array');
+          setCategories([]);
+        }
+      } else {
+        console.warn('Forums categories API returned non-JSON response');
+        setCategories([]);
+      }
     } catch (err) {
+      console.error('Forums categories fetch error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

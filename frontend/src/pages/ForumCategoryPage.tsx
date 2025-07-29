@@ -82,12 +82,35 @@ const ForumCategoryPage: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch threads');
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to fetch threads';
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorMessage;
+          } catch (parseError) {
+            console.error('Failed to parse error response as JSON:', parseError);
+            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          }
+        } else {
+          console.warn('Forums threads API returned non-JSON response');
+          errorMessage = `HTTP ${response.status}: ${response.statusText}. Make sure the backend server is running.`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const result = await response.json();
-      setData(result);
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        setData(result);
+      } else {
+        console.warn('Forums threads API returned non-JSON response');
+        setData(null);
+      }
     } catch (err) {
+      console.error('Forums threads fetch error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
