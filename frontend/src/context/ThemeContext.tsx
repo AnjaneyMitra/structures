@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { useAuth } from './AuthContext';
-import axios from 'axios';
 import apiClient from '../utils/apiClient';
 
 type ThemeMode = 'light' | 'dark' | 'soft-pop' | 'blue' | 'green' | 'neo-brutalism';
@@ -119,11 +118,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
   const [fontSize, setFontSizeState] = useState<FontSize>('medium');
   const { isAuthenticated } = useAuth();
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   // Load preferences from localStorage on mount
   useEffect(() => {

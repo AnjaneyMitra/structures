@@ -244,12 +244,13 @@ const ProblemDetailPage: React.FC = () => {
   const [runResult, setRunResult] = useState<TestCaseResult | null>(null);
   const [running, setRunning] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Start with description open for better UX
   const [consoleOutput, setConsoleOutput] = useState<string>('');
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [chatInput, setChatInput] = useState('');
+  const [consoleHeight, setConsoleHeight] = useState(300);
+  const [isResizing, setIsResizing] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -547,12 +548,6 @@ Good luck! 🚀`);
         }
       },
       {
-        key: 'Tab',
-        description: 'Toggle problem description panel',
-        category: 'Navigation',
-        action: () => setSidebarOpen(!sidebarOpen)
-      },
-      {
         key: '1',
         altKey: true,
         description: 'Switch to Description tab',
@@ -587,7 +582,7 @@ Good luck! 🚀`);
     return () => {
       unregisterShortcuts();
     };
-  }, [registerShortcuts, unregisterShortcuts, handleRun, handleSubmit, handleTestRun, running, submitting, sidebarOpen, setSidebarOpen, setActiveTab]);
+  }, [registerShortcuts, unregisterShortcuts, handleRun, handleSubmit, handleTestRun, running, submitting, setActiveTab]);
 
   if (loading) return (
     <Box sx={{ 
@@ -635,11 +630,13 @@ Good luck! 🚀`);
 
   return (
     <Box sx={{ 
-      minHeight: '100vh', 
+      width: '100vw',
+      height: '100vh', 
       bgcolor: 'var(--color-background)', 
       color: 'var(--color-foreground)',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -763,273 +760,13 @@ Good luck! 🚀`);
         </Stack>
       </Box>
 
-      {/* Main Content - LeetCode Style Layout */}
+      {/* Main Content - Full Width Editor Layout */}
       <Box sx={{ 
         display: 'flex', 
         flex: 1, 
-        minHeight: 'calc(100vh - 88px)'
+        height: 'calc(100vh - 88px)',
+        overflow: 'hidden'
       }}>
-        {/* Left Panel - Problem Description */}
-        <Box sx={{ 
-          width: sidebarOpen ? '40%' : '0%',
-          transition: 'width 0.3s ease-in-out',
-          borderRight: sidebarOpen ? '1px solid var(--color-border)' : 'none',
-          bgcolor: 'var(--color-card)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          {sidebarOpen && (
-            <>
-              <Tabs 
-                value={activeTab} 
-                onChange={(_, newValue) => setActiveTab(newValue)}
-                sx={{ 
-                  borderBottom: '1px solid var(--color-border)',
-                  '& .MuiTab-root': { 
-                    color: 'var(--color-muted-foreground)',
-                    fontWeight: 600,
-                    minHeight: 48
-                  },
-                  '& .Mui-selected': { color: 'var(--color-primary)' },
-                  '& .MuiTabs-indicator': { backgroundColor: 'var(--color-primary)' }
-                }}
-              >
-                <Tab icon={<AssignmentIcon />} label="Description" />
-                <Tab icon={<HistoryIcon />} label="Submissions" />
-                <Tab icon={<LightbulbOutlinedIcon />} label="Hints" />
-                <Tab icon={<ChatIcon />} label="Discussion" />
-              </Tabs>
-              
-              <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-                {/* Description Tab */}
-                {activeTab === 0 && (
-                  <Stack spacing={3}>
-                    <Typography variant="body1" sx={{ color: 'var(--color-foreground)', lineHeight: 1.7 }}>
-                      {problem.description}
-                    </Typography>
-                    
-                    {problem.sample_input && problem.sample_output && (
-                      <Card sx={{ 
-                        bgcolor: 'var(--color-card)', 
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 3,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }}>
-                        <CardContent sx={{ p: 3 }}>
-                          <Typography variant="subtitle1" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
-                            Example:
-                          </Typography>
-                          <Stack spacing={2}>
-                            <Box>
-                              <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
-                                Input:
-                              </Typography>
-                              <Box sx={{ 
-                                p: 2, 
-                                mt: 1,
-                                bgcolor: 'var(--color-background)', 
-                                border: '1px solid var(--color-border)',
-                                borderRadius: 1,
-                                fontFamily: 'JetBrains Mono, monospace',
-                                fontSize: 14,
-                                color: 'var(--color-foreground)'
-                              }}>
-                                {problem.sample_input}
-                              </Box>
-                            </Box>
-                            <Box>
-                              <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)', fontWeight: 600 }}>
-                                Output:
-                              </Typography>
-                              <Box sx={{ 
-                                p: 2, 
-                                mt: 1,
-                                bgcolor: 'var(--color-background)', 
-                                border: '1px solid var(--color-border)',
-                                borderRadius: 1,
-                                fontFamily: 'JetBrains Mono, monospace',
-                                fontSize: 14,
-                                color: 'var(--color-foreground)'
-                              }}>
-                                {problem.sample_output}
-                              </Box>
-                            </Box>
-                          </Stack>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </Stack>
-                )}
-                
-                {/* Submissions Tab */}
-                {activeTab === 1 && (
-                  <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
-                      Your Submissions
-                    </Typography>
-                    {loadingSubmissions ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                        <CircularProgress size={24} sx={{ color: 'var(--color-primary)' }} />
-                      </Box>
-                    ) : submissions.length > 0 ? (
-                      <Stack spacing={2}>
-                        {submissions.slice(0, 10).map((submission, index) => (
-                          <Card key={submission.id} sx={{ 
-                            bgcolor: 'var(--color-card)', 
-                            border: `1px solid ${submission.overall_status === 'pass' ? 'var(--color-success)' : 'var(--color-destructive)'}`,
-                            borderRadius: 2
-                          }}>
-                            <CardContent sx={{ p: 2 }}>
-                              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                  {submission.overall_status === 'pass' ? 
-                                    <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 18 }} /> : 
-                                    <CancelIcon sx={{ color: 'var(--color-destructive)', fontSize: 18 }} />
-                                  }
-                                  <Typography variant="body2" fontWeight={600} sx={{ 
-                                    color: submission.overall_status === 'pass' ? 'var(--color-success)' : 'var(--color-destructive)' 
-                                  }}>
-                                    {submission.overall_status === 'pass' ? 'Accepted' : 'Failed'}
-                                  </Typography>
-                                </Stack>
-                                <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)' }}>
-                                  {new Date(submission.submitted_at).toLocaleString()}
-                                </Typography>
-                              </Stack>
-                              <Stack direction="row" alignItems="center" spacing={2}>
-                                <Chip 
-                                  label={submission.language} 
-                                  size="small" 
-                                  sx={{ 
-                                    bgcolor: 'var(--color-muted)', 
-                                    color: 'var(--color-muted-foreground)',
-                                    fontSize: 11
-                                  }} 
-                                />
-                                <Chip 
-                                  label={`${submission.execution_time?.toFixed(3) || '0.000'}s`} 
-                                  size="small" 
-                                  sx={{ 
-                                    bgcolor: 'var(--color-muted)', 
-                                    color: 'var(--color-muted-foreground)',
-                                    fontSize: 11
-                                  }} 
-                                />
-                                {submission.test_case_results && (
-                                  <Chip 
-                                    label={`${submission.test_case_results.filter((r: any) => r.passed).length}/${submission.test_case_results.length} tests`} 
-                                    size="small" 
-                                    sx={{ 
-                                      bgcolor: 'var(--color-muted)', 
-                                      color: 'var(--color-muted-foreground)',
-                                      fontSize: 11
-                                    }} 
-                                  />
-                                )}
-                              </Stack>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </Stack>
-                    ) : (
-                      <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)' }}>
-                        Submit your solution to see your submission history here.
-                      </Typography>
-                    )}
-                  </Box>
-                )}
-                
-                {/* Hints Tab */}
-                {activeTab === 2 && (
-                  <SimpleHintsPanel 
-                    problemId={problem.id} 
-                    currentCode={code}
-                    currentLanguage={language}
-                  />
-                )}
-
-                {/* Discussion Tab */}
-                {activeTab === 3 && (
-                  <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
-                      Problem Discussion
-                    </Typography>
-                    <Box sx={{
-                      flex: 1,
-                      overflowY: 'auto',
-                      mb: 2,
-                      bgcolor: 'var(--color-background)',
-                      borderRadius: 2,
-                      p: 2,
-                      border: '1px solid var(--color-border)',
-                      minHeight: 200
-                    }}>
-                      {chatMessages.length === 0 ? (
-                        <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)', textAlign: 'center', mt: 4 }}>
-                          No discussions yet. Start the conversation!
-                        </Typography>
-                      ) : (
-                        chatMessages.map((msg, idx) => (
-                          <Box key={idx} sx={{ mb: 2 }}>
-                            <Typography variant="body2" sx={{
-                              color: 'var(--color-foreground)',
-                              wordBreak: 'break-word'
-                            }}>
-                              {msg}
-                            </Typography>
-                          </Box>
-                        ))
-                      )}
-                    </Box>
-                    <Stack direction="row" spacing={1}>
-                      <TextField
-                        size="small"
-                        fullWidth
-                        placeholder="Share your thoughts about this problem..."
-                        value={chatInput}
-                        onChange={e => setChatInput(e.target.value)}
-                        onKeyDown={e => { 
-                          if (e.key === 'Enter' && chatInput.trim()) {
-                            setChatMessages(prev => [...prev, `You: ${chatInput.trim()}`]);
-                            setChatInput('');
-                          }
-                        }}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            bgcolor: 'var(--color-background)',
-                            color: 'var(--color-foreground)',
-                            '& fieldset': { borderColor: 'var(--color-border)' },
-                            '&:hover fieldset': { borderColor: 'var(--color-primary)' },
-                            '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' }
-                          }
-                        }}
-                      />
-                      <IconButton
-                        onClick={() => {
-                          if (chatInput.trim()) {
-                            setChatMessages(prev => [...prev, `You: ${chatInput.trim()}`]);
-                            setChatInput('');
-                          }
-                        }}
-                        disabled={!chatInput.trim()}
-                        sx={{
-                          bgcolor: 'var(--color-primary)',
-                          color: 'white',
-                          '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
-                          '&:disabled': { bgcolor: 'var(--color-muted)', color: 'var(--color-muted-foreground)' }
-                        }}
-                      >
-                        <SendIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  </Box>
-                )}
-              </Box>
-            </>
-          )}
-        </Box>
-
         {/* Right Panel - Code Editor */}
         <Box sx={{ 
           flex: 1,
@@ -1037,7 +774,7 @@ Good luck! 🚀`);
           flexDirection: 'column',
           minHeight: 0
         }}>
-          {/* Code Editor Header */}
+          {/* Code Editor Header - Simplified */}
           <Box sx={{ 
             borderBottom: '1px solid var(--color-border)',
             px: 3,
@@ -1048,34 +785,9 @@ Good luck! 🚀`);
             justifyContent: 'space-between'
           }}>
             <Stack direction="row" alignItems="center" spacing={2}>
-              <Button
-                variant="text"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                sx={{ 
-                  color: 'var(--color-muted-foreground)',
-                  minWidth: 'auto',
-                  p: 1,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    color: 'var(--color-primary)',
-                    bgcolor: 'var(--color-primary-hover)'
-                  },
-                  '& .MuiSvgIcon-root': {
-                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }
-                }}
-                title={sidebarOpen ? 'Hide problem description' : 'Show problem description'}
-              >
-                {sidebarOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-              </Button>
-              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-muted-foreground)' }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-foreground)' }}>
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
-              {!sidebarOpen && (
-                <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)' }}>
-                  Click arrow to view problem description
-                </Typography>
-              )}
             </Stack>
             
             <Button
@@ -1095,8 +807,13 @@ Good luck! 🚀`);
             </Button>
           </Box>
 
-          {/* Monaco Editor */}
-          <Box sx={{ flex: 1, position: 'relative' }}>
+          {/* Monaco Editor - Dynamic Height */}
+          <Box sx={{ 
+            height: `calc(100vh - 150px - ${consoleHeight}px)`,
+            position: 'relative',
+            overflow: 'hidden',
+            minHeight: 200
+          }}>
             <MonacoEditor
               height="100%"
               language={languageOptions.find(l => l.value === language)?.monaco || 'python'}
@@ -1123,15 +840,84 @@ Good luck! 🚀`);
             />
           </Box>
 
-          {/* Console/Output Area */}
-          <Box sx={{ 
-            minHeight: 300,
-            maxHeight: '45vh',
-            borderTop: '1px solid var(--color-border)',
+          {/* Resizable Console/Output Area */}
+          <Box sx={{
+            height: consoleHeight,
+            borderTop: '2px solid var(--color-border)',
             bgcolor: 'var(--color-card)',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            position: 'relative',
+            minHeight: 200,
+            maxHeight: '60vh',
+            opacity: isResizing ? 0.9 : 1,
+            transition: isResizing ? 'none' : 'opacity 0.2s ease'
           }}>
+            {/* Resize Handle */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -3,
+                left: 0,
+                right: 0,
+                height: 6,
+                cursor: 'ns-resize',
+                bgcolor: 'transparent',
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                  bgcolor: 'var(--color-primary)',
+                  opacity: 0.7,
+                  '&::after': {
+                    content: '""',
+                    width: 30,
+                    height: 3,
+                    bgcolor: 'white',
+                    borderRadius: 1,
+                    opacity: 0.8
+                  }
+                },
+                '&:hover::before': {
+                  content: '"Drag to resize"',
+                  position: 'absolute',
+                  top: -25,
+                  fontSize: 11,
+                  color: 'var(--color-foreground)',
+                  bgcolor: 'var(--color-card)',
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 1,
+                  border: '1px solid var(--color-border)'
+                }
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setIsResizing(true);
+                const startY = e.clientY;
+                const startHeight = consoleHeight;
+                
+                const handleMouseMove = (moveEvent: MouseEvent) => {
+                  const deltaY = startY - moveEvent.clientY;
+                  const newHeight = Math.max(200, Math.min(window.innerHeight * 0.6, startHeight + deltaY));
+                  setConsoleHeight(newHeight);
+                };
+                
+                const handleMouseUp = () => {
+                  setIsResizing(false);
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                  document.body.style.cursor = '';
+                  document.body.style.userSelect = '';
+                };
+                
+                document.body.style.cursor = 'ns-resize';
+                document.body.style.userSelect = 'none';
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+              }}
+            />
             <Box sx={{ 
               px: 3,
               py: 1.5,
