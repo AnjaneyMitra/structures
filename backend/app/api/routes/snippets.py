@@ -891,6 +891,14 @@ async def get_snippet_categories(db: Session = Depends(get_db)):
             desc('count')
         ).all()
         
+        # If no categories found, return default categories
+        if not categories:
+            return [
+                {"category": "template", "count": 0},
+                {"category": "utility", "count": 0},
+                {"category": "algorithm", "count": 0}
+            ]
+        
         return [
             {"category": cat, "count": count}
             for cat, count in categories
@@ -898,10 +906,12 @@ async def get_snippet_categories(db: Session = Depends(get_db)):
         
     except Exception as e:
         logger.error(f"Error fetching categories: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch categories"
-        )
+        # Return default categories on error
+        return [
+            {"category": "template", "count": 0},
+            {"category": "utility", "count": 0},
+            {"category": "algorithm", "count": 0}
+        ]
 
 @router.get("/languages/popular")
 async def get_popular_languages(
@@ -921,6 +931,16 @@ async def get_popular_languages(
             desc('count')
         ).limit(limit).all()
         
+        # If no languages found, return default languages
+        if not languages:
+            return [
+                {"language": "python", "count": 0},
+                {"language": "javascript", "count": 0},
+                {"language": "java", "count": 0},
+                {"language": "cpp", "count": 0},
+                {"language": "typescript", "count": 0}
+            ]
+        
         return [
             {"language": lang, "count": count}
             for lang, count in languages
@@ -928,7 +948,11 @@ async def get_popular_languages(
         
     except Exception as e:
         logger.error(f"Error fetching popular languages: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch popular languages"
-        )
+        # Return default languages on error
+        return [
+            {"language": "python", "count": 0},
+            {"language": "javascript", "count": 0},
+            {"language": "java", "count": 0},
+            {"language": "cpp", "count": 0},
+            {"language": "typescript", "count": 0}
+        ]

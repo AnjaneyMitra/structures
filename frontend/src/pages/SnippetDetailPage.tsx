@@ -92,10 +92,15 @@ const SnippetDetailPage: React.FC = () => {
   const fetchComments = async () => {
     try {
       const token = localStorage.getItem('token');
+      const headers: Record<string, string> = {};
+      
+      // Only add Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(`/api/snippets/${snippetId}/comments`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers,
       });
 
       if (response.ok) {
@@ -106,12 +111,22 @@ const SnippetDetailPage: React.FC = () => {
         // Only try to parse as JSON if it's actually JSON
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          console.error('Error details:', errorData);
+          try {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+          } catch (parseError) {
+            console.error('Failed to parse error response as JSON');
+          }
+        } else {
+          console.error('Comments API returned non-JSON response');
         }
+        // Set empty comments array on error
+        setComments([]);
       }
     } catch (err) {
       console.error('Failed to fetch comments:', err);
+      // Set empty comments array on error
+      setComments([]);
     }
   };
 

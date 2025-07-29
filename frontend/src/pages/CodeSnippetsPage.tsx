@@ -98,12 +98,19 @@ const CodeSnippetsPage: React.FC = () => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          setLanguages(data.map((item: any) => item.language));
+          if (Array.isArray(data) && data.length > 0) {
+            setLanguages(data.map((item: any) => item.language));
+          } else {
+            console.warn('Languages API returned empty array, using fallback');
+            setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
+          }
         } else {
           console.warn('Languages API returned non-JSON response');
+          setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
         }
       } else {
         console.warn('Languages API not available:', response.status);
+        setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
       }
     } catch (err) {
       console.error('Failed to fetch languages:', err);
@@ -119,12 +126,19 @@ const CodeSnippetsPage: React.FC = () => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
-          setCategories(data.map((item: any) => item.category));
+          if (Array.isArray(data) && data.length > 0) {
+            setCategories(data.map((item: any) => item.category));
+          } else {
+            console.warn('Categories API returned empty array, using fallback');
+            setCategories(['template', 'utility', 'algorithm']);
+          }
         } else {
           console.warn('Categories API returned non-JSON response');
+          setCategories(['template', 'utility', 'algorithm']);
         }
       } else {
         console.warn('Categories API not available:', response.status);
+        setCategories(['template', 'utility', 'algorithm']);
       }
     } catch (err) {
       console.error('Failed to fetch categories:', err);
