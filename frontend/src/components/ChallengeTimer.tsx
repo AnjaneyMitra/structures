@@ -19,11 +19,36 @@ const ChallengeTimer: React.FC<ChallengeTimerProps> = ({
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
-      const start = new Date(startTime).getTime();
-      const now = new Date().getTime();
+      // Parse the start time - handle both UTC and local time formats
+      let startDate: Date;
+      
+      // If the startTime doesn't end with 'Z' or have timezone info, assume it's UTC
+      if (startTime && !startTime.includes('Z') && !startTime.includes('+') && !startTime.includes('-')) {
+        // Assume UTC if no timezone info
+        startDate = new Date(startTime + 'Z');
+      } else {
+        startDate = new Date(startTime);
+      }
+      
+      const start = startDate.getTime();
+      const now = new Date().getTime(); // User's local time
       const elapsed = Math.floor((now - start) / 1000); // seconds elapsed
       const totalSeconds = timeLimit * 60; // convert minutes to seconds
       const remaining = Math.max(0, totalSeconds - elapsed);
+      
+      // Debug logging (remove in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Timer Debug:', {
+          originalStartTime: startTime,
+          parsedStartTime: startDate.toISOString(),
+          userLocalTime: new Date().toISOString(),
+          userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          elapsed: elapsed,
+          totalSeconds,
+          remaining,
+          timeLimitMinutes: timeLimit
+        });
+      }
       
       setTimeRemaining(remaining);
       
@@ -99,6 +124,12 @@ const ChallengeTimer: React.FC<ChallengeTimerProps> = ({
               style={{ width: `${getProgressPercentage()}%` }}
             />
           </div>
+          {/* Debug info - remove in production */}
+          {process.env.NODE_ENV === 'development' && (
+            <span className="text-xs text-muted-foreground">
+              {Intl.DateTimeFormat().resolvedOptions().timeZone}
+            </span>
+          )}
         </div>
       </div>
     </div>
