@@ -268,10 +268,10 @@ const ChallengesPage: React.FC = () => {
                             
                             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                               <span>Created: {formatDate(challenge.created_at)}</span>
-                              {challenge.time_limit && challenge.status === 'accepted' && (
+                              {challenge.time_limit && challenge.status === 'accepted' && challenge.accepted_at && (
                                 <ChallengeTimer
                                   timeLimit={challenge.time_limit}
-                                  startTime={challenge.created_at}
+                                  startTime={challenge.accepted_at}
                                   className="ml-2"
                                 />
                               )}

@@ -29,6 +29,7 @@ class ChallengeResponse(BaseModel):
     message: Optional[str]
     time_limit: Optional[int]
     created_at: datetime
+    accepted_at: Optional[datetime]
     expires_at: Optional[datetime]
     completed_at: Optional[datetime]
 
@@ -113,6 +114,7 @@ async def create_challenge(
             message=challenge.message,
             time_limit=challenge.time_limit,
             created_at=challenge.created_at,
+            accepted_at=challenge.accepted_at,
             expires_at=challenge.expires_at,
             completed_at=challenge.completed_at
         )
@@ -151,6 +153,7 @@ async def get_received_challenges(
                 message=challenge.message,
                 time_limit=challenge.time_limit,
                 created_at=challenge.created_at,
+                accepted_at=challenge.accepted_at,
                 expires_at=challenge.expires_at,
                 completed_at=challenge.completed_at
             ))
@@ -190,6 +193,7 @@ async def get_sent_challenges(
                 message=challenge.message,
                 time_limit=challenge.time_limit,
                 created_at=challenge.created_at,
+                accepted_at=challenge.accepted_at,
                 expires_at=challenge.expires_at,
                 completed_at=challenge.completed_at
             ))
@@ -240,6 +244,7 @@ async def accept_challenge(
             )
         
         challenge.status = "accepted"
+        challenge.accepted_at = datetime.utcnow()
         db.commit()
         
         return {"message": "Challenge accepted successfully"}
@@ -332,6 +337,7 @@ async def get_challenge(
             message=challenge.message,
             time_limit=challenge.time_limit,
             created_at=challenge.created_at,
+            accepted_at=challenge.accepted_at,
             expires_at=challenge.expires_at,
             completed_at=challenge.completed_at
         )
@@ -381,6 +387,7 @@ async def get_challenge_status(
             message=challenge.message,
             time_limit=challenge.time_limit,
             created_at=challenge.created_at,
+            accepted_at=challenge.accepted_at,
             expires_at=challenge.expires_at,
             completed_at=challenge.completed_at
         )

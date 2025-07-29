@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   TrophyIcon, 
-  ClockIcon,
   UserIcon,
   FireIcon,
   CheckCircleIcon,
@@ -306,10 +305,10 @@ Good luck! 🚀`);
             </div>
             
             <div className="flex items-center space-x-4">
-              {challenge.time_limit && (
+              {challenge.time_limit && challenge.accepted_at && (
                 <ChallengeTimer
                   timeLimit={challenge.time_limit}
-                  startTime={challenge.created_at}
+                  startTime={challenge.accepted_at}
                   className="text-sm"
                 />
               )}

@@ -8,6 +8,7 @@ export interface Challenge {
   message?: string;
   time_limit?: number; // in minutes
   created_at: string;
+  accepted_at?: string;
   expires_at?: string;
   completed_at?: string;
 }
