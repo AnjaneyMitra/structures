@@ -160,7 +160,7 @@ class Challenge(Base):
     message = Column(Text, nullable=True)
     time_limit = Column(Integer, nullable=True)  # Minutes
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    accepted_at = Column(DateTime, nullable=True)
+    # accepted_at = Column(DateTime, nullable=True)  # Temporarily commented out until migration is run
     expires_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     

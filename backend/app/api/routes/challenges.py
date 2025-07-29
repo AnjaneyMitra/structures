@@ -114,7 +114,7 @@ async def create_challenge(
             message=challenge.message,
             time_limit=challenge.time_limit,
             created_at=challenge.created_at,
-            accepted_at=challenge.accepted_at,
+            accepted_at=None,  # Temporarily set to None until migration is run
             expires_at=challenge.expires_at,
             completed_at=challenge.completed_at
         )
@@ -153,7 +153,7 @@ async def get_received_challenges(
                 message=challenge.message,
                 time_limit=challenge.time_limit,
                 created_at=challenge.created_at,
-                accepted_at=challenge.accepted_at,
+                accepted_at=None,  # Temporarily set to None until migration is run
                 expires_at=challenge.expires_at,
                 completed_at=challenge.completed_at
             ))
@@ -193,7 +193,7 @@ async def get_sent_challenges(
                 message=challenge.message,
                 time_limit=challenge.time_limit,
                 created_at=challenge.created_at,
-                accepted_at=challenge.accepted_at,
+                accepted_at=None,  # Temporarily set to None until migration is run
                 expires_at=challenge.expires_at,
                 completed_at=challenge.completed_at
             ))
@@ -244,7 +244,7 @@ async def accept_challenge(
             )
         
         challenge.status = "accepted"
-        challenge.accepted_at = datetime.utcnow()
+        # challenge.accepted_at = datetime.utcnow()  # Temporarily commented out until migration is run
         db.commit()
         
         return {"message": "Challenge accepted successfully"}
@@ -337,7 +337,7 @@ async def get_challenge(
             message=challenge.message,
             time_limit=challenge.time_limit,
             created_at=challenge.created_at,
-            accepted_at=challenge.accepted_at,
+            accepted_at=None,  # Temporarily set to None until migration is run
             expires_at=challenge.expires_at,
             completed_at=challenge.completed_at
         )
@@ -387,7 +387,7 @@ async def get_challenge_status(
             message=challenge.message,
             time_limit=challenge.time_limit,
             created_at=challenge.created_at,
-            accepted_at=challenge.accepted_at,
+            accepted_at=None,  # Temporarily set to None until migration is run
             expires_at=challenge.expires_at,
             completed_at=challenge.completed_at
         )

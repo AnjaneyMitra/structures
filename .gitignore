@@ -50,5 +50,8 @@ frontend/dist/
 # Logs
 *.log
 
+
 # Markdown documentation directory
 markdowns/
+*./md
+CHALLENGE_TIMER_FIX_STATUS.md

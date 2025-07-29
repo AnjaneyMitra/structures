@@ -305,10 +305,10 @@ Good luck! 🚀`);
             </div>
             
             <div className="flex items-center space-x-4">
-              {challenge.time_limit && challenge.accepted_at && (
+              {challenge.time_limit && (
                 <ChallengeTimer
                   timeLimit={challenge.time_limit}
-                  startTime={challenge.accepted_at}
+                  startTime={challenge.accepted_at || challenge.created_at}
                   className="text-sm"
                 />
               )}
