@@ -6,12 +6,13 @@ import {
   UserGroupIcon, 
   UserIcon, 
   UsersIcon,
-  TrophyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   StarIcon,
   ChartBarIcon,
-  FireIcon
+  FireIcon,
+  GiftIcon,
+  QueueListIcon
 } from '@heroicons/react/24/outline';
 import { ThemeSelector } from './ThemeSelector';
 import { useAuth } from '../context/AuthContext';
@@ -22,8 +23,8 @@ const navItems = [
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
   { label: 'Analytics', path: '/analytics', icon: ChartBarIcon },
   { label: 'Levels', path: '/levels', icon: StarIcon },
-  { label: 'Achievements', path: '/achievements', icon: TrophyIcon },
-  { label: 'Leaderboards', path: '/leaderboards', icon: TrophyIcon },
+  { label: 'Achievements', path: '/achievements', icon: GiftIcon },
+  { label: 'Leaderboards', path: '/leaderboards', icon: QueueListIcon },
   { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Challenges', path: '/challenges', icon: FireIcon },
   { label: 'Profile', path: '/profile', icon: UserIcon },
@@ -33,12 +34,14 @@ interface SidebarProps {
   open?: boolean;
   onClose?: () => void;
   onToggle?: (open: boolean) => void;
+  isMobile?: boolean;
 }
 
 export const TailwindSidebar: React.FC<SidebarProps> = ({ 
   open = true, 
   onClose, 
-  onToggle 
+  onToggle,
+  isMobile = false
 }) => {
   const location = useLocation();
   const { username, logout } = useAuth();
@@ -59,24 +62,34 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
+      {/* Mobile overlay */}
+      {isMobile && sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[49]"
+          onClick={() => onToggle && onToggle(false)}
+        />
+      )}
+      
       <div 
         className={`fixed top-0 left-0 h-full z-50 bg-card border-r border-border flex flex-col ${
           sidebarOpen ? 'w-72' : 'w-20'
+        } ${
+          isMobile && !sidebarOpen ? '-translate-x-full' : 'translate-x-0'
         }`}
         style={{
-          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          willChange: 'width'
+          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out',
+          willChange: 'width, transform'
         }}
       >
         {/* Header */}
         <div className="flex items-center h-[88px] px-4 border-b border-border/20">
-          <div className={`flex items-center gap-3 overflow-hidden`}>
+          <div className={`flex items-center gap-3 overflow-hidden w-full`}>
             {sidebarOpen ? (
               <>
                 <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
                   <CodeBracketIcon className="h-6 w-6 text-white" />
                 </div>
-                <div className={`transition-opacity whitespace-nowrap ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
+                <div className={`transition-opacity whitespace-nowrap flex-1 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
                   style={{
                     transitionDuration: '0.3s',
                     transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -85,6 +98,14 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                   <h1 className="text-xl font-bold text-foreground whitespace-nowrap">Structures</h1>
                   <p className="text-sm text-muted-foreground whitespace-nowrap">Code & Collaborate</p>
                 </div>
+                {/* Collapse button - only visible when sidebar is open */}
+                <button
+                  onClick={handleToggle}
+                  className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-300 flex-shrink-0"
+                  title="Collapse sidebar"
+                >
+                  <ChevronLeftIcon className="h-4 w-4" />
+                </button>
               </>
             ) : (
               <button
@@ -193,22 +214,6 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
           )}
         </div>
       </div>
-      
-      {/* Fixed Toggle Button - positioned absolutely to prevent scrolling */}
-      {sidebarOpen && (
-        <button
-          className={`fixed top-7 z-[60] p-1.5 bg-card border border-border rounded-full hover:bg-primary/10 shadow-lg transition-opacity duration-300 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
-          style={{ 
-            left: `${280 - 12}px`,
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            transitionDelay: sidebarOpen ? '0.3s' : '0s'
-          }}
-          onClick={handleToggle}
-          title="Collapse sidebar"
-        >
-          <ChevronLeftIcon className={`h-4 w-4 text-primary transition-transform duration-300`} />
-        </button>
-      )}
     </>
   );
 };

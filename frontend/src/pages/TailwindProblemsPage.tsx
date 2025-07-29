@@ -219,17 +219,17 @@ const TailwindProblemsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-4xl font-bold text-foreground">Problems</h1>
-            <div className="group relative">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-center sm:text-left">Problems</h1>
+            <div className="group relative self-center sm:self-auto">
               <button className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
                 <kbd className="px-2 py-1 bg-muted border border-border rounded text-xs group-hover:bg-card">?</kbd>
               </button>
               <div className="absolute right-0 top-full mt-2 hidden group-hover:block z-50">
-                <div className="bg-card border border-border rounded-lg shadow-lg p-4 min-w-[300px]">
+                <div className="bg-card border border-border rounded-lg shadow-lg p-4 min-w-[280px] sm:min-w-[300px]">
                   <h3 className="text-sm font-semibold mb-3">Keyboard Shortcuts</h3>
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between">
@@ -255,31 +255,31 @@ const TailwindProblemsPage: React.FC = () => {
           </div>
           
           {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative max-w-2xl">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary" />
+          <div className="mb-4 sm:mb-6">
+            <div className="relative max-w-full sm:max-w-2xl mx-auto">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               <input
                 ref={searchInputRef}
                 type="text"
                 placeholder="Search problems... (Ctrl+/ to focus)"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm sm:text-base"
               />
             </div>
           </div>
 
           {/* Filter and Sort Controls */}
-          <div className="flex flex-col lg:flex-row gap-6 mb-6">
+          <div className="flex flex-col gap-4 sm:gap-6 mb-4 sm:mb-6">
             {/* Difficulty Filter */}
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-2">Filter by Difficulty:</p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {(['All', 'Easy', 'Medium', 'Hard'] as DifficultyFilter[]).map((difficulty) => (
                   <button
                     key={difficulty}
                     onClick={() => setDifficultyFilter(difficulty)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors duration-200 ${
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium border transition-colors duration-200 ${
                       difficultyFilter === difficulty
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-card text-card-foreground border-border hover:border-primary'
@@ -297,7 +297,7 @@ const TailwindProblemsPage: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground"
+                className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground text-sm sm:text-base"
               >
                 <option value="popular">Popular</option>
                 <option value="trending">Trending</option>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Box, Typography, CircularProgress, Alert, Chip, Stack, Button, 
-  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab
+  MenuItem, Select, FormControl, Card, CardContent, Tabs, Tab,
+  IconButton
 } from '@mui/material';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { useTheme } from '../context/ThemeContext';
@@ -12,7 +13,7 @@ import { useLevelUp } from '../hooks/useLevelUp';
 import LevelUpModal from '../components/LevelUpModal';
 import { useChallengeCompletion } from '../hooks/useChallengeCompletion';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -26,6 +27,10 @@ import HistoryIcon from '@mui/icons-material/History';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ChatIcon from '@mui/icons-material/Chat';
+import SendIcon from '@mui/icons-material/Send';
+import { TextField } from '@mui/material';
 import SimpleHintsPanel from '../components/SimpleHintsPanel';
 import ChallengeCreator from '../components/ChallengeCreator';
 
@@ -208,6 +213,7 @@ function getJSReturnType(problemData: any): string {
 
 const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { fontSize, themeMode } = useTheme();
   const { registerShortcuts, unregisterShortcuts } = useKeyboardShortcutsContext();
   const { showAchievements } = useAchievements();
@@ -238,8 +244,12 @@ const ProblemDetailPage: React.FC = () => {
   const [runResult, setRunResult] = useState<TestCaseResult | null>(null);
   const [running, setRunning] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Start with description open for better UX
   const [consoleOutput, setConsoleOutput] = useState<string>('');
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [chatInput, setChatInput] = useState('');
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -270,7 +280,29 @@ Good luck! 🚀`);
       }
     };
     fetchProblem();
-  }, [id]);
+  }, [id, language]);
+
+  // Fetch submissions when switching to submissions tab
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      if (activeTab === 1 && problem) {
+        setLoadingSubmissions(true);
+        try {
+          const token = localStorage.getItem('token');
+          const res = await axios.get(
+            `https://structures-production.up.railway.app/api/submissions/problem/${problem.id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setSubmissions(res.data || []);
+        } catch (err) {
+          console.error('Failed to fetch submissions:', err);
+        } finally {
+          setLoadingSubmissions(false);
+        }
+      }
+    };
+    fetchSubmissions();
+  }, [activeTab, problem]);
 
   useEffect(() => {
     // Reset code when language changes with problem-specific template
@@ -373,6 +405,20 @@ Good luck! 🚀`);
       }
       
       setConsoleOutput(summaryMessage);
+      
+      // Refresh submissions if we're on the submissions tab
+      if (activeTab === 1) {
+        try {
+          const token = localStorage.getItem('token');
+          const submissionsRes = await axios.get(
+            `https://structures-production.up.railway.app/api/submissions/problem/${problem?.id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setSubmissions(submissionsRes.data || []);
+        } catch (submissionsErr) {
+          console.error('Failed to refresh submissions:', submissionsErr);
+        }
+      }
     } catch (err: any) {
       const errorMsg = err.response?.data?.detail || 'Submission failed';
       setSubmitError(errorMsg);
@@ -519,6 +565,20 @@ Good luck! 🚀`);
         description: 'Switch to Submissions tab',
         category: 'Navigation',
         action: () => setActiveTab(1)
+      },
+      {
+        key: '3',
+        altKey: true,
+        description: 'Switch to Hints tab',
+        category: 'Navigation',
+        action: () => setActiveTab(2)
+      },
+      {
+        key: '4',
+        altKey: true,
+        description: 'Switch to Discussion tab',
+        category: 'Navigation',
+        action: () => setActiveTab(3)
       }
     ];
 
@@ -575,12 +635,11 @@ Good luck! 🚀`);
 
   return (
     <Box sx={{ 
-      height: '100vh', 
+      minHeight: '100vh', 
       bgcolor: 'var(--color-background)', 
       color: 'var(--color-foreground)',
       display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
+      flexDirection: 'column'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -590,6 +649,21 @@ Good luck! 🚀`);
         bgcolor: 'var(--color-card)'
       }}>
         <Stack direction="row" alignItems="center" spacing={3}>
+          <IconButton
+            onClick={() => {
+              console.log('Navigating back to problems page');
+              navigate('/problems');
+            }}
+            sx={{ 
+              color: 'var(--color-muted-foreground)',
+              '&:hover': { 
+                color: 'var(--color-primary)',
+                bgcolor: 'var(--color-primary-hover)'
+              }
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
           <CodeIcon sx={{ color: 'var(--color-primary)', fontSize: 28 }} />
           <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-card-foreground)' }}>
             {problem.id}. {problem.title}
@@ -612,19 +686,19 @@ Good luck! 🚀`);
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between">
                     <span>Run code</span>
-                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Enter</kbd>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Submit solution</span>
-                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Shift+Enter</kbd>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Reset code</span>
                     <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+R</kbd>
                   </div>
                   <div className="flex justify-between">
-                    <span>Toggle theme</span>
-                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+D</kbd>
+                    <span>Submit solution</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+S</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Test run</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Ctrl+Shift+T</kbd>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Toggle description</span>
+                    <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded">Tab</kbd>
                   </div>
                 </div>
               </div>
@@ -689,19 +763,24 @@ Good luck! 🚀`);
         </Stack>
       </Box>
 
-      {/* Main Content */}
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      {/* Main Content - LeetCode Style Layout */}
+      <Box sx={{ 
+        display: 'flex', 
+        flex: 1, 
+        minHeight: 'calc(100vh - 88px)'
+      }}>
         {/* Left Panel - Problem Description */}
         <Box sx={{ 
-          width: sidebarOpen ? 450 : 0,
-          transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          borderRight: '1px solid var(--color-border)',
+          width: sidebarOpen ? '40%' : '0%',
+          transition: 'width 0.3s ease-in-out',
+          borderRight: sidebarOpen ? '1px solid var(--color-border)' : 'none',
           bgcolor: 'var(--color-card)',
           overflow: 'hidden',
-          willChange: 'width'
+          display: 'flex',
+          flexDirection: 'column'
         }}>
           {sidebarOpen && (
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <>
               <Tabs 
                 value={activeTab} 
                 onChange={(_, newValue) => setActiveTab(newValue)}
@@ -719,6 +798,7 @@ Good luck! 🚀`);
                 <Tab icon={<AssignmentIcon />} label="Description" />
                 <Tab icon={<HistoryIcon />} label="Submissions" />
                 <Tab icon={<LightbulbOutlinedIcon />} label="Hints" />
+                <Tab icon={<ChatIcon />} label="Discussion" />
               </Tabs>
               
               <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
@@ -788,9 +868,75 @@ Good luck! 🚀`);
                     <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
                       Your Submissions
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)' }}>
-                      Submit your solution to see your submission history here.
-                    </Typography>
+                    {loadingSubmissions ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                        <CircularProgress size={24} sx={{ color: 'var(--color-primary)' }} />
+                      </Box>
+                    ) : submissions.length > 0 ? (
+                      <Stack spacing={2}>
+                        {submissions.slice(0, 10).map((submission, index) => (
+                          <Card key={submission.id} sx={{ 
+                            bgcolor: 'var(--color-card)', 
+                            border: `1px solid ${submission.overall_status === 'pass' ? 'var(--color-success)' : 'var(--color-destructive)'}`,
+                            borderRadius: 2
+                          }}>
+                            <CardContent sx={{ p: 2 }}>
+                              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  {submission.overall_status === 'pass' ? 
+                                    <CheckCircleIcon sx={{ color: 'var(--color-success)', fontSize: 18 }} /> : 
+                                    <CancelIcon sx={{ color: 'var(--color-destructive)', fontSize: 18 }} />
+                                  }
+                                  <Typography variant="body2" fontWeight={600} sx={{ 
+                                    color: submission.overall_status === 'pass' ? 'var(--color-success)' : 'var(--color-destructive)' 
+                                  }}>
+                                    {submission.overall_status === 'pass' ? 'Accepted' : 'Failed'}
+                                  </Typography>
+                                </Stack>
+                                <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)' }}>
+                                  {new Date(submission.submitted_at).toLocaleString()}
+                                </Typography>
+                              </Stack>
+                              <Stack direction="row" alignItems="center" spacing={2}>
+                                <Chip 
+                                  label={submission.language} 
+                                  size="small" 
+                                  sx={{ 
+                                    bgcolor: 'var(--color-muted)', 
+                                    color: 'var(--color-muted-foreground)',
+                                    fontSize: 11
+                                  }} 
+                                />
+                                <Chip 
+                                  label={`${submission.execution_time?.toFixed(3) || '0.000'}s`} 
+                                  size="small" 
+                                  sx={{ 
+                                    bgcolor: 'var(--color-muted)', 
+                                    color: 'var(--color-muted-foreground)',
+                                    fontSize: 11
+                                  }} 
+                                />
+                                {submission.test_case_results && (
+                                  <Chip 
+                                    label={`${submission.test_case_results.filter((r: any) => r.passed).length}/${submission.test_case_results.length} tests`} 
+                                    size="small" 
+                                    sx={{ 
+                                      bgcolor: 'var(--color-muted)', 
+                                      color: 'var(--color-muted-foreground)',
+                                      fontSize: 11
+                                    }} 
+                                  />
+                                )}
+                              </Stack>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)' }}>
+                        Submit your solution to see your submission history here.
+                      </Typography>
+                    )}
                   </Box>
                 )}
                 
@@ -802,13 +948,95 @@ Good luck! 🚀`);
                     currentLanguage={language}
                   />
                 )}
+
+                {/* Discussion Tab */}
+                {activeTab === 3 && (
+                  <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                      Problem Discussion
+                    </Typography>
+                    <Box sx={{
+                      flex: 1,
+                      overflowY: 'auto',
+                      mb: 2,
+                      bgcolor: 'var(--color-background)',
+                      borderRadius: 2,
+                      p: 2,
+                      border: '1px solid var(--color-border)',
+                      minHeight: 200
+                    }}>
+                      {chatMessages.length === 0 ? (
+                        <Typography variant="body2" sx={{ color: 'var(--color-muted-foreground)', textAlign: 'center', mt: 4 }}>
+                          No discussions yet. Start the conversation!
+                        </Typography>
+                      ) : (
+                        chatMessages.map((msg, idx) => (
+                          <Box key={idx} sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{
+                              color: 'var(--color-foreground)',
+                              wordBreak: 'break-word'
+                            }}>
+                              {msg}
+                            </Typography>
+                          </Box>
+                        ))
+                      )}
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        placeholder="Share your thoughts about this problem..."
+                        value={chatInput}
+                        onChange={e => setChatInput(e.target.value)}
+                        onKeyDown={e => { 
+                          if (e.key === 'Enter' && chatInput.trim()) {
+                            setChatMessages(prev => [...prev, `You: ${chatInput.trim()}`]);
+                            setChatInput('');
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            bgcolor: 'var(--color-background)',
+                            color: 'var(--color-foreground)',
+                            '& fieldset': { borderColor: 'var(--color-border)' },
+                            '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                            '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' }
+                          }
+                        }}
+                      />
+                      <IconButton
+                        onClick={() => {
+                          if (chatInput.trim()) {
+                            setChatMessages(prev => [...prev, `You: ${chatInput.trim()}`]);
+                            setChatInput('');
+                          }
+                        }}
+                        disabled={!chatInput.trim()}
+                        sx={{
+                          bgcolor: 'var(--color-primary)',
+                          color: 'white',
+                          '&:hover': { bgcolor: 'var(--color-primary)', opacity: 0.9 },
+                          '&:disabled': { bgcolor: 'var(--color-muted)', color: 'var(--color-muted-foreground)' }
+                        }}
+                      >
+                        <SendIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Box>
+                )}
               </Box>
-            </Box>
+            </>
           )}
         </Box>
 
-        {/* Main Coding Area */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Right Panel - Code Editor */}
+        <Box sx={{ 
+          flex: 1,
+          display: 'flex', 
+          flexDirection: 'column',
+          minHeight: 0
+        }}>
           {/* Code Editor Header */}
           <Box sx={{ 
             borderBottom: '1px solid var(--color-border)',
@@ -836,12 +1064,18 @@ Good luck! 🚀`);
                     transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                   }
                 }}
+                title={sidebarOpen ? 'Hide problem description' : 'Show problem description'}
               >
-                {sidebarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                {sidebarOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
               </Button>
               <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-muted-foreground)' }}>
                 Solution.{language === 'python' ? 'py' : 'js'}
               </Typography>
+              {!sidebarOpen && (
+                <Typography variant="caption" sx={{ color: 'var(--color-muted-foreground)' }}>
+                  Click arrow to view problem description
+                </Typography>
+              )}
             </Stack>
             
             <Button
@@ -891,7 +1125,8 @@ Good luck! 🚀`);
 
           {/* Console/Output Area */}
           <Box sx={{ 
-            height: 250,
+            minHeight: 300,
+            maxHeight: '45vh',
             borderTop: '1px solid var(--color-border)',
             bgcolor: 'var(--color-card)',
             display: 'flex',
