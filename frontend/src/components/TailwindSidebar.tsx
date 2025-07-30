@@ -157,8 +157,11 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
         {/* User Section - Always at bottom */}
         <div className="mt-auto p-4 border-t border-border/20">
           {/* User Profile */}
-          <div className={`flex items-center overflow-hidden mb-4`}>
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex-shrink-0 text-white font-bold text-sm" title={user.name}>
+          <Link 
+            to="/profile"
+            className={`flex items-center overflow-hidden mb-4 rounded-lg p-2 transition-all duration-300 hover:bg-muted/50 cursor-pointer group`}
+          >
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex-shrink-0 text-white font-bold text-sm transition-transform duration-300 group-hover:scale-110" title={user.name}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className={`pl-3 flex-1 min-w-0 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
@@ -166,12 +169,12 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 transitionDelay: sidebarOpen ? '0.1s' : '0s'
               }}>
-              <p className="text-sm font-medium text-card-foreground truncate whitespace-nowrap">
+              <p className="text-sm font-medium text-card-foreground truncate whitespace-nowrap group-hover:text-primary transition-colors duration-300">
                 {user.name}
               </p>
               <p className="text-xs text-muted-foreground whitespace-nowrap">Online</p>
             </div>
-          </div>
+          </Link>
           
           {/* Controls */}
           {sidebarOpen ? (
