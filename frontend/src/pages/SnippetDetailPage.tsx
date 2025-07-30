@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import apiClient from '../utils/apiClient';
 import { 
   ArrowLeftIcon,
   ClipboardDocumentIcon,
@@ -92,38 +93,8 @@ const SnippetDetailPage: React.FC = () => {
 
   const fetchComments = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const headers: Record<string, string> = {};
-      
-      // Only add Authorization header if token exists
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      const response = await fetch(`/api/snippets/${snippetId}/comments`, {
-        headers,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setComments(data);
-      } else {
-        console.error('Comments API error:', response.status, response.statusText);
-        // Only try to parse as JSON if it's actually JSON
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          try {
-            const errorData = await response.json();
-            console.error('Error details:', errorData);
-          } catch (parseError) {
-            console.error('Failed to parse error response as JSON');
-          }
-        } else {
-          console.error('Comments API returned non-JSON response');
-        }
-        // Set empty comments array on error
-        setComments([]);
-      }
+      const response = await apiClient.get(`/api/snippets/${snippetId}/comments`);
+      setComments(response.data);
     } catch (err) {
       console.error('Failed to fetch comments:', err);
       // Set empty comments array on error
@@ -139,13 +110,7 @@ const SnippetDetailPage: React.FC = () => {
       setCopied(true);
       
       // Track usage
-      const token = localStorage.getItem('token');
-      await fetch(`/api/snippets/${snippet.id}/use`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      await apiClient.post(`/api/snippets/${snippet.id}/use`);
 
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -157,22 +122,13 @@ const SnippetDetailPage: React.FC = () => {
     if (!snippet) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/snippets/${snippet.id}/like`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      const response = await apiClient.post(`/api/snippets/${snippet.id}/like`);
+      const result = response.data;
+      setSnippet({
+        ...snippet,
+        is_liked: result.is_liked,
+        like_count: result.like_count
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSnippet({
-          ...snippet,
-          is_liked: result.is_liked,
-          like_count: result.like_count
-        });
-      }
     } catch (err) {
       console.error('Failed to toggle like:', err);
     }
@@ -183,21 +139,13 @@ const SnippetDetailPage: React.FC = () => {
 
     setSubmittingComment(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/snippets/${snippet.id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: newComment }),
+      const response = await apiClient.post(`/api/snippets/${snippet.id}/comments`, {
+        content: newComment
       });
 
-      if (response.ok) {
-        const comment = await response.json();
-        setComments([comment, ...comments]);
-        setNewComment('');
-      }
+      const comment = response.data;
+      setComments([comment, ...comments]);
+      setNewComment('');
     } catch (err) {
       console.error('Failed to submit comment:', err);
     } finally {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import BackendStatusBanner from '../components/BackendStatusBanner';
+import apiClient from '../utils/apiClient';
 import { 
   CodeBracketIcon,
   PlusIcon,
@@ -53,7 +54,6 @@ const CodeSnippetsPage: React.FC = () => {
 
   const fetchSnippets = async () => {
     try {
-      const token = localStorage.getItem('token');
       const params = new URLSearchParams({
         ...(selectedLanguage && { language: selectedLanguage }),
         ...(selectedCategory && { category: selectedCategory }),
@@ -63,28 +63,9 @@ const CodeSnippetsPage: React.FC = () => {
       });
 
       const endpoint = viewMode === 'my' ? '/api/snippets/my' : '/api/snippets/public';
-      const response = await fetch(`${endpoint}?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await apiClient.get(`${endpoint}?${params}`);
 
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let errorMessage = 'Failed to fetch snippets';
-        
-        if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorMessage;
-        } else {
-          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      setSnippets(data);
+      setSnippets(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -94,23 +75,11 @@ const CodeSnippetsPage: React.FC = () => {
 
   const fetchLanguages = async () => {
     try {
-      const response = await fetch('/api/snippets/languages/popular');
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setLanguages(data.map((item: any) => item.language));
-          } else {
-            console.warn('Languages API returned empty array, using fallback');
-            setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
-          }
-        } else {
-          console.warn('Languages API returned non-JSON response');
-          setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
-        }
+      const response = await apiClient.get('/api/snippets/languages/popular');
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setLanguages(response.data.map((item: any) => item.language));
       } else {
-        console.warn('Languages API not available:', response.status);
+        console.warn('Languages API returned empty array, using fallback');
         setLanguages(['python', 'javascript', 'java', 'cpp', 'typescript']);
       }
     } catch (err) {
@@ -122,23 +91,11 @@ const CodeSnippetsPage: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/snippets/categories');
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setCategories(data.map((item: any) => item.category));
-          } else {
-            console.warn('Categories API returned empty array, using fallback');
-            setCategories(['template', 'utility', 'algorithm']);
-          }
-        } else {
-          console.warn('Categories API returned non-JSON response');
-          setCategories(['template', 'utility', 'algorithm']);
-        }
+      const response = await apiClient.get('/api/snippets/categories');
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setCategories(response.data.map((item: any) => item.category));
       } else {
-        console.warn('Categories API not available:', response.status);
+        console.warn('Categories API returned empty array, using fallback');
         setCategories(['template', 'utility', 'algorithm']);
       }
     } catch (err) {
@@ -155,7 +112,6 @@ const CodeSnippetsPage: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
       const params = new URLSearchParams({
         q: searchQuery,
         ...(selectedLanguage && { language: selectedLanguage }),
@@ -163,16 +119,8 @@ const CodeSnippetsPage: React.FC = () => {
         public_only: viewMode === 'public' ? 'true' : 'false'
       });
 
-      const response = await fetch(`/api/snippets/search?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSnippets(data);
-      }
+      const response = await apiClient.get(`/api/snippets/search?${params}`);
+      setSnippets(response.data);
     } catch (err) {
       console.error('Search failed:', err);
     }
@@ -180,22 +128,13 @@ const CodeSnippetsPage: React.FC = () => {
 
   const toggleLike = async (snippetId: number) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/snippets/${snippetId}/like`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSnippets(snippets.map(snippet => 
-          snippet.id === snippetId 
-            ? { ...snippet, is_liked: result.is_liked, like_count: result.like_count }
-            : snippet
-        ));
-      }
+      const response = await apiClient.post(`/api/snippets/${snippetId}/like`);
+      const result = response.data;
+      setSnippets(snippets.map(snippet => 
+        snippet.id === snippetId 
+          ? { ...snippet, is_liked: result.is_liked, like_count: result.like_count }
+          : snippet
+      ));
     } catch (err) {
       console.error('Failed to toggle like:', err);
     }
