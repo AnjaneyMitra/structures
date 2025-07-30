@@ -354,6 +354,97 @@ async def get_my_snippets(
             detail="Failed to fetch user snippets"
         )
 
+@router.get("/public", response_model=List[SnippetResponse])
+async def get_public_snippets(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    language: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    tags: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    sort_by: str = Query("created_at", regex="^(created_at|updated_at|like_count|view_count|usage_count|title)$"),
+    sort_order: str = Query("desc", regex="^(asc|desc)$"),
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user)
+):
+    """Get public code snippets with filtering and sorting"""
+    try:
+        query = db.query(CodeSnippet).join(User).filter(CodeSnippet.is_public == True)
+        
+        # Filter by language
+        if language:
+            query = query.filter(CodeSnippet.language == language)
+        
+        # Filter by category
+        if category:
+            query = query.filter(CodeSnippet.category == category)
+        
+        # Filter by tags
+        if tags:
+            tag_list = [tag.strip() for tag in tags.split(',')]
+            for tag in tag_list:
+                query = query.filter(CodeSnippet.tags.contains(tag))
+        
+        # Search in title, description, and code
+        if search:
+            search_term = f"%{search}%"
+            query = query.filter(
+                or_(
+                    CodeSnippet.title.ilike(search_term),
+                    CodeSnippet.description.ilike(search_term),
+                    CodeSnippet.code.ilike(search_term)
+                )
+            )
+        
+        # Sorting
+        sort_column = getattr(CodeSnippet, sort_by)
+        if sort_order == "desc":
+            query = query.order_by(desc(sort_column))
+        else:
+            query = query.order_by(asc(sort_column))
+        
+        # Pagination
+        snippets = query.offset(skip).limit(limit).all()
+        
+        # Build response with like status
+        result = []
+        for snippet in snippets:
+            is_liked = False
+            if current_user:
+                like = db.query(SnippetLike).filter(
+                    SnippetLike.user_id == current_user.id,
+                    SnippetLike.snippet_id == snippet.id
+                ).first()
+                is_liked = like is not None
+            
+            result.append(SnippetResponse(
+                id=snippet.id,
+                user_id=snippet.user_id,
+                username=snippet.user.username,
+                title=snippet.title,
+                description=snippet.description,
+                code=snippet.code,
+                language=snippet.language,
+                category=snippet.category,
+                tags=snippet.tags,
+                is_public=snippet.is_public,
+                is_featured=snippet.is_featured,
+                view_count=snippet.view_count,
+                like_count=snippet.like_count,
+                is_liked=is_liked,
+                created_at=snippet.created_at,
+                updated_at=snippet.updated_at
+            ))
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error fetching public snippets: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch public snippets"
+        )
+
 @router.get("/{snippet_id}", response_model=SnippetResponse)
 async def get_snippet(
     snippet_id: int,
@@ -673,97 +764,6 @@ async def add_comment(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to add comment"
-        )
-
-@router.get("/public", response_model=List[SnippetResponse])
-async def get_public_snippets(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
-    language: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
-    tags: Optional[str] = Query(None),
-    search: Optional[str] = Query(None),
-    sort_by: str = Query("created_at", regex="^(created_at|updated_at|like_count|view_count|usage_count|title)$"),
-    sort_order: str = Query("desc", regex="^(asc|desc)$"),
-    db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
-):
-    """Get public code snippets with filtering and sorting"""
-    try:
-        query = db.query(CodeSnippet).join(User).filter(CodeSnippet.is_public == True)
-        
-        # Filter by language
-        if language:
-            query = query.filter(CodeSnippet.language == language)
-        
-        # Filter by category
-        if category:
-            query = query.filter(CodeSnippet.category == category)
-        
-        # Filter by tags
-        if tags:
-            tag_list = [tag.strip() for tag in tags.split(',')]
-            for tag in tag_list:
-                query = query.filter(CodeSnippet.tags.contains(tag))
-        
-        # Search in title, description, and code
-        if search:
-            search_term = f"%{search}%"
-            query = query.filter(
-                or_(
-                    CodeSnippet.title.ilike(search_term),
-                    CodeSnippet.description.ilike(search_term),
-                    CodeSnippet.code.ilike(search_term)
-                )
-            )
-        
-        # Sorting
-        sort_column = getattr(CodeSnippet, sort_by)
-        if sort_order == "desc":
-            query = query.order_by(desc(sort_column))
-        else:
-            query = query.order_by(asc(sort_column))
-        
-        # Pagination
-        snippets = query.offset(skip).limit(limit).all()
-        
-        # Build response with like status
-        result = []
-        for snippet in snippets:
-            is_liked = False
-            if current_user:
-                like = db.query(SnippetLike).filter(
-                    SnippetLike.user_id == current_user.id,
-                    SnippetLike.snippet_id == snippet.id
-                ).first()
-                is_liked = like is not None
-            
-            result.append(SnippetResponse(
-                id=snippet.id,
-                user_id=snippet.user_id,
-                username=snippet.user.username,
-                title=snippet.title,
-                description=snippet.description,
-                code=snippet.code,
-                language=snippet.language,
-                category=snippet.category,
-                tags=snippet.tags,
-                is_public=snippet.is_public,
-                is_featured=snippet.is_featured,
-                view_count=snippet.view_count,
-                like_count=snippet.like_count,
-                is_liked=is_liked,
-                created_at=snippet.created_at,
-                updated_at=snippet.updated_at
-            ))
-        
-        return result
-        
-    except Exception as e:
-        logger.error(f"Error fetching public snippets: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch public snippets"
         )
 
 @router.get("/templates", response_model=List[SnippetResponse])
