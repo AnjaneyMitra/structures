@@ -214,7 +214,7 @@ async def get_snippets(
     language: Optional[str] = Query(None),
     tags: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
-    sort_by: str = Query("created_at", regex="^(created_at|updated_at|like_count|view_count|title)$"),
+    sort_by: str = Query("created_at", regex="^(created_at|updated_at|like_count|view_count|usage_count|title)$"),
     sort_order: str = Query("desc", regex="^(asc|desc)$"),
     public_only: bool = Query(True),
     db: Session = Depends(get_db),
