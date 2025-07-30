@@ -306,9 +306,11 @@ async def get_snippets(
         
     except Exception as e:
         logger.error(f"Error fetching snippets: {str(e)}")
+        logger.error(f"Error type: {type(e)}")
+        logger.error(f"Error details: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch snippets"
+            detail=f"Failed to fetch snippets: {str(e)}"
         )
 
 @router.get("/my", response_model=List[SnippetResponse])
@@ -440,9 +442,11 @@ async def get_public_snippets(
         
     except Exception as e:
         logger.error(f"Error fetching public snippets: {str(e)}")
+        logger.error(f"Error type: {type(e)}")
+        logger.error(f"Error details: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch public snippets"
+            detail=f"Failed to fetch public snippets: {str(e)}"
         )
 
 @router.get("/{snippet_id}", response_model=SnippetResponse)
