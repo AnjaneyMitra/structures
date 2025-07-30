@@ -23,6 +23,7 @@ interface CodeSnippet {
   description: string | null;
   code: string;
   language: string;
+  category: string | null;
   tags: string | null;
   is_public: boolean;
   is_featured: boolean;

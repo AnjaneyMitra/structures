@@ -48,6 +48,7 @@ interface CodeSnippet {
     description?: string;
     code: string;
     language: string;
+    category?: string;
     tags?: string;
     is_public: boolean;
     is_featured: boolean;
@@ -63,6 +64,7 @@ interface SnippetFormData {
     description: string;
     code: string;
     language: string;
+    category?: string;
     tags: string;
     is_public: boolean;
 }

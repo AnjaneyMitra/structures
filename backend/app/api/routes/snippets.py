@@ -53,6 +53,7 @@ class SnippetResponse(BaseModel):
     description: Optional[str]
     code: str
     language: str
+    category: Optional[str]
     tags: Optional[str]
     is_public: bool
     is_featured: bool
@@ -110,6 +111,7 @@ async def create_snippet(
             description=snippet.description,
             code=snippet.code,
             language=snippet.language,
+            category=snippet.category,
             tags=snippet.tags,
             is_public=snippet.is_public,
             is_featured=snippet.is_featured,
@@ -289,6 +291,7 @@ async def get_snippets(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
+                category=snippet.category,
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
@@ -331,6 +334,7 @@ async def get_my_snippets(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
+                category=snippet.category,
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
@@ -394,6 +398,7 @@ async def get_snippet(
             description=snippet.description,
             code=snippet.code,
             language=snippet.language,
+            category=snippet.category,
             tags=snippet.tags,
             is_public=snippet.is_public,
             is_featured=snippet.is_featured,
@@ -452,6 +457,7 @@ async def update_snippet(
             description=snippet.description,
             code=snippet.code,
             language=snippet.language,
+            category=snippet.category,
             tags=snippet.tags,
             is_public=snippet.is_public,
             is_featured=snippet.is_featured,
@@ -740,6 +746,7 @@ async def get_public_snippets(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
+                category=snippet.category,
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
@@ -803,6 +810,7 @@ async def get_code_templates(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
+                category=snippet.category,
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
@@ -948,6 +956,7 @@ async def search_snippets(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
+                category=snippet.category,
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
