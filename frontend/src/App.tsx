@@ -13,8 +13,15 @@ import AchievementsPage from './pages/AchievementsPage';
 import LevelsPage from './pages/LevelsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import ForumsPage from './pages/ForumsPage';
+import ForumCategoryPage from './pages/ForumCategoryPage';
+import ForumThreadPage from './pages/ForumThreadPage';
+import CodeSnippetsPage from './pages/CodeSnippetsPage';
+import CodeTemplatesPage from './pages/CodeTemplatesPage';
+import SnippetDetailPage from './pages/SnippetDetailPage';
 
 import { TailwindSidebar } from './components/TailwindSidebar';
+import ApiHealthCheck from './components/ApiHealthCheck';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import CollaborativeRoomPage from './pages/CollaborativeRoomPage';
 import ChallengeProblemPage from './pages/ChallengeProblemPage';
@@ -237,7 +244,7 @@ function Landing() {
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   // Auto-collapse sidebar on specific pages for better focus
@@ -296,6 +303,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="relative z-0 page-slide-in">
           {children}
         </div>
+        <ApiHealthCheck />
       </main>
     </div>
   );
@@ -349,6 +357,16 @@ function AppRoutes() {
         <Route path="/levels" element={<AppLayout><LevelsPage /></AppLayout>} />
         <Route path="/analytics" element={<AppLayout><AnalyticsPage /></AppLayout>} />
         <Route path="/leaderboards" element={<AppLayout><LeaderboardPage /></AppLayout>} />
+        
+        {/* Forum Routes */}
+        <Route path="/forums" element={<AppLayout><ForumsPage /></AppLayout>} />
+        <Route path="/forums/category/:categoryId" element={<AppLayout><ForumCategoryPage /></AppLayout>} />
+        <Route path="/forums/thread/:threadId" element={<AppLayout><ForumThreadPage /></AppLayout>} />
+        
+        {/* Snippets Routes */}
+        <Route path="/snippets" element={<AppLayout><CodeSnippetsPage /></AppLayout>} />
+        <Route path="/snippets/:snippetId" element={<AppLayout><SnippetDetailPage /></AppLayout>} />
+        <Route path="/templates" element={<AppLayout><CodeTemplatesPage /></AppLayout>} />
       </Route>
       
       {/* Fallback route */}

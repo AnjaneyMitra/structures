@@ -8,10 +8,7 @@ echo "Listing contents:"
 ls -la
 
 echo "Running database migrations..."
-# Emergency fix for multiple heads issue
-python emergency_migration_fix.py
-
-# Try normal migration, but don't fail if it has issues
+# Run normal migration
 alembic -c /app/alembic.ini upgrade head || echo "⚠️  Migration completed with warnings (this is expected)"
 
 echo "Running database seeding..."

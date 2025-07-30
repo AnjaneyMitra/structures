@@ -5,9 +5,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
-from ...db.base import get_db
 from ...db.models import ForumCategory, ForumThread, ForumReply, ForumVote, User, Problem
-from ..deps import get_current_user
+from ..deps import get_db, get_current_user
 
 router = APIRouter()
 

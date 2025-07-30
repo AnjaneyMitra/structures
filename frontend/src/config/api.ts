@@ -1,14 +1,11 @@
-// HARDCODED API Configuration - FOOLPROOF HTTPS ENFORCEMENT
-// This eliminates any possibility of HTTP URLs in production
-
-// PRODUCTION URL - ALWAYS HTTPS
+// API Configuration
 const PRODUCTION_API_URL = 'https://structures-production.up.railway.app';
-
-// DEVELOPMENT URL - ONLY FOR LOCALHOST
 const DEVELOPMENT_API_URL = 'http://localhost:8000';
 
-// HARDCODED EXPORT - NO DYNAMIC LOGIC
-export const API_BASE_URL = PRODUCTION_API_URL;
+// Use development URL for localhost, production URL otherwise
+export const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+  ? DEVELOPMENT_API_URL 
+  : PRODUCTION_API_URL;
 
 // Simple, foolproof function
 export const getApiBaseUrl = () => {

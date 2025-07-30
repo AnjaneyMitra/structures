@@ -12,7 +12,9 @@ import {
   ChartBarIcon,
   FireIcon,
   GiftIcon,
-  QueueListIcon
+  QueueListIcon,
+  ChatBubbleLeftRightIcon,
+  DocumentDuplicateIcon
 } from '@heroicons/react/24/outline';
 import { ThemeSelector } from './ThemeSelector';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +23,8 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
+  { label: 'Forums', path: '/forums', icon: ChatBubbleLeftRightIcon },
+  { label: 'Snippets', path: '/snippets', icon: DocumentDuplicateIcon },
   { label: 'Analytics', path: '/analytics', icon: ChartBarIcon },
   { label: 'Levels', path: '/levels', icon: StarIcon },
   { label: 'Achievements', path: '/achievements', icon: GiftIcon },

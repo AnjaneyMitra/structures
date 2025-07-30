@@ -7,13 +7,15 @@ load_dotenv()
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .db.base import Base, engine
-from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks, levels, analytics, leaderboards, challenges, forums
+from .api.routes import auth, problems, submissions, profile, rooms, friends, bookmarks, achievements, streaks, levels, analytics, leaderboards, challenges, forums, snippets
 from .api.routes import simple_hints as hints
 import socketio
 from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
 from app.db.models import Room, User
 from app.sockets import sio
+from fastapi.responses import JSONResponse
+from typing import List, Dict
 
 app = FastAPI()
 
@@ -38,11 +40,28 @@ app.add_middleware(
     secret_key=SESSION_SECRET_KEY
 )
 
-# Create database tables
+# Create database tables and ensure new features are ready
 try:
     print("Creating database tables...")
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created successfully")
+    
+    # Verify new feature tables exist
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        try:
+            # Quick check for forum tables
+            conn.execute(text("SELECT 1 FROM forum_categories LIMIT 1"))
+            print("✓ Forum tables verified")
+        except Exception:
+            print("⚠️ Forum tables may not exist - check migration")
+            
+        try:
+            # Quick check for snippet tables
+            conn.execute(text("SELECT 1 FROM code_snippets LIMIT 1"))
+            print("✓ Snippet tables verified")
+        except Exception:
+            print("⚠️ Snippet tables may not exist - check migration")
     
     # Check Gemini API configuration for hints
     gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -128,6 +147,7 @@ app.include_router(hints.router, prefix="/api/hints", tags=["hints"])
 app.include_router(leaderboards.router, prefix="/api/leaderboards", tags=["leaderboards"])
 app.include_router(challenges.router, prefix="/api/challenges", tags=["challenges"])
 app.include_router(forums.router, prefix="/api/forums", tags=["forums"])
+app.include_router(snippets.router, prefix="/api/snippets", tags=["snippets"])
 
 
 @app.get("/")
@@ -140,7 +160,7 @@ def health_check():
 
 @app.get("/api/system/status")
 def system_status():
-    """Check system status including hints system."""
+    """Check system status including hints system and new features."""
     try:
         from sqlalchemy import text
         
@@ -148,6 +168,32 @@ def system_status():
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
             db_status = "connected"
+            
+            # Check if new tables exist
+            try:
+                # Check forum tables
+                result = conn.execute(text("SELECT COUNT(*) FROM forum_categories"))
+                forum_categories = result.scalar()
+                
+                # Check snippet tables  
+                result = conn.execute(text("SELECT COUNT(*) FROM code_snippets"))
+                code_snippets = result.scalar()
+                
+                new_features_status = {
+                    "forums": {
+                        "tables_exist": True,
+                        "categories_count": forum_categories
+                    },
+                    "snippets": {
+                        "tables_exist": True,
+                        "snippets_count": code_snippets
+                    }
+                }
+            except Exception as e:
+                new_features_status = {
+                    "forums": {"tables_exist": False, "error": str(e)},
+                    "snippets": {"tables_exist": False, "error": str(e)}
+                }
         
         # Check Gemini API key
         gemini_configured = bool(os.getenv("GEMINI_API_KEY"))
@@ -156,13 +202,15 @@ def system_status():
             "status": "ok",
             "database": db_status,
             "gemini_configured": gemini_configured,
-            "hints_system": "operational" if gemini_configured else "limited"
+            "hints_system": "operational" if gemini_configured else "limited",
+            "new_features": new_features_status
         }
     except Exception as e:
         return {
             "status": "error",
             "error": str(e),
-            "hints_system": "error"
+            "hints_system": "error",
+            "new_features": {"error": str(e)}
         }
 
 @app.get("/api/friends/test")

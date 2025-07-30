@@ -15,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -53,6 +53,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    # If no token provided, return None for public endpoints
+    if token is None:
+        return None
     
     try:
         payload = decode_access_token(token)
