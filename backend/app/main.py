@@ -14,6 +14,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.db.base import SessionLocal
 from app.db.models import Room, User
 from app.sockets import sio
+from fastapi.responses import JSONResponse
+from typing import List, Dict
 
 app = FastAPI()
 
@@ -146,100 +148,6 @@ app.include_router(leaderboards.router, prefix="/api/leaderboards", tags=["leade
 app.include_router(challenges.router, prefix="/api/challenges", tags=["challenges"])
 app.include_router(forums.router, prefix="/api/forums", tags=["forums"])
 app.include_router(snippets.router, prefix="/api/snippets", tags=["snippets"])
-
-# Add public snippet endpoints directly to main app to bypass authentication
-@app.get("/api/snippets/categories")
-async def get_snippet_categories():
-    """Get available snippet categories with counts - public endpoint"""
-    try:
-        from sqlalchemy import text
-        from .db.base import SessionLocal
-        
-        db = SessionLocal()
-        try:
-            # Use raw SQL to avoid any ORM-level authentication issues
-            result = db.execute(text("""
-                SELECT category, COUNT(*) as count 
-                FROM code_snippets 
-                WHERE is_public = true AND category IS NOT NULL 
-                GROUP BY category 
-                ORDER BY count DESC
-            """))
-            
-            categories = result.fetchall()
-            
-            # If no categories found, return default categories
-            if not categories:
-                return [
-                    {"category": "template", "count": 0},
-                    {"category": "utility", "count": 0},
-                    {"category": "algorithm", "count": 0}
-                ]
-            
-            return [
-                {"category": cat, "count": count}
-                for cat, count in categories
-            ]
-        finally:
-            db.close()
-            
-    except Exception as e:
-        print(f"Error fetching categories: {str(e)}")
-        # Return default categories on error
-        return [
-            {"category": "template", "count": 0},
-            {"category": "utility", "count": 0},
-            {"category": "algorithm", "count": 0}
-        ]
-
-@app.get("/api/snippets/languages/popular")
-async def get_popular_languages(limit: int = 10):
-    """Get most popular programming languages - public endpoint"""
-    try:
-        from sqlalchemy import text
-        from .db.base import SessionLocal
-        
-        db = SessionLocal()
-        try:
-            # Use raw SQL to avoid any ORM-level authentication issues
-            result = db.execute(text("""
-                SELECT language, COUNT(*) as count 
-                FROM code_snippets 
-                WHERE is_public = true 
-                GROUP BY language 
-                ORDER BY count DESC 
-                LIMIT :limit
-            """), {"limit": limit})
-            
-            languages = result.fetchall()
-            
-            # If no languages found, return default languages
-            if not languages:
-                return [
-                    {"language": "python", "count": 0},
-                    {"language": "javascript", "count": 0},
-                    {"language": "java", "count": 0},
-                    {"language": "cpp", "count": 0},
-                    {"language": "typescript", "count": 0}
-                ]
-            
-            return [
-                {"language": lang, "count": count}
-                for lang, count in languages
-            ]
-        finally:
-            db.close()
-            
-    except Exception as e:
-        print(f"Error fetching popular languages: {str(e)}")
-        # Return default languages on error
-        return [
-            {"language": "python", "count": 0},
-            {"language": "javascript", "count": 0},
-            {"language": "java", "count": 0},
-            {"language": "cpp", "count": 0},
-            {"language": "typescript", "count": 0}
-        ]
 
 
 @app.get("/")
