@@ -7,18 +7,14 @@ import TailwindDashboardPage from './pages/TailwindDashboardPage';
 import TailwindProblemsPage from './pages/TailwindProblemsPage';
 import TailwindRoomsPage from './pages/TailwindRoomsPage';
 import TailwindProfilePage from './pages/TailwindProfilePage';
-import TailwindFriendsPage from './pages/TailwindFriendsPage';
 import ChallengesPage from './pages/ChallengesPage';
-import AchievementsPage from './pages/AchievementsPage';
-import LevelsPage from './pages/LevelsPage';
-import AnalyticsPage from './pages/AnalyticsPage';
-import LeaderboardPage from './pages/LeaderboardPage';
-import ForumsPage from './pages/ForumsPage';
 import ForumCategoryPage from './pages/ForumCategoryPage';
 import ForumThreadPage from './pages/ForumThreadPage';
 import CodeSnippetsPage from './pages/CodeSnippetsPage';
 import CodeTemplatesPage from './pages/CodeTemplatesPage';
 import SnippetDetailPage from './pages/SnippetDetailPage';
+import StatsPage from './pages/StatsPage';
+import CommunityPage from './pages/CommunityPage';
 
 import { TailwindSidebar } from './components/TailwindSidebar';
 import ApiHealthCheck from './components/ApiHealthCheck';
@@ -349,17 +345,22 @@ function AppRoutes() {
         <Route path="/challenges/:challengeId/solve" element={<AppLayout><ChallengeProblemPage /></AppLayout>} />
         <Route path="/rooms" element={<AppLayout><TailwindRoomsPage /></AppLayout>} />
         <Route path="/rooms/:code/:problem_id" element={<AppLayout><CollaborativeRoomPage /></AppLayout>} />
-        <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
-        <Route path="/friends" element={<AppLayout><TailwindFriendsPage /></AppLayout>} />
         <Route path="/challenges" element={<AppLayout><ChallengesPage /></AppLayout>} />
 
-        <Route path="/achievements" element={<AppLayout><AchievementsPage /></AppLayout>} />
-        <Route path="/levels" element={<AppLayout><LevelsPage /></AppLayout>} />
-        <Route path="/analytics" element={<AppLayout><AnalyticsPage /></AppLayout>} />
-        <Route path="/leaderboards" element={<AppLayout><LeaderboardPage /></AppLayout>} />
+        {/* Consolidated pages */}
+        <Route path="/community" element={<AppLayout><CommunityPage /></AppLayout>} />
+        <Route path="/stats" element={<AppLayout><StatsPage /></AppLayout>} />
+
+        {/* Legacy routes - redirect to consolidated pages */}
+        <Route path="/achievements" element={<Navigate to="/stats" replace />} />
+        <Route path="/levels" element={<Navigate to="/stats" replace />} />
+        <Route path="/analytics" element={<Navigate to="/stats" replace />} />
+        <Route path="/leaderboards" element={<Navigate to="/stats" replace />} />
+        <Route path="/forums" element={<Navigate to="/community" replace />} />
+        <Route path="/friends" element={<Navigate to="/community" replace />} />
+        <Route path="/profile" element={<AppLayout><TailwindProfilePage /></AppLayout>} />
         
-        {/* Forum Routes */}
-        <Route path="/forums" element={<AppLayout><ForumsPage /></AppLayout>} />
+        {/* Direct forum and snippet routes still work */}
         <Route path="/forums/category/:categoryId" element={<AppLayout><ForumCategoryPage /></AppLayout>} />
         <Route path="/forums/thread/:threadId" element={<AppLayout><ForumThreadPage /></AppLayout>} />
         

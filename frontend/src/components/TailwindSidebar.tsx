@@ -4,15 +4,10 @@ import {
   HomeIcon, 
   CodeBracketIcon, 
   UserGroupIcon, 
-  UserIcon, 
-  UsersIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  StarIcon,
   ChartBarIcon,
   FireIcon,
-  GiftIcon,
-  QueueListIcon,
   ChatBubbleLeftRightIcon,
   DocumentDuplicateIcon
 } from '@heroicons/react/24/outline';
@@ -23,15 +18,10 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
-  { label: 'Forums', path: '/forums', icon: ChatBubbleLeftRightIcon },
-  { label: 'Snippets', path: '/snippets', icon: DocumentDuplicateIcon },
-  { label: 'Analytics', path: '/analytics', icon: ChartBarIcon },
-  { label: 'Levels', path: '/levels', icon: StarIcon },
-  { label: 'Achievements', path: '/achievements', icon: GiftIcon },
-  { label: 'Leaderboards', path: '/leaderboards', icon: QueueListIcon },
-  { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Challenges', path: '/challenges', icon: FireIcon },
-  { label: 'Profile', path: '/profile', icon: UserIcon },
+  { label: 'Community', path: '/community', icon: ChatBubbleLeftRightIcon },
+  { label: 'Stats & Rankings', path: '/stats', icon: ChartBarIcon },
+  { label: 'Snippets', path: '/snippets', icon: DocumentDuplicateIcon },
 ];
 
 interface SidebarProps {
