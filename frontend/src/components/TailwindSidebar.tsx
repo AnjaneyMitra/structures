@@ -4,15 +4,10 @@ import {
   HomeIcon, 
   CodeBracketIcon, 
   UserGroupIcon, 
-  UserIcon, 
-  UsersIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  StarIcon,
   ChartBarIcon,
   FireIcon,
-  GiftIcon,
-  QueueListIcon,
   ChatBubbleLeftRightIcon,
   DocumentDuplicateIcon
 } from '@heroicons/react/24/outline';
@@ -23,15 +18,10 @@ const navItems = [
   { label: 'Home', path: '/dashboard', icon: HomeIcon },
   { label: 'Problems', path: '/problems', icon: CodeBracketIcon },
   { label: 'Rooms', path: '/rooms', icon: UserGroupIcon },
-  { label: 'Forums', path: '/forums', icon: ChatBubbleLeftRightIcon },
-  { label: 'Snippets', path: '/snippets', icon: DocumentDuplicateIcon },
-  { label: 'Analytics', path: '/analytics', icon: ChartBarIcon },
-  { label: 'Levels', path: '/levels', icon: StarIcon },
-  { label: 'Achievements', path: '/achievements', icon: GiftIcon },
-  { label: 'Leaderboards', path: '/leaderboards', icon: QueueListIcon },
-  { label: 'Friends', path: '/friends', icon: UsersIcon },
   { label: 'Challenges', path: '/challenges', icon: FireIcon },
-  { label: 'Profile', path: '/profile', icon: UserIcon },
+  { label: 'Community', path: '/community', icon: ChatBubbleLeftRightIcon },
+  { label: 'Stats & Rankings', path: '/stats', icon: ChartBarIcon },
+  { label: 'Snippets', path: '/snippets', icon: DocumentDuplicateIcon },
 ];
 
 interface SidebarProps {
@@ -167,8 +157,11 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
         {/* User Section - Always at bottom */}
         <div className="mt-auto p-4 border-t border-border/20">
           {/* User Profile */}
-          <div className={`flex items-center overflow-hidden mb-4`}>
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex-shrink-0 text-white font-bold text-sm" title={user.name}>
+          <Link 
+            to="/profile"
+            className={`flex items-center overflow-hidden mb-4 rounded-lg p-2 transition-all duration-300 hover:bg-muted/50 cursor-pointer group`}
+          >
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex-shrink-0 text-white font-bold text-sm transition-transform duration-300 group-hover:scale-110" title={user.name}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className={`pl-3 flex-1 min-w-0 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
@@ -176,12 +169,12 @@ export const TailwindSidebar: React.FC<SidebarProps> = ({
                 transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 transitionDelay: sidebarOpen ? '0.1s' : '0s'
               }}>
-              <p className="text-sm font-medium text-card-foreground truncate whitespace-nowrap">
+              <p className="text-sm font-medium text-card-foreground truncate whitespace-nowrap group-hover:text-primary transition-colors duration-300">
                 {user.name}
               </p>
               <p className="text-xs text-muted-foreground whitespace-nowrap">Online</p>
             </div>
-          </div>
+          </Link>
           
           {/* Controls */}
           {sidebarOpen ? (
