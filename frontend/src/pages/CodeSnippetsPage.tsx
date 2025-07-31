@@ -67,8 +67,24 @@ const CodeSnippetsPage: React.FC = () => {
       const response = await apiClient.get(`${endpoint}?${params}`);
 
       setSnippets(response.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(null); // Clear any previous errors
+    } catch (err: any) {
+      console.error('Failed to fetch snippets:', err);
+      
+      // Handle different types of errors gracefully
+      if (err.response?.status === 500) {
+        setError('Database is being updated. Please try again in a few moments.');
+        setSnippets([]); // Set empty array instead of leaving undefined
+      } else if (err.response?.status === 404) {
+        setError('Snippets service not found. Please check back later.');
+        setSnippets([]);
+      } else if (err.response?.status === 422) {
+        setError('Invalid request. Please try refreshing the page.');
+        setSnippets([]);
+      } else {
+        setError('Failed to load snippets. Please try again later.');
+        setSnippets([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -122,8 +138,21 @@ const CodeSnippetsPage: React.FC = () => {
 
       const response = await apiClient.get(`/api/snippets/search?${params}`);
       setSnippets(response.data);
-    } catch (err) {
+      setError(null); // Clear any previous errors
+    } catch (err: any) {
       console.error('Search failed:', err);
+      
+      // Handle search errors gracefully
+      if (err.response?.status === 500) {
+        setError('Search service is temporarily unavailable. Please try again later.');
+        setSnippets([]);
+      } else if (err.response?.status === 422) {
+        setError('Invalid search parameters. Please try a different search term.');
+        setSnippets([]);
+      } else {
+        setError('Search failed. Please try again.');
+        setSnippets([]);
+      }
     }
   };
 
@@ -172,11 +201,15 @@ const CodeSnippetsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-muted rounded w-1/4 mb-6"></div>
+            <div className="h-4 bg-muted rounded w-1/2 mb-8"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(9)].map((_, i) => (
+              {[...Array(6)].map((_, i) => (
                 <div key={i} className="h-64 bg-muted rounded-lg"></div>
               ))}
             </div>
+          </div>
+          <div className="text-center mt-8">
+            <div className="text-muted-foreground">Loading snippets...</div>
           </div>
         </div>
       </div>
@@ -289,7 +322,7 @@ const CodeSnippetsPage: React.FC = () => {
 
         {/* Snippets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {snippets.map((snippet) => (
+          {snippets && snippets.map((snippet) => (
             <div key={snippet.id} className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
               {/* Header */}
               <div className="p-4 border-b border-border">
@@ -368,7 +401,7 @@ const CodeSnippetsPage: React.FC = () => {
         </div>
 
         {/* Empty State */}
-        {snippets.length === 0 && !loading && (
+        {(!snippets || snippets.length === 0) && !loading && !error && (
           <div className="text-center py-12">
             <CodeBracketIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium text-foreground mb-2">
@@ -392,14 +425,22 @@ const CodeSnippetsPage: React.FC = () => {
         {/* Error State */}
         {error && (
           <div className="text-center py-12">
-            <div className="text-destructive text-lg mb-4">Error loading snippets</div>
-            <div className="text-muted-foreground mb-6">{error}</div>
-            <button
-              onClick={fetchSnippets}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              Try Again
-            </button>
+            <div className="text-destructive text-lg mb-4">⚠️ Unable to load snippets</div>
+            <div className="text-muted-foreground mb-6 max-w-md mx-auto">{error}</div>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={fetchSnippets}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => navigate('/snippets/new')}
+                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors"
+              >
+                Create Snippet
+              </button>
+            </div>
           </div>
         )}
       </div>
