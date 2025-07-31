@@ -88,16 +88,26 @@ async def create_snippet(
 ):
     """Create a new code snippet"""
     try:
-        snippet = CodeSnippet(
-            user_id=current_user.id,
-            title=snippet_data.title,
-            description=snippet_data.description,
-            code=snippet_data.code,
-            language=snippet_data.language,
-            category=snippet_data.category,
-            tags=snippet_data.tags,
-            is_public=snippet_data.is_public
-        )
+        # Create snippet data, handling missing category column gracefully
+        snippet_data_dict = {
+            'user_id': current_user.id,
+            'title': snippet_data.title,
+            'description': snippet_data.description,
+            'code': snippet_data.code,
+            'language': snippet_data.language,
+            'tags': snippet_data.tags,
+            'is_public': snippet_data.is_public
+        }
+        
+        # Only add category if the column exists (will be handled by migration)
+        try:
+            snippet = CodeSnippet(**snippet_data_dict, category=snippet_data.category)
+        except Exception as e:
+            if "category" in str(e).lower():
+                # Category column doesn't exist, create without it
+                snippet = CodeSnippet(**snippet_data_dict)
+            else:
+                raise e
         
         db.add(snippet)
         db.commit()
@@ -111,7 +121,7 @@ async def create_snippet(
             description=snippet.description,
             code=snippet.code,
             language=snippet.language,
-            category=snippet.category,
+            category=getattr(snippet, 'category', None),  # Handle missing column gracefully
             tags=snippet.tags,
             is_public=snippet.is_public,
             is_featured=snippet.is_featured,
@@ -124,27 +134,55 @@ async def create_snippet(
         
     except Exception as e:
         logger.error(f"Error creating snippet: {str(e)}")
+        logger.error(f"Error type: {type(e)}")
+        logger.error(f"Error details: {e}")
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create snippet"
-        )
+        
+        # Provide specific error messages based on the error type
+        if "category" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database is being updated. Please try again in a few moments."
+            )
+        elif "duplicate" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A snippet with this title already exists."
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create snippet. Please try again."
+            )
 
 @router.get("/categories")
 async def get_snippet_categories(db: Session = Depends(get_db_public)):
     """Get available snippet categories with counts - public endpoint"""
     try:
-        categories = db.query(
-            CodeSnippet.category,
-            func.count(CodeSnippet.id).label('count')
-        ).filter(
-            CodeSnippet.is_public == True,
-            CodeSnippet.category.isnot(None)
-        ).group_by(
-            CodeSnippet.category
-        ).order_by(
-            desc('count')
-        ).all()
+        # Check if category column exists by trying a simple query
+        try:
+            categories = db.query(
+                CodeSnippet.category,
+                func.count(CodeSnippet.id).label('count')
+            ).filter(
+                CodeSnippet.is_public == True,
+                CodeSnippet.category.isnot(None)
+            ).group_by(
+                CodeSnippet.category
+            ).order_by(
+                desc('count')
+            ).all()
+        except Exception as column_error:
+            if "category" in str(column_error).lower():
+                # Category column doesn't exist, return default categories
+                logger.warning("Category column not found, returning default categories")
+                return [
+                    {"category": "template", "count": 0},
+                    {"category": "utility", "count": 0},
+                    {"category": "algorithm", "count": 0}
+                ]
+            else:
+                raise column_error
         
         # If no categories found, return default categories
         if not categories:
