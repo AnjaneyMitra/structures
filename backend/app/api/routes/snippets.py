@@ -377,9 +377,9 @@ async def get_public_snippets(
         if language:
             query = query.filter(CodeSnippet.language == language)
         
-        # Filter by category
-        if category:
-            query = query.filter(CodeSnippet.category == category)
+        # Filter by category (temporarily disabled until migration is applied)
+        # if category:
+        #     query = query.filter(CodeSnippet.category == category)
         
         # Filter by tags
         if tags:
