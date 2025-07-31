@@ -13,6 +13,7 @@ import ForumThreadPage from './pages/ForumThreadPage';
 import CodeSnippetsPage from './pages/CodeSnippetsPage';
 import CodeTemplatesPage from './pages/CodeTemplatesPage';
 import SnippetDetailPage from './pages/SnippetDetailPage';
+import SnippetsPage from './pages/SnippetsPage';
 import StatsPage from './pages/StatsPage';
 import CommunityPage from './pages/CommunityPage';
 
@@ -366,6 +367,7 @@ function AppRoutes() {
         
         {/* Snippets Routes */}
         <Route path="/snippets" element={<AppLayout><CodeSnippetsPage /></AppLayout>} />
+        <Route path="/snippets/new" element={<AppLayout><SnippetsPage /></AppLayout>} />
         <Route path="/snippets/:snippetId" element={<AppLayout><SnippetDetailPage /></AppLayout>} />
         <Route path="/templates" element={<AppLayout><CodeTemplatesPage /></AppLayout>} />
       </Route>
