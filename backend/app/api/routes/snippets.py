@@ -16,6 +16,13 @@ router = APIRouter()
 # Create a separate public router for endpoints that don't require authentication
 public_router = APIRouter()
 
+def safe_get_category(snippet):
+    """Safely get category from snippet, handling missing column gracefully"""
+    try:
+        return snippet.category
+    except AttributeError:
+        return None
+
 # Custom dependency for public endpoints that don't require authentication
 def get_db_public():
     """Database dependency for public endpoints that don't require authentication"""
@@ -465,7 +472,7 @@ async def get_public_snippets(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
-                category=snippet.category,
+                category=safe_get_category(snippet),
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
@@ -482,10 +489,18 @@ async def get_public_snippets(
         logger.error(f"Error fetching public snippets: {str(e)}")
         logger.error(f"Error type: {type(e)}")
         logger.error(f"Error details: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch public snippets: {str(e)}"
-        )
+        
+        # Provide specific error messages based on the error type
+        if "category" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database is being updated. Please try again in a few moments."
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to fetch public snippets. Please try again."
+            )
 
 @router.get("/{snippet_id}", response_model=SnippetResponse)
 async def get_snippet(
@@ -531,7 +546,7 @@ async def get_snippet(
             description=snippet.description,
             code=snippet.code,
             language=snippet.language,
-            category=snippet.category,
+            category=safe_get_category(snippet),
             tags=snippet.tags,
             is_public=snippet.is_public,
             is_featured=snippet.is_featured,
@@ -590,7 +605,7 @@ async def update_snippet(
             description=snippet.description,
             code=snippet.code,
             language=snippet.language,
-            category=snippet.category,
+            category=safe_get_category(snippet),
             tags=snippet.tags,
             is_public=snippet.is_public,
             is_featured=snippet.is_featured,
@@ -819,8 +834,9 @@ async def get_code_templates(
     """Get code templates (snippets with category 'template')"""
     try:
         query = db.query(CodeSnippet).join(User).filter(
-            CodeSnippet.is_public == True,
-            CodeSnippet.category == "template"
+            CodeSnippet.is_public == True
+            # Category filter temporarily disabled until migration is applied
+            # CodeSnippet.category == "template"
         )
         
         # Filter by language
@@ -852,7 +868,7 @@ async def get_code_templates(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
-                category=snippet.category,
+                category=safe_get_category(snippet),
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
@@ -965,9 +981,9 @@ async def search_snippets(
         if language:
             query = query.filter(CodeSnippet.language == language)
         
-        # Filter by category
-        if category:
-            query = query.filter(CodeSnippet.category == category)
+        # Filter by category (temporarily disabled until migration is applied)
+        # if category:
+        #     query = query.filter(CodeSnippet.category == category)
         
         # Order by relevance (title matches first, then description, then code)
         query = query.order_by(
@@ -998,7 +1014,7 @@ async def search_snippets(
                 description=snippet.description,
                 code=snippet.code,
                 language=snippet.language,
-                category=snippet.category,
+                category=safe_get_category(snippet),
                 tags=snippet.tags,
                 is_public=snippet.is_public,
                 is_featured=snippet.is_featured,
